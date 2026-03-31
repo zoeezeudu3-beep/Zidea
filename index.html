@@ -1,0 +1,2562 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zidea â€” Connect, Call, Play</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand: #7C3AED;
+      --brand-dark: #5B21B6;
+      --brand-light: #A78BFA;
+      --surface: #0F0F13;
+      --card: #1A1A24;
+      --border: #2A2A3A;
+    }
+
+    body {
+      background: var(--surface);
+      color: #E5E7EB;
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* â”€â”€ Utilities â”€â”€ */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+      background: var(--brand); color: #fff; font-weight: 600;
+      padding: 10px 20px; border-radius: 12px; border: none; cursor: pointer;
+      transition: background .2s;
+    }
+    .btn-primary:hover { background: var(--brand-dark); }
+
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 8px; justify-content: center;
+      background: transparent; color: #D1D5DB; font-weight: 500;
+      padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border); cursor: pointer;
+      transition: border-color .2s, color .2s;
+    }
+    .btn-ghost:hover { border-color: var(--brand); color: #fff; }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 24px;
+    }
+
+    .input-field {
+      width: 100%; background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 16px; color: #fff;
+      font-size: 14px; font-family: inherit; outline: none; transition: border-color .2s;
+    }
+    .input-field::placeholder { color: #6B7280; }
+    .input-field:focus { border-color: var(--brand); }
+
+    .input-wrap { position: relative; }
+    .input-wrap svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #6B7280; pointer-events: none; }
+    .input-wrap .input-field { padding-left: 36px; }
+
+    /* â”€â”€ Pages (shown/hidden via JS) â”€â”€ */
+    .page { display: none; }
+    .page.active { display: flex; flex-direction: column; }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       LANDING
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    #page-landing { min-height: 100vh; }
+
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 32px; border-bottom: 1px solid var(--border);
+    }
+    .logo { font-size: 22px; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 8px; }
+    .logo span { color: var(--brand); }
+    .nav-actions { display: flex; gap: 12px; }
+
+    .hero {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 80px 24px 40px;
+      gap: 20px;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(124,58,237,.1); border: 1px solid rgba(124,58,237,.3);
+      color: var(--brand-light); font-size: 13px; padding: 6px 16px; border-radius: 999px;
+    }
+    .hero h1 { font-size: clamp(36px, 7vw, 68px); font-weight: 800; color: #fff; line-height: 1.1; max-width: 700px; }
+    .hero h1 em { font-style: normal; color: var(--brand); }
+    .hero p { color: #9CA3AF; font-size: 17px; max-width: 480px; line-height: 1.6; }
+    .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+    .features {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px; padding: 0 32px 60px; max-width: 900px; margin: 0 auto; width: 100%;
+    }
+    .feature-card { display: flex; flex-direction: column; gap: 12px; }
+    .feature-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(124,58,237,.2); display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .feature-card h3 { font-weight: 600; color: #fff; }
+    .feature-card p { color: #9CA3AF; font-size: 14px; line-height: 1.5; }
+
+    footer { text-align: center; color: #4B5563; font-size: 13px; padding-bottom: 28px; }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       AUTH (login / signup)
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    .auth-page {
+      min-height: 100vh; align-items: center; justify-content: center; padding: 24px;
+    }
+    .auth-box { width: 100%; max-width: 420px; display: flex; flex-direction: column; gap: 24px; }
+    .auth-header { text-align: center; }
+    .auth-header p { color: #9CA3AF; font-size: 14px; margin-top: 4px; }
+    .auth-form { display: flex; flex-direction: column; gap: 14px; }
+    .divider { display: flex; align-items: center; gap: 12px; color: #4B5563; font-size: 13px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .google-btn {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 11px; border-radius: 12px; border: 1px solid var(--border);
+      background: transparent; color: #D1D5DB; font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: inherit; transition: border-color .2s, color .2s;
+    }
+    .google-btn:hover { border-color: var(--brand); color: #fff; }
+    .auth-footer { text-align: center; color: #6B7280; font-size: 14px; }
+    .auth-footer a { color: var(--brand-light); }
+    .auth-footer a:hover { text-decoration: underline; }
+    .error-msg {
+      color: #F87171; font-size: 13px; background: rgba(248,113,113,.1);
+      border: 1px solid rgba(248,113,113,.2); border-radius: 12px; padding: 12px 16px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       GOOGLE CONFIRM MODAL
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); backdrop-filter: blur(4px);
+      z-index: 100; align-items: center; justify-content: center; padding: 24px;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal-box {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px; width: 100%; max-width: 400px;
+      display: flex; flex-direction: column; gap: 20px;
+      animation: slideUp .2s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .modal-header { text-align: center; display: flex; flex-direction: column; gap: 8px; }
+    .modal-google-icon {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: rgba(255,255,255,.06); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center; margin: 0 auto;
+    }
+    .modal-header h2 { font-size: 18px; font-weight: 700; color: #fff; }
+    .modal-header p { font-size: 13px; color: #9CA3AF; line-height: 1.5; }
+    .modal-form { display: flex; flex-direction: column; gap: 12px; }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions .btn-ghost { flex: 1; font-size: 14px; }
+    .modal-actions .btn-primary { flex: 1; font-size: 14px; }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       DASHBOARD
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    #page-dashboard { flex-direction: row; min-height: 100vh; }
+
+    .sidebar {
+      width: 240px; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; padding: 20px; gap: 24px; flex-shrink: 0;
+    }
+    .sidebar-nav { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+    .sidebar-label { font-size: 11px; color: #4B5563; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 4px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      border-radius: 12px; font-size: 14px; font-weight: 500; color: #9CA3AF;
+      cursor: pointer; transition: background .15s, color .15s; border: none; background: none; font-family: inherit; width: 100%; text-align: left;
+    }
+    .nav-item.active, .nav-item:hover { background: rgba(124,58,237,.1); color: #fff; }
+    .nav-item.active { border: 1px solid rgba(124,58,237,.2); }
+    .sidebar-footer { border-top: 1px solid var(--border); padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .sidebar-user { font-size: 13px; color: #9CA3AF; }
+
+    .main-content { flex: 1; padding: 28px; display: flex; flex-direction: column; gap: 20px; max-width: 680px; }
+    .page-title { font-size: 22px; font-weight: 700; color: #fff; }
+    .page-subtitle { font-size: 13px; color: #6B7280; margin-top: 2px; }
+
+    .user-list { display: flex; flex-direction: column; gap: 12px; }
+    .user-card {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .user-avatar {
+      width: 46px; height: 46px; border-radius: 50%;
+      background: rgba(124,58,237,.3); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 16px; color: var(--brand-light); flex-shrink: 0;
+    }
+    .user-info { flex: 1; }
+    .user-info strong { color: #fff; font-size: 14px; }
+    .user-stats { display: flex; gap: 12px; font-size: 12px; color: #6B7280; margin-top: 3px; }
+    .stat-w { color: #FBBF24; }
+    .stat-l { color: #F87171; }
+
+    .call-btn {
+      display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+      background: #16A34A; color: #fff; border: none; border-radius: 10px;
+      font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .2s;
+    }
+    .call-btn:hover { background: #15803D; }
+    .call-btn.active { background: #DC2626; }
+    .call-btn.active:hover { background: #B91C1C; }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       ARCADE
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    #page-arcade { min-height: 100vh; padding: 28px; max-width: 680px; margin: 0 auto; gap: 24px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      color: #6B7280; font-size: 14px; cursor: pointer; background: none; border: none; font-family: inherit;
+      transition: color .2s;
+    }
+    .back-link:hover { color: #fff; }
+
+    .mode-toggle { display: flex; gap: 12px; }
+    .mode-btn {
+      flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px; border-radius: 12px; border: 1px solid var(--border);
+      background: transparent; color: #9CA3AF; font-size: 14px; font-weight: 500;
+      cursor: pointer; font-family: inherit; transition: all .2s;
+    }
+    .mode-btn.active { background: rgba(124,58,237,.2); border-color: var(--brand); color: #fff; }
+
+    .game-list { display: flex; flex-direction: column; gap: 12px; }
+    .game-item {
+      display: flex; align-items: center; gap: 16px; cursor: pointer;
+      transition: border-color .2s;
+    }
+    .game-item:hover:not(.disabled) { border-color: rgba(124,58,237,.5); }
+    .game-item.disabled { opacity: .4; cursor: not-allowed; }
+    .game-emoji { font-size: 28px; }
+    .game-info strong { color: #fff; font-size: 15px; }
+    .game-info p { color: #6B7280; font-size: 13px; margin-top: 2px; }
+
+    /* Tic-Tac-Toe */
+    .ttt-wrap { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .ttt-players { display: flex; align-items: center; gap: 16px; font-size: 13px; color: #9CA3AF; }
+    .ttt-grid { display: grid; grid-template-columns: repeat(3, 80px); gap: 8px; }
+    .ttt-cell {
+      width: 80px; height: 80px; border-radius: 12px; border: 1px solid var(--border);
+      background: transparent; font-size: 28px; font-weight: 700; cursor: pointer;
+      transition: all .15s; font-family: inherit;
+    }
+    .ttt-cell:hover:not(:disabled) { border-color: rgba(124,58,237,.4); background: rgba(124,58,237,.05); }
+    .ttt-cell.x { color: var(--brand); border-color: rgba(124,58,237,.4); background: rgba(124,58,237,.1); }
+    .ttt-cell.o { color: #34D399; border-color: rgba(52,211,153,.4); background: rgba(52,211,153,.1); }
+    .ttt-status { color: #9CA3AF; font-size: 14px; }
+    .ttt-result { text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center; }
+    .ttt-result p { font-size: 20px; font-weight: 700; color: #fff; }
+
+    /* â”€â”€ Responsive â”€â”€ */
+    @media (max-width: 640px) {
+      .sidebar { display: none; }
+      #page-arcade { padding: 16px; }
+      .ttt-grid { grid-template-columns: repeat(3, 70px); }
+      .ttt-cell { width: 70px; height: 70px; }
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       CHAT
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    #page-chat { flex-direction: row; min-height: 100vh; }
+
+    .chat-layout { flex: 1; display: flex; overflow: hidden; }
+
+    /* Conversation list */
+    .convo-list {
+      width: 280px; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; flex-shrink: 0;
+    }
+    .convo-list-header {
+      padding: 20px 16px 12px; font-size: 16px; font-weight: 700; color: #fff;
+      border-bottom: 1px solid var(--border);
+    }
+    .convo-items { flex: 1; overflow-y: auto; }
+    .convo-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; cursor: pointer; transition: background .15s;
+      border-left: 3px solid transparent;
+    }
+    .convo-item:hover { background: rgba(255,255,255,.03); }
+    .convo-item.active { background: rgba(124,58,237,.08); border-left-color: var(--brand); }
+    .convo-avatar {
+      width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(124,58,237,.3); display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px; color: var(--brand-light); position: relative;
+    }
+    .online-dot {
+      width: 10px; height: 10px; border-radius: 50%; background: #22C55E;
+      border: 2px solid var(--surface); position: absolute; bottom: 0; right: 0;
+    }
+    .convo-meta { flex: 1; min-width: 0; }
+    .convo-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .convo-preview { font-size: 12px; color: #6B7280; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+    .convo-time { font-size: 11px; color: #4B5563; flex-shrink: 0; }
+    .unread-badge {
+      background: var(--brand); color: #fff; font-size: 10px; font-weight: 700;
+      min-width: 18px; height: 18px; border-radius: 999px; display: flex;
+      align-items: center; justify-content: center; padding: 0 4px; flex-shrink: 0;
+    }
+
+    /* Chat window */
+    .chat-window {
+      flex: 1; display: flex; flex-direction: column; min-width: 0;
+    }
+    .chat-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .chat-header-info { flex: 1; }
+    .chat-header-name { font-size: 15px; font-weight: 700; color: #fff; }
+    .chat-header-status { font-size: 12px; color: #22C55E; margin-top: 1px; }
+    .chat-header-status.offline { color: #6B7280; }
+    .chat-header-actions { display: flex; gap: 8px; }
+    .icon-btn {
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border);
+      background: transparent; color: #9CA3AF; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; transition: all .15s;
+    }
+    .icon-btn:hover { border-color: var(--brand); color: var(--brand-light); background: rgba(124,58,237,.08); }
+
+    .chat-messages {
+      flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px;
+    }
+    .chat-messages::-webkit-scrollbar { width: 4px; }
+    .chat-messages::-webkit-scrollbar-track { background: transparent; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .msg-group { display: flex; gap: 10px; align-items: flex-end; }
+    .msg-group.mine { flex-direction: row-reverse; }
+    .msg-avatar {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: rgba(124,58,237,.3); display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: var(--brand-light);
+    }
+    .msg-group.mine .msg-avatar { background: rgba(124,58,237,.5); }
+    .msg-bubbles { display: flex; flex-direction: column; gap: 4px; max-width: 65%; }
+    .msg-group.mine .msg-bubbles { align-items: flex-end; }
+    .bubble {
+      padding: 9px 14px; border-radius: 16px; font-size: 14px; line-height: 1.5;
+      background: var(--card); border: 1px solid var(--border); color: #E5E7EB;
+      border-bottom-left-radius: 4px;
+    }
+    .msg-group.mine .bubble {
+      background: var(--brand); border-color: var(--brand-dark); color: #fff;
+      border-bottom-right-radius: 4px; border-bottom-left-radius: 16px;
+    }
+    .msg-time { font-size: 11px; color: #4B5563; padding: 0 4px; }
+
+    .chat-empty {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 10px; color: #4B5563;
+    }
+    .chat-empty svg { opacity: .3; }
+    .chat-empty p { font-size: 14px; }
+
+    .chat-input-bar {
+      padding: 14px 20px; border-top: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: flex-end; flex-shrink: 0;
+    }
+    .chat-input {
+      flex: 1; background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 10px 16px; color: #fff; font-size: 14px;
+      font-family: inherit; outline: none; resize: none; max-height: 120px;
+      transition: border-color .2s; line-height: 1.5;
+    }
+    .chat-input::placeholder { color: #6B7280; }
+    .chat-input:focus { border-color: var(--brand); }
+    .send-btn {
+      width: 40px; height: 40px; border-radius: 12px; background: var(--brand);
+      border: none; color: #fff; cursor: pointer; display: flex; align-items: center;
+      justify-content: center; flex-shrink: 0; transition: background .2s;
+    }
+    .send-btn:hover { background: var(--brand-dark); }
+    .send-btn:disabled { background: #374151; cursor: not-allowed; }
+
+    .chat-placeholder {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 12px; color: #4B5563;
+    }
+    .chat-placeholder p { font-size: 14px; }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       CHESS
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    .chess-sq {
+      aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+      font-size: clamp(18px, 4vw, 28px); cursor: pointer; user-select: none;
+      transition: background .1s;
+    }
+    .chess-sq.light { background: #C8A97E; }
+    .chess-sq.dark  { background: #8B5E3C; }
+    .chess-sq.selected { background: #F6F669 !important; }
+    .chess-sq.legal   { background: rgba(0,200,0,.35) !important; }
+    .chess-sq.last-move { background: rgba(246,246,105,.5) !important; }
+    .chess-sq:hover:not(.empty-hover) { filter: brightness(1.15); }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       AMONG US â€” FULL REWORK
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    #au-wrap {
+      position: relative; background: #000; border-radius: 16px; overflow: hidden;
+      border: 2px solid #1a1a2e; user-select: none;
+    }
+    #au-canvas { display: block; width: 100%; image-rendering: pixelated; cursor: crosshair; }
+
+    /* Fullscreen overlay screens */
+    .au-screen {
+      position: absolute; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: rgba(0,0,0,.92); z-index: 10; padding: 24px;
+    }
+    .au-screen.hidden { display: none; }
+
+    /* Lobby */
+    #au-lobby-screen { background: #0d1117; }
+    .au-lobby-title {
+      font-size: clamp(22px,5vw,36px); font-weight: 900; color: #fff;
+      text-shadow: 0 0 20px #C51111, 0 0 40px #C51111;
+      letter-spacing: 2px;
+    }
+    .au-lobby-subtitle { font-size: 13px; color: #9CA3AF; }
+    .au-player-grid { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; max-width: 500px; }
+    .au-player-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      border: 2px solid; background: rgba(0,0,0,.4);
+    }
+    .au-chip-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .au-lobby-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: center; }
+    .au-btn {
+      padding: 10px 22px; border-radius: 12px; border: none; font-size: 14px;
+      font-weight: 700; cursor: pointer; font-family: inherit; transition: all .15s;
+      letter-spacing: .5px;
+    }
+    .au-btn-red   { background: #C51111; color: #fff; }
+    .au-btn-red:hover { background: #a00e0e; transform: scale(1.03); }
+    .au-btn-green { background: #117F2D; color: #fff; }
+    .au-btn-green:hover { background: #0d6124; transform: scale(1.03); }
+    .au-btn-ghost { background: transparent; color: #9CA3AF; border: 1px solid #374151; }
+    .au-btn-ghost:hover { border-color: #6B7280; color: #fff; }
+
+    /* HUD overlay on canvas */
+    #au-hud {
+      position: absolute; top: 0; left: 0; right: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 12px; background: rgba(0,0,0,.7);
+      backdrop-filter: blur(4px); gap: 8px; flex-wrap: wrap;
+    }
+    .au-hud-stat { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; }
+    #au-role-pill {
+      font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 999px;
+      letter-spacing: .5px;
+    }
+    #au-task-bar-wrap {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 6px;
+      background: rgba(0,0,0,.5);
+    }
+    #au-task-bar { height: 100%; background: #4ADE80; transition: width .4s; width: 0%; }
+
+    /* D-pad */
+    #au-dpad {
+      position: absolute; bottom: 16px; right: 16px;
+      display: grid; grid-template-columns: repeat(3,44px); grid-template-rows: repeat(3,44px); gap: 3px;
+    }
+    .au-dpad-btn {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15);
+      color: #fff; font-size: 16px; cursor: pointer; display: flex;
+      align-items: center; justify-content: center; backdrop-filter: blur(4px);
+      transition: background .1s; -webkit-tap-highlight-color: transparent;
+    }
+    .au-dpad-btn:active { background: rgba(124,58,237,.5); }
+
+    /* Action button */
+    #au-action-wrap {
+      position: absolute; bottom: 16px; left: 16px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .au-action-pill {
+      padding: 10px 18px; border-radius: 12px; border: none; font-size: 13px;
+      font-weight: 700; cursor: pointer; font-family: inherit; display: none;
+      animation: popIn .15s ease; letter-spacing: .3px;
+    }
+    @keyframes popIn { from { transform: scale(.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    /* Meeting screen */
+    #au-meeting-screen {
+      background: #0d1117; padding: 20px; overflow-y: auto;
+    }
+    .au-meeting-title {
+      font-size: 20px; font-weight: 900; color: #F87171;
+      text-shadow: 0 0 12px #F87171; letter-spacing: 1px; text-align: center;
+    }
+    .au-vote-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; width: 100%; max-width: 560px; }
+    .au-vote-card {
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      padding: 14px 10px; border-radius: 14px; border: 2px solid transparent;
+      background: rgba(255,255,255,.04); cursor: pointer; transition: all .15s;
+      position: relative;
+    }
+    .au-vote-card:hover { border-color: #F87171; background: rgba(248,113,113,.08); }
+    .au-vote-card.voted { border-color: #F87171; background: rgba(248,113,113,.15); }
+    .au-vote-card.skip-card:hover { border-color: #6B7280; background: rgba(107,114,128,.1); }
+    .au-vote-card.skip-card.voted { border-color: #6B7280; }
+    .au-vote-avatar { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+    .au-vote-name { font-size: 12px; font-weight: 600; color: #fff; text-align: center; }
+    .au-vote-count { font-size: 11px; color: #9CA3AF; }
+    .au-vote-badge { position: absolute; top: 6px; right: 6px; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 999px; }
+
+    /* Kill flash */
+    #au-kill-flash {
+      position: absolute; inset: 0; background: rgba(197,17,17,.6);
+      pointer-events: none; opacity: 0; transition: opacity .1s; z-index: 5;
+    }
+
+    /* Task minigame overlay */
+    #au-task-overlay {
+      position: absolute; inset: 0; background: rgba(0,0,0,.85);
+      display: none; align-items: center; justify-content: center; z-index: 8;
+    }
+    .au-task-panel {
+      background: #1a1a2e; border: 2px solid #2a2a4a; border-radius: 16px;
+      padding: 24px; width: min(340px, 90%); display: flex; flex-direction: column; gap: 16px;
+    }
+    .au-task-panel h3 { color: #fff; font-size: 16px; font-weight: 700; }
+    .au-wire { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; border-radius: 8px; transition: background .1s; }
+    .au-wire:hover { background: rgba(255,255,255,.05); }
+    .au-wire-dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; border: 2px solid rgba(255,255,255,.3); }
+    .au-wire-line { flex: 1; height: 4px; border-radius: 2px; background: rgba(255,255,255,.1); }
+    .au-wire-dot.right { cursor: pointer; }
+
+    /* Gameover */
+    #au-gameover-screen { text-align: center; }
+    .au-gameover-title { font-size: clamp(24px,6vw,42px); font-weight: 900; letter-spacing: 2px; }
+    .au-gameover-crew { color: #4ADE80; text-shadow: 0 0 20px #4ADE80; }
+    .au-gameover-imp  { color: #F87171; text-shadow: 0 0 20px #F87171; }
+    .au-reveal-list { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 400px; }
+    .rps-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      padding: 14px 20px; border-radius: 14px; border: 1px solid var(--border);
+      background: var(--card); cursor: pointer; font-family: inherit;
+      font-size: 32px; transition: all .15s; color: #fff;
+    }
+    .rps-btn span { font-size: 12px; color: #9CA3AF; font-weight: 500; }
+    .rps-btn:hover { border-color: var(--brand); background: rgba(124,58,237,.1); transform: translateY(-2px); }
+    .rps-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  </style>
+</head>
+<body>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     LANDING PAGE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="page-landing" class="page active">
+  <nav class="nav">
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Zidea
+    </div>
+    <div class="nav-actions">
+      <button class="btn-ghost" onclick="showPage('login')" style="font-size:14px">Log In</button>
+      <button class="btn-primary" onclick="showPage('signup')" style="font-size:14px">Sign Up Free</button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+      Now with Zidea Arcade
+    </div>
+    <h1>Connect. Call. <em>Play.</em></h1>
+    <p>Zidea is the social platform where you find friends by username, jump into voice calls, and challenge them to multiplayer games â€” all in one place.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="showPage('signup')" style="padding:12px 32px;font-size:15px">Get Started</button>
+      <button class="btn-ghost" onclick="showPage('login')" style="padding:12px 32px;font-size:15px">Log In</button>
+    </div>
+  </section>
+
+  <div class="features">
+    <div class="card feature-card">
+      <div class="feature-icon">ðŸ‘¥</div>
+      <h3>Find Friends</h3>
+      <p>Search anyone by their unique @username and connect instantly.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="feature-icon">ðŸŽ™ï¸</div>
+      <h3>Voice Calls</h3>
+      <p>Crystal-clear real-time voice calls powered by Agora WebRTC.</p>
+    </div>
+    <div class="card feature-card">
+      <div class="feature-icon">ðŸŽ®</div>
+      <h3>Zidea Arcade</h3>
+      <p>Challenge your caller to classic games or battle an AI bot.</p>
+    </div>
+  </div>
+
+  <footer>Â© 2026 Zidea. All rights reserved.</footer>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     LOGIN PAGE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="page-login" class="page auth-page">
+  <div class="auth-box card">
+    <div class="auth-header">
+      <div class="logo" style="justify-content:center;font-size:20px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Zidea
+      </div>
+      <p>Welcome back</p>
+    </div>
+
+    <div id="login-error" class="error-msg"></div>
+
+    <form class="auth-form" onsubmit="handleLogin(event)">
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input class="input-field" type="email" id="login-email" placeholder="Email" required />
+      </div>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input class="input-field" type="password" id="login-password" placeholder="Password" required />
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Log In
+      </button>
+    </form>
+
+    <div class="divider">or</div>
+
+    <button class="google-btn" onclick="handleGoogleLogin()">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+
+    <p class="auth-footer">No account? <a href="#" onclick="showPage('signup')">Sign up</a></p>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     SIGNUP PAGE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="page-signup" class="page auth-page">
+  <div class="auth-box card">
+    <div class="auth-header">
+      <div class="logo" style="justify-content:center;font-size:20px">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        Zidea
+      </div>
+      <p>Create your account</p>
+    </div>
+
+    <div id="signup-error" class="error-msg"></div>
+
+    <form class="auth-form" onsubmit="handleSignup(event)">
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        <input class="input-field" type="text" id="signup-username" placeholder="Username (e.g. cooldev42)" minlength="3" maxlength="20" required />
+      </div>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        <input class="input-field" type="email" id="signup-email" placeholder="Email" required />
+      </div>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input class="input-field" type="password" id="signup-password" placeholder="Password (min 6 chars)" minlength="6" required />
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        Create Account
+      </button>
+    </form>
+
+    <p class="auth-footer">Already have an account? <a href="#" onclick="showPage('login')">Log in</a></p>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     DASHBOARD PAGE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="page-dashboard" class="page">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Zidea
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-label">Menu</div>
+      <button class="nav-item active" onclick="showPage('dashboard')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Discover
+      </button>
+      <button class="nav-item" onclick="showPage('chat')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Messages
+      </button>
+      <button class="nav-item" onclick="showPage('arcade')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+        Zidea Arcade
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="sidebar-username">@username</div>
+      <button class="btn-ghost" style="font-size:13px;width:100%" onclick="handleLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <div class="main-content">
+    <div>
+      <div class="page-title">Discover People</div>
+      <div class="page-subtitle">Search by username and start a call</div>
+    </div>
+    <div class="input-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="input-field" type="text" id="search-input" placeholder="Search @username..." oninput="filterUsers()" />
+    </div>
+    <div class="user-list" id="user-list"></div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     ARCADE PAGE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="page-arcade" class="page">
+  <button class="back-link" onclick="showPage('dashboard')">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+    Dashboard
+  </button>
+
+  <div>
+    <div class="page-title" style="display:flex;align-items:center;gap:10px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+      Zidea Arcade
+    </div>
+    <div class="page-subtitle">Challenge a friend or battle the AI</div>
+  </div>
+
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="mode-bot" onclick="setMode('bot')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>
+      vs AI Bot
+    </button>
+    <button class="mode-btn" id="mode-multi" onclick="setMode('multiplayer')">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      vs Friend (local)
+    </button>
+  </div>
+
+  <!-- Game picker -->
+  <div class="game-list" id="game-picker">
+    <div class="card game-item" onclick="startGame('tictactoe')">
+      <div class="game-emoji">â­•</div>
+      <div class="game-info"><strong>Tic-Tac-Toe</strong><p>Classic 3x3 strategy game</p></div>
+    </div>
+    <div class="card game-item" onclick="startGame('chess')">
+      <div class="game-emoji">â™Ÿï¸</div>
+      <div class="game-info"><strong>Chess</strong><p>Full chess vs AI or a friend</p></div>
+    </div>
+    <div class="card game-item" onclick="startGame('rps')">
+      <div class="game-emoji">âœŠ</div>
+      <div class="game-info"><strong>Rock Paper Scissors</strong><p>Best of 5 rounds</p></div>
+    </div>
+    <div class="card game-item" id="among-us-entry" onclick="startGame('amongus')">
+      <div class="game-emoji">ðŸš€</div>
+      <div class="game-info"><strong>Among Us</strong><p>Play with friends on a call or vs bots</p></div>
+    </div>
+  </div>
+
+  <!-- Tic-Tac-Toe game -->
+  <div class="card" id="game-ttt" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <strong style="color:#fff">Tic-Tac-Toe</strong>
+      <button class="back-link" onclick="exitGame()">â† Back</button>
+    </div>
+    <div class="ttt-wrap">
+      <div class="ttt-players">
+        <span>ðŸ‘¤ You (X)</span>
+        <span>vs</span>
+        <span id="ttt-opponent">ðŸ¤– AI Bot (O)</span>
+      </div>
+      <div class="ttt-grid" id="ttt-grid"></div>
+      <div class="ttt-status" id="ttt-status">Your turn (X)</div>
+      <div class="ttt-result" id="ttt-result" style="display:none">
+        <p id="ttt-result-text"></p>
+        <button class="btn-primary" onclick="resetTTT()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Play Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chess game -->
+  <div class="card" id="game-chess" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <strong style="color:#fff">Chess</strong>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="chess-status" style="font-size:13px;color:#9CA3AF"></span>
+        <button class="back-link" onclick="exitGame()">â† Back</button>
+      </div>
+    </div>
+    <div id="chess-wrap" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <div id="chess-captured-black" style="font-size:18px;min-height:24px;letter-spacing:2px"></div>
+      <div id="chess-board" style="display:grid;grid-template-columns:repeat(8,1fr);border:2px solid var(--border);border-radius:8px;overflow:hidden;width:min(400px,100%)"></div>
+      <div id="chess-captured-white" style="font-size:18px;min-height:24px;letter-spacing:2px"></div>
+      <div id="chess-result" style="display:none;text-align:center">
+        <p id="chess-result-text" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:12px"></p>
+        <button class="btn-primary" onclick="resetChess()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Play Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rock Paper Scissors game -->
+  <div class="card" id="game-rps" style="display:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <strong style="color:#fff">Rock Paper Scissors</strong>
+      <button class="back-link" onclick="exitGame()">â† Back</button>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px">
+      <div style="display:flex;gap:32px;font-size:13px;color:#9CA3AF">
+        <span>You: <strong id="rps-score-you" style="color:#fff">0</strong></span>
+        <span style="color:#4B5563">Best of 5</span>
+        <span>Bot: <strong id="rps-score-bot" style="color:#fff">0</strong></span>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;min-height:80px">
+        <div style="text-align:center">
+          <div id="rps-you-pick" style="font-size:56px;line-height:1">â“</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px">You</div>
+        </div>
+        <div style="font-size:22px;color:#4B5563">vs</div>
+        <div style="text-align:center">
+          <div id="rps-bot-pick" style="font-size:56px;line-height:1">â“</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px">Bot</div>
+        </div>
+      </div>
+      <div id="rps-round-result" style="font-size:16px;font-weight:600;color:#fff;min-height:24px"></div>
+      <div id="rps-choices" style="display:flex;gap:12px">
+        <button class="rps-btn" onclick="rpsPlay('rock')">âœŠ<span>Rock</span></button>
+        <button class="rps-btn" onclick="rpsPlay('paper')">ðŸ–ï¸<span>Paper</span></button>
+        <button class="rps-btn" onclick="rpsPlay('scissors')">âœŒï¸<span>Scissors</span></button>
+      </div>
+      <div id="rps-final" style="display:none;text-align:center">
+        <p id="rps-final-text" style="font-size:20px;font-weight:700;color:#fff;margin-bottom:12px"></p>
+        <button class="btn-primary" onclick="resetRPS()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          Play Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Among Us game -->
+  <div id="game-amongus" style="display:none;flex-direction:column;gap:0">
+
+    <!-- LOBBY SCREEN -->
+    <div id="au-lobby-screen" class="au-screen">
+      <div class="au-lobby-title">AMONG US</div>
+      <div class="au-lobby-subtitle" id="au-lobby-info">Loading players...</div>
+      <div class="au-player-grid" id="au-player-list"></div>
+      <div class="au-lobby-controls">
+        <label style="font-size:13px;color:#9CA3AF;display:flex;align-items:center;gap:8px">
+          Impostors:
+          <select id="au-impostor-count" style="background:#1a1a2e;border:1px solid #374151;color:#fff;border-radius:8px;padding:6px 10px;font-family:inherit;font-size:13px">
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+        </label>
+        <button class="au-btn au-btn-red" onclick="auStartGame()">â–¶ START GAME</button>
+        <button class="au-btn au-btn-ghost" onclick="exitGame()">â† Back</button>
+      </div>
+    </div>
+
+    <!-- GAME SCREEN (canvas + overlays) -->
+    <div id="au-game-screen" class="au-screen hidden" style="padding:0;background:#000;position:relative;min-height:520px">
+
+      <!-- HUD -->
+      <div id="au-hud">
+        <div style="display:flex;gap:12px;align-items:center">
+          <span class="au-hud-stat" style="color:#4ADE80">ðŸ§‘â€ðŸš€ <span id="au-crew-count">0</span></span>
+          <span class="au-hud-stat" style="color:#F87171">ðŸ”ª <span id="au-imp-count">0</span></span>
+          <span id="au-role-pill"></span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <span style="font-size:11px;color:#9CA3AF" id="au-task-label">Tasks: 0/0</span>
+          <button class="au-btn au-btn-red" style="padding:5px 12px;font-size:11px" onclick="auCallMeeting()">ðŸš¨ MEETING</button>
+        </div>
+      </div>
+
+      <!-- Canvas -->
+      <canvas id="au-canvas" style="display:block;width:100%;touch-action:none;margin-top:40px"></canvas>
+
+      <!-- Task progress bar -->
+      <div id="au-task-bar-wrap"><div id="au-task-bar"></div></div>
+
+      <!-- Kill flash -->
+      <div id="au-kill-flash"></div>
+
+      <!-- Action buttons -->
+      <div id="au-action-wrap">
+        <button id="au-kill-btn" class="au-action-pill" style="background:#C51111;color:#fff" onclick="auDoKill()">ðŸ”ª KILL</button>
+        <button id="au-task-btn" class="au-action-pill" style="background:#117F2D;color:#fff" onclick="auDoTask()">âœ… TASK</button>
+        <button id="au-report-btn" class="au-action-pill" style="background:#EF7D0E;color:#fff" onclick="auReportBody()">ðŸ“¢ REPORT</button>
+      </div>
+
+      <!-- D-pad -->
+      <div id="au-dpad">
+        <div></div>
+        <button class="au-dpad-btn" id="dpad-up">â–²</button>
+        <div></div>
+        <button class="au-dpad-btn" id="dpad-left">â—€</button>
+        <div></div>
+        <button class="au-dpad-btn" id="dpad-right">â–¶</button>
+        <div></div>
+        <button class="au-dpad-btn" id="dpad-down">â–¼</button>
+        <div></div>
+      </div>
+
+      <!-- Task minigame overlay -->
+      <div id="au-task-overlay">
+        <div class="au-task-panel">
+          <h3 id="au-task-title">Fix Wiring</h3>
+          <div id="au-task-content"></div>
+          <button class="au-btn au-btn-ghost" style="font-size:12px;padding:8px" onclick="auCloseTask()">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MEETING SCREEN -->
+    <div id="au-meeting-screen" class="au-screen hidden">
+      <div class="au-meeting-title">ðŸš¨ EMERGENCY MEETING ðŸš¨</div>
+      <div id="au-meeting-reason" style="font-size:13px;color:#9CA3AF;text-align:center"></div>
+      <div class="au-vote-grid" id="au-vote-list"></div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:center">
+        <span id="au-vote-timer" style="font-size:13px;color:#6B7280"></span>
+      </div>
+    </div>
+
+    <!-- GAMEOVER SCREEN -->
+    <div id="au-gameover-screen" class="au-screen hidden">
+      <div id="au-gameover-title" class="au-gameover-title"></div>
+      <div id="au-gameover-sub" style="font-size:14px;color:#9CA3AF"></div>
+      <div class="au-reveal-list" id="au-reveal-list"></div>
+      <button class="au-btn au-btn-green" onclick="resetAmongUs()">â–¶ PLAY AGAIN</button>
+      <button class="au-btn au-btn-ghost" onclick="exitGame()">â† Back to Arcade</button>
+    </div>
+
+  </div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     CHAT PAGE
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div id="page-chat" class="page">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:var(--brand)"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Zidea
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Discover
+      </button>
+      <button class="nav-item active" onclick="showPage('chat')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Messages
+      </button>
+      <button class="nav-item" onclick="showPage('arcade')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+        Zidea Arcade
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="sidebar-user" id="chat-sidebar-username">@username</div>
+      <button class="btn-ghost" style="font-size:13px;width:100%" onclick="handleLogout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <div class="chat-layout">
+    <!-- Conversation list -->
+    <div class="convo-list">
+      <div class="convo-list-header">Messages</div>
+      <div class="convo-items" id="convo-items"></div>
+    </div>
+
+    <!-- Chat window -->
+    <div class="chat-window" id="chat-window">
+      <div class="chat-placeholder">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <p>Select a conversation to start chatting</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+     GOOGLE EMAIL CONFIRM MODAL
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• -->
+<div class="modal-overlay" id="google-modal" onclick="handleModalOverlayClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-google-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      </div>
+      <h2>Sign in with Google</h2>
+      <p>Enter your Google email to continue, then verify your password.</p>
+    </div>
+
+    <div id="google-modal-error" class="error-msg"></div>
+
+    <form class="modal-form" onsubmit="handleGoogleModalSubmit(event)">
+      <!-- Step 1: email -->
+      <div id="google-step-email">
+        <div class="input-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <input class="input-field" type="email" id="google-email-input" placeholder="your@gmail.com" />
+        </div>
+      </div>
+      <!-- Step 2: password (hidden until email confirmed) -->
+      <div id="google-step-password" style="display:none">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 14px;background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.2);border-radius:10px">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--brand-light)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+          <span id="google-email-display" style="font-size:13px;color:var(--brand-light)"></span>
+        </div>
+        <div class="input-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="input-field" type="password" id="google-password-input" placeholder="Enter your password" />
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-ghost" onclick="closeGoogleModal()">Cancel</button>
+        <button type="submit" class="btn-primary" id="google-modal-btn">
+          Next
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // â”€â”€ Real users from localStorage â”€â”€
+  function getUsers() {
+    const accounts = loadAccounts();
+    return Object.entries(accounts)
+      .filter(([email]) => !currentUser || email !== currentUser.email)
+      .map(([, a]) => ({
+        username: a.username,
+        wins: a.wins || 0,
+        losses: a.losses || 0,
+        online: false,
+      }));
+  }
+
+  let currentUser = null;
+  let activeCallBtn = null; // kept for compat
+  let callGroup = new Set(); // all users currently on call
+  let gameMode = "bot";
+
+  // â”€â”€ localStorage helpers â”€â”€
+  function saveAccounts(accounts) {
+    localStorage.setItem('zidea_accounts', JSON.stringify(accounts));
+  }
+  function loadAccounts() {
+    try { return JSON.parse(localStorage.getItem('zidea_accounts')) || {}; } catch { return {}; }
+  }
+  function saveSession(user) {
+    localStorage.setItem('zidea_session', JSON.stringify(user));
+  }
+  function clearSession() {
+    localStorage.removeItem('zidea_session');
+  }
+  function loadSession() {
+    try { return JSON.parse(localStorage.getItem('zidea_session')); } catch { return null; }
+  }
+
+  // â”€â”€ Auto-login on page load â”€â”€
+  function init() {
+    const saved = loadSession();
+    if (saved) {
+      currentUser = saved;
+      setLoggedInUI();
+      showPage('dashboard');
+    }
+  }
+
+  function setLoggedInUI() {
+    const name = '@' + currentUser.username;
+    document.getElementById('sidebar-username').textContent = name;
+    document.getElementById('chat-sidebar-username').textContent = name;
+  }
+
+  // â”€â”€ Page routing â”€â”€
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    if (name === 'dashboard') renderUsers();
+    if (name === 'chat') {
+      document.getElementById('chat-sidebar-username').textContent =
+        '@' + (currentUser ? currentUser.username : 'you');
+      renderConvoList(activeChatUser);
+    }
+  }
+
+  // â”€â”€ Auth handlers â”€â”€
+  function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
+    const err = document.getElementById('login-error');
+
+    const accounts = loadAccounts();
+    const account = accounts[email];
+
+    if (!account) {
+      err.textContent = 'No account found with that email. Please sign up first.';
+      err.classList.add('show'); return;
+    }
+    if (account.password !== password) {
+      err.textContent = 'Incorrect password. Please try again.';
+      err.classList.add('show'); return;
+    }
+    err.classList.remove('show');
+    currentUser = { email, username: account.username };
+    saveSession(currentUser);
+    setLoggedInUI();
+    showPage('dashboard');
+  }
+
+  function handleSignup(e) {
+    e.preventDefault();
+    const username = document.getElementById('signup-username').value.trim().toLowerCase();
+    const email = document.getElementById('signup-email').value.trim().toLowerCase();
+    const password = document.getElementById('signup-password').value;
+    const err = document.getElementById('signup-error');
+
+    const accounts = loadAccounts();
+
+    // Check username taken
+    const usernameTaken = Object.values(accounts).some(a => a.username === username);
+    if (usernameTaken) {
+      err.textContent = 'That username is already taken. Try another.';
+      err.classList.add('show'); return;
+    }
+    if (accounts[email]) {
+      err.textContent = 'An account with that email already exists. Try logging in.';
+      err.classList.add('show'); return;
+    }
+    err.classList.remove('show');
+
+    // Save new account
+    accounts[email] = { username, password, wins: 0, losses: 0 };
+    saveAccounts(accounts);
+
+    currentUser = { email, username };
+    saveSession(currentUser);
+    setLoggedInUI();
+    showPage('dashboard');
+  }
+
+  // â”€â”€ Google OAuth (also backed by localStorage) â”€â”€
+  const GOOGLE_ACCOUNTS = {
+    'nova@gmail.com': 'nova1234',
+    'pixel@gmail.com': 'pixel999',
+    'demo@gmail.com': 'demo123',
+  };
+
+  let googleModalStep = 'email';
+  let googlePendingEmail = '';
+
+  function handleModalOverlayClick(e) {
+    if (e.target === document.getElementById('google-modal')) closeGoogleModal();
+  }
+
+  function handleGoogleLogin() {
+    googleModalStep = 'email';
+    googlePendingEmail = '';
+    document.getElementById('google-email-input').value = '';
+    document.getElementById('google-password-input').value = '';
+    document.getElementById('google-step-email').style.display = 'block';
+    document.getElementById('google-step-password').style.display = 'none';
+    document.getElementById('google-modal-btn').innerHTML = 'Next <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>';
+    document.getElementById('google-modal-error').classList.remove('show');
+    document.getElementById('google-modal').classList.add('show');
+    setTimeout(() => document.getElementById('google-email-input').focus(), 100);
+  }
+
+  function closeGoogleModal() {
+    document.getElementById('google-modal').classList.remove('show');
+  }
+
+  function handleGoogleModalSubmit(e) {
+    e.preventDefault();
+    const err = document.getElementById('google-modal-error');
+    err.classList.remove('show');
+
+    if (googleModalStep === 'email') {
+      const email = document.getElementById('google-email-input').value.trim().toLowerCase();
+      if (!email.includes('@')) {
+        err.textContent = 'Please enter a valid email address.';
+        err.classList.add('show'); return;
+      }
+      // Check built-in Google accounts OR user-registered accounts
+      const accounts = loadAccounts();
+      if (!GOOGLE_ACCOUNTS[email] && !accounts[email]) {
+        err.textContent = 'No account found with that email. Try signing up instead.';
+        err.classList.add('show'); return;
+      }
+      googlePendingEmail = email;
+      googleModalStep = 'password';
+      document.getElementById('google-email-display').textContent = email;
+      document.getElementById('google-step-email').style.display = 'none';
+      document.getElementById('google-step-password').style.display = 'block';
+      document.getElementById('google-modal-btn').innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Sign In';
+      setTimeout(() => document.getElementById('google-password-input').focus(), 100);
+
+    } else {
+      const password = document.getElementById('google-password-input').value;
+      if (!password) {
+        err.textContent = 'Please enter your password.';
+        err.classList.add('show'); return;
+      }
+      const accounts = loadAccounts();
+      const storedPw = GOOGLE_ACCOUNTS[googlePendingEmail] || (accounts[googlePendingEmail] && accounts[googlePendingEmail].password);
+      if (storedPw !== password) {
+        err.textContent = 'Incorrect password. Access not granted.';
+        err.classList.add('show');
+        document.getElementById('google-password-input').value = '';
+        setTimeout(() => document.getElementById('google-password-input').focus(), 50);
+        return;
+      }
+      closeGoogleModal();
+      const username = (accounts[googlePendingEmail] && accounts[googlePendingEmail].username)
+        || googlePendingEmail.split('@')[0].replace(/[^a-z0-9_]/gi, '_');
+      currentUser = { email: googlePendingEmail, username };
+      saveSession(currentUser);
+      setLoggedInUI();
+      showPage('dashboard');
+    }
+  }
+
+  function handleLogout() {
+    currentUser = null;
+    clearSession();
+    showPage('landing');
+  }
+
+  // â”€â”€ Dashboard â”€â”€
+  function renderUsers(filter = '') {
+    const list = document.getElementById('user-list');
+    const users = getUsers();
+    const filtered = users.filter(u =>
+      !filter || u.username.includes(filter.toLowerCase())
+    );
+    if (!users.length) {
+      list.innerHTML = '<p style="color:#6B7280;font-size:14px;text-align:center;padding:40px 0">No other users yet. Share Zidea with friends!</p>';
+      return;
+    }
+    if (!filtered.length) {
+      list.innerHTML = '<p style="color:#6B7280;font-size:14px;text-align:center;padding:40px 0">No users found.</p>';
+      return;
+    }
+    list.innerHTML = filtered.map(u => `
+      <div class="card user-card">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="user-avatar">${u.username.slice(0,2).toUpperCase()}</div>
+          <div class="user-info">
+            <strong>@${u.username}</strong>
+            <div class="user-stats">
+              <span class="stat-w">ðŸ† ${u.wins}W</span>
+              <span class="stat-l">ðŸ’€ ${u.losses}L</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button onclick="openChat('${u.username}')" style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:var(--brand-light);border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.background='rgba(124,58,237,.3)'" onmouseout="this.style.background='rgba(124,58,237,.15)'">
+            ï¿½ Chat
+          </button>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+            <button class="call-btn" id="call-${u.username}" onclick="toggleCall('${u.username}')">
+              ðŸ“ž Call
+            </button>
+            <span id="call-status-${u.username}" style="font-size:11px;color:#6B7280"></span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function filterUsers() {
+    renderUsers(document.getElementById('search-input').value);
+  }
+
+  function toggleCall(username) {
+    const btn = document.getElementById('call-' + username);
+    const status = document.getElementById('call-status-' + username);
+    if (!btn) return;
+
+    if (btn.classList.contains('active')) {
+      btn.innerHTML = 'ðŸ“ž Call';
+      btn.classList.remove('active');
+      if (status) status.textContent = '';
+      callGroup.delete(username);
+      activeCallBtn = callGroup.size > 0 ? [...callGroup][0] : null;
+    } else {
+      btn.innerHTML = 'ï¿½ End Call';
+      btn.classList.add('active');
+      if (status) status.textContent = 'In call with @' + username;
+      callGroup.add(username);
+      activeCallBtn = username;
+    }
+    updateAmongUsEntry();
+  }
+
+  function updateAmongUsEntry() {
+    const el = document.getElementById('among-us-entry');
+    if (!el) return;
+    if (callGroup.size > 0) {
+      el.classList.remove('disabled');
+      el.querySelector('.game-info p').textContent =
+        `${callGroup.size} friend${callGroup.size>1?'s':''} on call â€” ready to play!`;
+    } else {
+      el.classList.remove('disabled');
+      el.querySelector('.game-info p').textContent = 'Play with friends on a call or vs bots';
+    }
+  }
+
+  // â”€â”€ Arcade â”€â”€
+  function setMode(mode) {
+    gameMode = mode;
+    document.getElementById('mode-bot').classList.toggle('active', mode === 'bot');
+    document.getElementById('mode-multi').classList.toggle('active', mode === 'multiplayer');
+    const opp = document.getElementById('ttt-opponent');
+    if (opp) opp.textContent = mode === 'bot' ? 'ðŸ¤– AI Bot (O)' : 'ðŸ‘¤ Player 2 (O)';
+  }
+
+  function startGame(type) {
+    document.getElementById('game-picker').style.display = 'none';
+    document.getElementById('game-ttt').style.display = 'none';
+    document.getElementById('game-chess').style.display = 'none';
+    document.getElementById('game-rps').style.display = 'none';
+    document.getElementById('game-amongus').style.display = 'none';
+    if (type === 'tictactoe') { document.getElementById('game-ttt').style.display = 'block'; resetTTT(); }
+    if (type === 'chess')     { document.getElementById('game-chess').style.display = 'block'; resetChess(); }
+    if (type === 'rps')       { document.getElementById('game-rps').style.display = 'block'; resetRPS(); }
+    if (type === 'amongus')   { document.getElementById('game-amongus').style.display = 'flex'; resetAmongUs(); }
+  }
+
+  function exitGame() {
+    document.getElementById('game-picker').style.display = 'flex';
+    document.getElementById('game-ttt').style.display = 'none';
+    document.getElementById('game-chess').style.display = 'none';
+    document.getElementById('game-rps').style.display = 'none';
+    document.getElementById('game-amongus').style.display = 'none';
+    if (auLoop) { clearInterval(auLoop); auLoop = null; }
+  }
+
+  // â”€â”€ Tic-Tac-Toe engine â”€â”€
+  let tttBoard = Array(9).fill(null);
+  let tttIsX = true;
+  let tttOver = false;
+
+  const WIN_LINES = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+  function checkWinner(b) {
+    for (const [a,c,d] of WIN_LINES) {
+      if (b[a] && b[a] === b[c] && b[a] === b[d]) return b[a];
+    }
+    return b.every(Boolean) ? 'draw' : null;
+  }
+
+  function botMove(b) {
+    for (const mark of ['O','X']) {
+      for (const [a,c,d] of WIN_LINES) {
+        const line = [b[a],b[c],b[d]];
+        if (line.filter(x=>x===mark).length===2 && line.includes(null)) {
+          return [a,c,d][line.indexOf(null)];
+        }
+      }
+    }
+    const empty = b.map((v,i)=>v===null?i:-1).filter(i=>i!==-1);
+    return empty[Math.floor(Math.random()*empty.length)];
+  }
+
+  function renderTTT() {
+    const grid = document.getElementById('ttt-grid');
+    grid.innerHTML = tttBoard.map((cell, i) => `
+      <button class="ttt-cell ${cell === 'X' ? 'x' : cell === 'O' ? 'o' : ''}"
+        onclick="tttClick(${i})" ${(cell || tttOver) ? 'disabled' : ''}>
+        ${cell || ''}
+      </button>
+    `).join('');
+  }
+
+  function tttClick(i) {
+    if (tttBoard[i] || tttOver) return;
+    tttBoard[i] = tttIsX ? 'X' : 'O';
+    tttIsX = !tttIsX;
+    renderTTT();
+
+    const w = checkWinner(tttBoard);
+    if (w) { endTTT(w); return; }
+
+    if (gameMode === 'bot' && !tttIsX) {
+      document.getElementById('ttt-status').textContent = 'Bot is thinking...';
+      setTimeout(() => {
+        const idx = botMove(tttBoard);
+        if (idx !== undefined) {
+          tttBoard[idx] = 'O';
+          tttIsX = true;
+          renderTTT();
+          const w2 = checkWinner(tttBoard);
+          if (w2) { endTTT(w2); return; }
+          document.getElementById('ttt-status').textContent = 'Your turn (X)';
+        }
+      }, 400);
+    } else {
+      document.getElementById('ttt-status').textContent =
+        tttIsX ? 'Your turn (X)' : (gameMode === 'bot' ? 'Bot is thinking...' : "Player 2's turn (O)");
+    }
+  }
+
+  function endTTT(result) {
+    tttOver = true;
+    renderTTT();
+    document.getElementById('ttt-status').style.display = 'none';
+    const res = document.getElementById('ttt-result');
+    const txt = document.getElementById('ttt-result-text');
+    res.style.display = 'flex';
+    if (result === 'draw') txt.textContent = "It's a draw!";
+    else if (result === 'X') txt.textContent = 'You win! ðŸŽ‰';
+    else txt.textContent = gameMode === 'bot' ? 'Bot wins!' : 'Player 2 wins!';
+  }
+
+  function resetTTT() {
+    tttBoard = Array(9).fill(null);
+    tttIsX = true;
+    tttOver = false;
+    document.getElementById('ttt-status').style.display = 'block';
+    document.getElementById('ttt-status').textContent = 'Your turn (X)';
+    document.getElementById('ttt-result').style.display = 'none';
+    renderTTT();
+  }
+
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // CHESS ENGINE
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  const PIECES = {
+    wK:'â™”',wQ:'â™•',wR:'â™–',wB:'â™—',wN:'â™˜',wP:'â™™',
+    bK:'â™š',bQ:'â™›',bR:'â™œ',bB:'â™',bN:'â™ž',bP:'â™Ÿ',
+  };
+  const PIECE_VALUES = { P:1, N:3, B:3, R:5, Q:9, K:0 };
+
+  let chessBoard, chessTurn, chessSelected, chessLegal, chessLastMove, chessOver, chessCaptured;
+
+  function resetChess() {
+    chessBoard = [
+      ['bR','bN','bB','bQ','bK','bB','bN','bR'],
+      ['bP','bP','bP','bP','bP','bP','bP','bP'],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      [null,null,null,null,null,null,null,null],
+      ['wP','wP','wP','wP','wP','wP','wP','wP'],
+      ['wR','wN','wB','wQ','wK','wB','wN','wR'],
+    ];
+    chessTurn = 'w'; chessSelected = null; chessLegal = [];
+    chessLastMove = null; chessOver = false;
+    chessCaptured = { w: [], b: [] };
+    document.getElementById('chess-result').style.display = 'none';
+    renderChess();
+  }
+
+  function renderChess() {
+    const board = document.getElementById('chess-board');
+    board.innerHTML = '';
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const sq = document.createElement('div');
+        const isLight = (r + c) % 2 === 0;
+        sq.className = 'chess-sq ' + (isLight ? 'light' : 'dark');
+        if (chessSelected && chessSelected[0]===r && chessSelected[1]===c) sq.classList.add('selected');
+        if (chessLegal.some(([lr,lc])=>lr===r&&lc===c)) sq.classList.add('legal');
+        if (chessLastMove && ((chessLastMove[0]===r&&chessLastMove[1]===c)||(chessLastMove[2]===r&&chessLastMove[3]===c))) sq.classList.add('last-move');
+        const piece = chessBoard[r][c];
+        if (piece) sq.textContent = PIECES[piece];
+        sq.onclick = () => chessClick(r, c);
+        board.appendChild(sq);
+      }
+    }
+    document.getElementById('chess-captured-black').textContent =
+      chessCaptured.b.map(p => PIECES['w'+p]).join('');
+    document.getElementById('chess-captured-white').textContent =
+      chessCaptured.w.map(p => PIECES['b'+p]).join('');
+    const statusEl = document.getElementById('chess-status');
+    if (!chessOver) statusEl.textContent = chessTurn === 'w' ? 'â¬œ Your turn (White)' : 'â¬› Bot thinking...';
+  }
+
+  function chessClick(r, c) {
+    if (chessOver || chessTurn !== 'w') return;
+    const piece = chessBoard[r][c];
+    if (chessSelected) {
+      const isLegal = chessLegal.some(([lr,lc])=>lr===r&&lc===c);
+      if (isLegal) {
+        chessMove(chessSelected[0], chessSelected[1], r, c);
+        chessSelected = null; chessLegal = [];
+        renderChess();
+        if (!chessOver) {
+          chessTurn = 'b';
+          renderChess();
+          setTimeout(chessBotMove, 500);
+        }
+        return;
+      }
+      chessSelected = null; chessLegal = [];
+    }
+    if (piece && piece[0] === 'w') {
+      chessSelected = [r, c];
+      chessLegal = getLegalMoves(r, c);
+    }
+    renderChess();
+  }
+
+  function chessMove(fr, fc, tr, tc) {
+    const piece = chessBoard[fr][fc];
+    const target = chessBoard[tr][tc];
+    if (target) {
+      const color = target[0], type = target[1];
+      chessCaptured[color].push(type);
+      if (type === 'K') { chessOver = true; }
+    }
+    chessBoard[tr][tc] = piece;
+    chessBoard[fr][fc] = null;
+    // Pawn promotion
+    if (piece === 'wP' && tr === 0) chessBoard[tr][tc] = 'wQ';
+    if (piece === 'bP' && tr === 7) chessBoard[tr][tc] = 'bQ';
+    chessLastMove = [fr, fc, tr, tc];
+    if (chessOver) showChessResult(piece[0]);
+  }
+
+  function showChessResult(winner) {
+    const el = document.getElementById('chess-result');
+    document.getElementById('chess-result-text').textContent =
+      winner === 'w' ? 'You win! â™”' : 'Bot wins! â™š';
+    el.style.display = 'block';
+    document.getElementById('chess-status').textContent = '';
+  }
+
+  function getLegalMoves(r, c) {
+    const piece = chessBoard[r][c];
+    if (!piece) return [];
+    const color = piece[0], type = piece[1];
+    const moves = [];
+    const enemy = color === 'w' ? 'b' : 'w';
+
+    const add = (tr, tc) => {
+      if (tr < 0 || tr > 7 || tc < 0 || tc > 7) return false;
+      const t = chessBoard[tr][tc];
+      if (t && t[0] === color) return false;
+      moves.push([tr, tc]);
+      return !t; // can continue sliding if empty
+    };
+
+    const slide = (dr, dc) => {
+      for (let i = 1; i < 8; i++) { if (!add(r+dr*i, c+dc*i)) break; }
+    };
+
+    if (type === 'P') {
+      const dir = color === 'w' ? -1 : 1;
+      const start = color === 'w' ? 6 : 1;
+      if (!chessBoard[r+dir]?.[c]) {
+        moves.push([r+dir, c]);
+        if (r === start && !chessBoard[r+dir*2]?.[c]) moves.push([r+dir*2, c]);
+      }
+      for (const dc of [-1,1]) {
+        const t = chessBoard[r+dir]?.[c+dc];
+        if (t && t[0] === enemy) moves.push([r+dir, c+dc]);
+      }
+    } else if (type === 'N') {
+      for (const [dr,dc] of [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]) add(r+dr,c+dc);
+    } else if (type === 'B') {
+      for (const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) slide(dr,dc);
+    } else if (type === 'R') {
+      for (const [dr,dc] of [[-1,0],[1,0],[0,-1],[0,1]]) slide(dr,dc);
+    } else if (type === 'Q') {
+      for (const [dr,dc] of [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]) slide(dr,dc);
+    } else if (type === 'K') {
+      for (const [dr,dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) add(r+dr,c+dc);
+    }
+    return moves;
+  }
+
+  function chessBotMove() {
+    if (chessOver) return;
+    // Collect all black moves, prefer captures
+    let best = null, bestScore = -Infinity;
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const piece = chessBoard[r][c];
+        if (!piece || piece[0] !== 'b') continue;
+        for (const [tr, tc] of getLegalMoves(r, c)) {
+          const target = chessBoard[tr][tc];
+          let score = target ? (PIECE_VALUES[target[1]] || 0) : 0;
+          score += Math.random() * 0.5; // slight randomness
+          if (score > bestScore) { bestScore = score; best = [r,c,tr,tc]; }
+        }
+      }
+    }
+    if (best) {
+      chessMove(best[0], best[1], best[2], best[3]);
+      chessTurn = 'w';
+    }
+    renderChess();
+  }
+
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // ROCK PAPER SCISSORS ENGINE
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  const RPS_EMOJI = { rock:'âœŠ', paper:'ðŸ–ï¸', scissors:'âœŒï¸' };
+  const RPS_CHOICES = ['rock','paper','scissors'];
+  let rpsScoreYou, rpsScoreBot, rpsRound, rpsOver;
+
+  function resetRPS() {
+    rpsScoreYou = 0; rpsScoreBot = 0; rpsRound = 0; rpsOver = false;
+    document.getElementById('rps-score-you').textContent = '0';
+    document.getElementById('rps-score-bot').textContent = '0';
+    document.getElementById('rps-you-pick').textContent = 'â“';
+    document.getElementById('rps-bot-pick').textContent = 'â“';
+    document.getElementById('rps-round-result').textContent = '';
+    document.getElementById('rps-final').style.display = 'none';
+    document.getElementById('rps-choices').style.display = 'flex';
+    document.querySelectorAll('.rps-btn').forEach(b => b.disabled = false);
+  }
+
+  function rpsPlay(choice) {
+    if (rpsOver) return;
+    document.querySelectorAll('.rps-btn').forEach(b => b.disabled = true);
+    const botChoice = RPS_CHOICES[Math.floor(Math.random() * 3)];
+    document.getElementById('rps-you-pick').textContent = RPS_EMOJI[choice];
+    document.getElementById('rps-bot-pick').textContent = 'ðŸ¤”';
+
+    setTimeout(() => {
+      document.getElementById('rps-bot-pick').textContent = RPS_EMOJI[botChoice];
+      let result;
+      if (choice === botChoice) {
+        result = "It's a tie! ðŸ¤";
+      } else if (
+        (choice==='rock'&&botChoice==='scissors') ||
+        (choice==='paper'&&botChoice==='rock') ||
+        (choice==='scissors'&&botChoice==='paper')
+      ) {
+        result = 'You win this round! ðŸŽ‰'; rpsScoreYou++;
+      } else {
+        result = 'Bot wins this round!'; rpsScoreBot++;
+      }
+      rpsRound++;
+      document.getElementById('rps-round-result').textContent = result;
+      document.getElementById('rps-score-you').textContent = rpsScoreYou;
+      document.getElementById('rps-score-bot').textContent = rpsScoreBot;
+
+      const needed = 3;
+      if (rpsScoreYou >= needed || rpsScoreBot >= needed || rpsRound >= 5) {
+        rpsOver = true;
+        document.getElementById('rps-choices').style.display = 'none';
+        const final = document.getElementById('rps-final');
+        final.style.display = 'block';
+        document.getElementById('rps-final-text').textContent =
+          rpsScoreYou > rpsScoreBot ? 'You win! ðŸ†' :
+          rpsScoreBot > rpsScoreYou ? 'Bot wins! ðŸ¤–' : "It's a draw! ðŸ¤";
+      } else {
+        setTimeout(() => {
+          document.querySelectorAll('.rps-btn').forEach(b => b.disabled = false);
+        }, 600);
+      }
+    }, 600);
+  }
+
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // AMONG US ENGINE
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  const AU_COLORS = ['#C51111','#132ED1','#117F2D','#ED54BA','#EF7D0E','#F5F557','#3F474E','#D6E0F0','#6B2FBB','#71491E'];
+  const AU_COLOR_NAMES = ['Red','Blue','Green','Pink','Orange','Yellow','Black','White','Purple','Brown'];
+  const AU_W = 800, AU_H = 520;
+
+  // Ship rooms â€” real Skeld-inspired layout
+  const AU_ROOMS = [
+    { id:'cafe',    name:'Cafeteria',  x:280, y:20,  w:200, h:130, fill:'#1a3a5c', tasks:['Fix Wiring','Empty Garbage'] },
+    { id:'weapons', name:'Weapons',    x:500, y:20,  w:140, h:100, fill:'#1a3a2a', tasks:['Calibrate Distributor'] },
+    { id:'nav',     name:'Navigation', x:560, y:140, w:160, h:100, fill:'#2a1a3a', tasks:['Chart Course','Enter ID Code'] },
+    { id:'shields', name:'Shields',    x:500, y:360, w:160, h:120, fill:'#3a2a1a', tasks:['Prime Shields'] },
+    { id:'engine',  name:'Engine Room',x:60,  y:300, w:160, h:120, fill:'#1a2a3a', tasks:['Align Engine Output'] },
+    { id:'reactor', name:'Reactor',    x:20,  y:100, w:160, h:160, fill:'#3a1a1a', tasks:['Start Reactor','Unlock Manifolds'] },
+    { id:'medbay',  name:'MedBay',     x:240, y:200, w:140, h:110, fill:'#1a3a3a', tasks:['Submit Scan','Inspect Sample'] },
+    { id:'storage', name:'Storage',    x:280, y:360, w:180, h:120, fill:'#2a2a1a', tasks:['Fuel Engines','Clean O2 Filter'] },
+    { id:'admin',   name:'Admin',      x:440, y:240, w:120, h:100, fill:'#1a1a3a', tasks:['Swipe Card'] },
+    { id:'security',name:'Security',   x:100, y:220, w:120, h:80,  fill:'#2a1a1a', tasks:['View Security Cameras'] },
+    { id:'comms',   name:'Comms',      x:380, y:420, w:100, h:80,  fill:'#1a2a2a', tasks:['Fix Comms'] },
+    { id:'o2',      name:'O2',         x:200, y:100, w:100, h:80,  fill:'#1a3a1a', tasks:['Clean O2 Filter','Water Plants'] },
+    { id:'elec',    name:'Electrical', x:100, y:340, w:140, h:80,  fill:'#2a2a3a', tasks:['Fix Wiring','Divert Power'] },
+  ];
+
+  // Corridors connecting rooms (pairs of room centers)
+  const AU_CORRIDORS = [
+    ['cafe','weapons'],['cafe','nav'],['cafe','medbay'],['cafe','o2'],
+    ['weapons','nav'],['nav','shields'],['shields','storage'],['storage','engine'],
+    ['engine','reactor'],['reactor','security'],['security','medbay'],
+    ['medbay','admin'],['admin','shields'],['storage','comms'],['elec','engine'],
+    ['elec','storage'],['o2','reactor'],
+  ];
+
+  let auPlayers=[], auMyIdx=0, auPhase='lobby', auRaf=null;
+  let auKeys={}, auDeadBodies=[], auKillCooldown=0, auActiveTask=null;
+  let auTasksTotal=0, auTasksDone=0, auVotes={}, auVoteTimer=null;
+  let auMeetingReason='', auMyVote=null;
+  let auLastTime=0, auAnimFrame=0;
+
+  function auScreen(id) {
+    ['au-lobby-screen','au-game-screen','au-meeting-screen','au-gameover-screen']
+      .forEach(s => document.getElementById(s).classList.toggle('hidden', s !== id));
+  }
+
+  function resetAmongUs() {
+    if (auRaf) { cancelAnimationFrame(auRaf); auRaf = null; }
+    if (auVoteTimer) { clearInterval(auVoteTimer); auVoteTimer = null; }
+    auPhase='lobby'; auDeadBodies=[]; auKillCooldown=0; auActiveTask=null;
+    auTasksDone=0; auVotes={}; auMyVote=null;
+
+    const friends = [...callGroup];
+    const myName = currentUser ? currentUser.username : 'You';
+    const allNames = [myName, ...friends];
+    const bots = ['Crewbot','Redbot','Bluebot','Greenbot','Pinkbot','Orangebot'];
+    while (allNames.length < 6) allNames.push(bots[allNames.length - friends.length - 1]);
+
+    const startRoom = AU_ROOMS[0];
+    auPlayers = allNames.slice(0,8).map((name,i) => ({
+      name, color: AU_COLORS[i], colorName: AU_COLOR_NAMES[i],
+      x: startRoom.x + startRoom.w/2 + (Math.random()-0.5)*80,
+      y: startRoom.y + startRoom.h/2 + (Math.random()-0.5)*40,
+      role: 'crewmate', alive: true,
+      isBot: i !== 0 && !friends.includes(name),
+      isMe: i === 0,
+      tasks: [], vx:(Math.random()-.5)*2, vy:(Math.random()-.5)*2,
+      facing: 1, walkFrame: 0,
+    }));
+    auMyIdx = 0;
+
+    // Assign tasks
+    auPlayers.forEach(p => {
+      const pool = AU_ROOMS.flatMap(r => r.tasks.map(t => ({ room: r, task: t })));
+      p.tasks = pool.sort(()=>Math.random()-.5).slice(0,3).map(t => ({...t, done:false}));
+    });
+
+    document.getElementById('au-player-list').innerHTML = auPlayers.map(p => `
+      <div class="au-player-chip" style="border-color:${p.color};color:${p.color}">
+        <div class="au-chip-dot" style="background:${p.color}"></div>
+        ${p.isMe?'ðŸ‘¤':p.isBot?'ðŸ¤–':'ðŸ‘¥'} ${p.name}
+      </div>`).join('');
+
+    document.getElementById('au-lobby-info').textContent =
+      friends.length ? `Playing with ${friends.map(f=>'@'+f).join(', ')} + bots`
+                     : 'No friends on call â€” playing with bots';
+
+    auScreen('au-lobby-screen');
+  }
+
+  function auStartGame() {
+    const impCount = parseInt(document.getElementById('au-impostor-count').value);
+    const pool = auPlayers.map((_,i)=>i).filter(i=>i!==0).sort(()=>Math.random()-.5);
+    pool.slice(0,impCount).forEach(i => auPlayers[i].role = 'impostor');
+
+    auTasksTotal = auPlayers.filter(p=>p.role==='crewmate').reduce((s,p)=>s+p.tasks.length,0);
+    auTasksDone = 0; auPhase = 'game'; auKillCooldown = 10;
+
+    // Setup canvas
+    const canvas = document.getElementById('au-canvas');
+    const dpr = window.devicePixelRatio||1;
+    canvas.width  = AU_W * dpr;
+    canvas.height = AU_H * dpr;
+    canvas.style.height = AU_H + 'px';
+    canvas.getContext('2d').scale(dpr, dpr);
+    canvas.onclick = auCanvasClick;
+
+    // D-pad
+    const dirs = {up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'};
+    Object.entries(dirs).forEach(([d,k]) => {
+      const btn = document.getElementById('dpad-'+d);
+      if (!btn) return;
+      btn.addEventListener('mousedown',  () => { auKeys[k]=true; });
+      btn.addEventListener('touchstart', (e) => { e.preventDefault(); auKeys[k]=true; }, {passive:false});
+      btn.addEventListener('mouseup',    () => { auKeys[k]=false; });
+      btn.addEventListener('touchend',   () => { auKeys[k]=false; });
+    });
+
+    document.addEventListener('keydown', e => { auKeys[e.key]=true; });
+    document.addEventListener('keyup',   e => { auKeys[e.key]=false; });
+
+    // Role reveal
+    const me = auPlayers[auMyIdx];
+    const pill = document.getElementById('au-role-pill');
+    if (pill) {
+      pill.textContent = me.role==='impostor' ? 'ðŸ”ª IMPOSTOR' : 'ðŸ§‘â€ðŸš€ CREWMATE';
+      pill.style.background = me.role==='impostor' ? 'rgba(197,17,17,.3)' : 'rgba(17,127,45,.3)';
+      pill.style.color = me.role==='impostor' ? '#F87171' : '#4ADE80';
+      pill.style.border = `1px solid ${me.role==='impostor'?'#F87171':'#4ADE80'}`;
+    }
+
+    auScreen('au-game-screen');
+    auUpdateHUD();
+    auRaf = requestAnimationFrame(auLoop);
+  }
+
+  function auLoop(ts) {
+    if (auPhase !== 'game') return;
+    const dt = Math.min((ts - auLastTime) / 16.67, 3);
+    auLastTime = ts;
+    auAnimFrame++;
+    auTick(dt);
+    auDraw();
+    auRaf = requestAnimationFrame(auLoop);
+  }
+
+  function auTick(dt) {
+    const me = auPlayers[auMyIdx];
+    const spd = 3 * dt;
+
+    if (me.alive) {
+      let moved = false;
+      if (auKeys['ArrowUp']   ||auKeys['w']) { me.y -= spd; moved=true; me.facing=1; }
+      if (auKeys['ArrowDown'] ||auKeys['s']) { me.y += spd; moved=true; me.facing=1; }
+      if (auKeys['ArrowLeft'] ||auKeys['a']) { me.x -= spd; moved=true; me.facing=-1; }
+      if (auKeys['ArrowRight']||auKeys['d']) { me.x += spd; moved=true; me.facing=1; }
+      me.x = Math.max(10, Math.min(AU_W-10, me.x));
+      me.y = Math.max(10, Math.min(AU_H-10, me.y));
+      if (moved) me.walkFrame += dt;
+    }
+
+    if (auKillCooldown > 0) auKillCooldown -= dt * 0.06;
+
+    // Bot AI
+    auPlayers.forEach((p,i) => {
+      if (!p.isBot || !p.alive) return;
+      if (Math.random() < 0.03) { p.vx=(Math.random()-.5)*3; p.vy=(Math.random()-.5)*3; }
+      // Bots navigate toward tasks or targets
+      if (p.role==='crewmate' && p.tasks.some(t=>!t.done)) {
+        const t = p.tasks.find(t=>!t.done);
+        const dx = (t.room.x+t.room.w/2) - p.x, dy = (t.room.y+t.room.h/2) - p.y;
+        const d = Math.hypot(dx,dy);
+        if (d > 5) { p.vx = (dx/d)*2; p.vy = (dy/d)*2; }
+        else { t.done=true; auTasksDone++; auUpdateHUD(); auCheckWin(); }
+      }
+      if (p.role==='impostor') {
+        const target = auPlayers.find((c,ci)=>ci!==i&&c.alive&&c.role==='crewmate'&&Math.hypot(c.x-p.x,c.y-p.y)<200);
+        if (target) { const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy); p.vx=(dx/d)*2.5; p.vy=(dy/d)*2.5; }
+        if (Math.random()<0.008) {
+          const victim = auPlayers.find((c,ci)=>ci!==i&&c.alive&&c.role==='crewmate'&&Math.hypot(c.x-p.x,c.y-p.y)<35);
+          if (victim) { victim.alive=false; auDeadBodies.push({x:victim.x,y:victim.y,color:victim.color,name:victim.name}); auCheckWin(); }
+        }
+      }
+      p.x = Math.max(10, Math.min(AU_W-10, p.x + p.vx));
+      p.y = Math.max(10, Math.min(AU_H-10, p.y + p.vy));
+      if (Math.abs(p.vx)>0.1||Math.abs(p.vy)>0.1) p.walkFrame += dt;
+      p.facing = p.vx >= 0 ? 1 : -1;
+    });
+
+    auUpdateActionBtns();
+  }
+
+  function auUpdateActionBtns() {
+    const me = auPlayers[auMyIdx];
+    if (!me || !me.alive) { ['au-kill-btn','au-task-btn','au-report-btn'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';}); return; }
+
+    // Kill button
+    const killBtn = document.getElementById('au-kill-btn');
+    if (killBtn) {
+      if (me.role==='impostor' && auKillCooldown<=0) {
+        const victim = auPlayers.find((p,i)=>i!==auMyIdx&&p.alive&&p.role==='crewmate'&&Math.hypot(p.x-me.x,p.y-me.y)<45);
+        killBtn.style.display = victim ? 'block' : 'none';
+        killBtn.dataset.target = victim ? victim.name : '';
+      } else if (me.role==='impostor') {
+        killBtn.style.display = 'block';
+        killBtn.textContent = `ðŸ”ª KILL (${Math.ceil(auKillCooldown)}s)`;
+        killBtn.style.opacity = '0.5';
+        killBtn.disabled = true;
+      } else {
+        killBtn.style.display = 'none';
+      }
+      if (me.role==='impostor' && auKillCooldown<=0) { killBtn.style.opacity='1'; killBtn.disabled=false; killBtn.textContent='ðŸ”ª KILL'; }
+    }
+
+    // Task button
+    const taskBtn = document.getElementById('au-task-btn');
+    if (taskBtn) {
+      if (me.role==='crewmate') {
+        const t = me.tasks.find(t => !t.done && me.x>t.room.x&&me.x<t.room.x+t.room.w&&me.y>t.room.y&&me.y<t.room.y+t.room.h);
+        taskBtn.style.display = t ? 'block' : 'none';
+        if (t) { taskBtn.textContent = `âœ… ${t.task}`; taskBtn.dataset.task = t.task; }
+      } else { taskBtn.style.display='none'; }
+    }
+
+    // Report button
+    const repBtn = document.getElementById('au-report-btn');
+    if (repBtn) {
+      const body = auDeadBodies.find(b=>Math.hypot(b.x-me.x,b.y-me.y)<50);
+      repBtn.style.display = body ? 'block' : 'none';
+      if (body) repBtn.dataset.body = body.name;
+    }
+  }
+
+  function auDoKill() {
+    const me = auPlayers[auMyIdx];
+    const btn = document.getElementById('au-kill-btn');
+    const targetName = btn && btn.dataset.target;
+    if (!targetName) return;
+    const target = auPlayers.find(p=>p.name===targetName);
+    if (!target) return;
+    target.alive = false;
+    auDeadBodies.push({x:target.x, y:target.y, color:target.color, name:target.name});
+    auKillCooldown = 10;
+    // Flash
+    const flash = document.getElementById('au-kill-flash');
+    if (flash) { flash.style.opacity='1'; setTimeout(()=>flash.style.opacity='0',200); }
+    auCheckWin();
+  }
+
+  function auDoTask() {
+    const me = auPlayers[auMyIdx];
+    const btn = document.getElementById('au-task-btn');
+    const taskName = btn && btn.dataset.task;
+    if (!taskName) return;
+    const t = me.tasks.find(t=>t.task===taskName&&!t.done);
+    if (!t) return;
+    auActiveTask = t;
+    auShowTaskMinigame(t);
+  }
+
+  function auReportBody() {
+    const btn = document.getElementById('au-report-btn');
+    const bodyName = btn && btn.dataset.body;
+    auDeadBodies = auDeadBodies.filter(b=>b.name!==bodyName);
+    auShowMeeting(`${bodyName}'s body was found!`);
+  }
+
+  function auShowTaskMinigame(t) {
+    const overlay = document.getElementById('au-task-overlay');
+    const title   = document.getElementById('au-task-title');
+    const content = document.getElementById('au-task-content');
+    if (!overlay) return;
+    title.textContent = t.task;
+    overlay.style.display = 'flex';
+
+    // Wire-matching minigame for all tasks
+    const colors = ['#C51111','#132ED1','#117F2D','#ED54BA'];
+    const shuffled = [...colors].sort(()=>Math.random()-.5);
+    let selected = null;
+    let matched = 0;
+    content.innerHTML = `
+      <div style="display:flex;justify-content:space-between;gap:16px">
+        <div id="au-wires-left" style="display:flex;flex-direction:column;gap:10px"></div>
+        <div style="flex:1;position:relative" id="au-wire-canvas-wrap">
+          <svg id="au-wire-svg" style="position:absolute;inset:0;width:100%;height:100%;overflow:visible"></svg>
+        </div>
+        <div id="au-wires-right" style="display:flex;flex-direction:column;gap:10px"></div>
+      </div>
+      <div id="au-wire-msg" style="font-size:12px;color:#9CA3AF;text-align:center;margin-top:8px">Match the colored wires!</div>`;
+
+    const leftDiv  = document.getElementById('au-wires-left');
+    const rightDiv = document.getElementById('au-wires-right');
+    colors.forEach((c,i) => {
+      leftDiv.innerHTML  += `<div class="au-wire-dot" data-side="left"  data-idx="${i}" data-color="${c}" style="background:${c};width:22px;height:22px;border-radius:50%;cursor:pointer;border:3px solid rgba(255,255,255,.3)"></div>`;
+      rightDiv.innerHTML += `<div class="au-wire-dot" data-side="right" data-idx="${i}" data-color="${shuffled[i]}" style="background:${shuffled[i]};width:22px;height:22px;border-radius:50%;cursor:pointer;border:3px solid rgba(255,255,255,.3)"></div>`;
+    });
+
+    content.querySelectorAll('.au-wire-dot').forEach(dot => {
+      dot.onclick = () => {
+        if (!selected) {
+          if (dot.dataset.side !== 'left') return;
+          selected = dot;
+          dot.style.border = '3px solid #fff';
+        } else {
+          if (dot.dataset.side !== 'right') { selected.style.border='3px solid rgba(255,255,255,.3)'; selected=null; return; }
+          if (selected.dataset.color === dot.dataset.color) {
+            selected.style.border='3px solid #4ADE80'; dot.style.border='3px solid #4ADE80';
+            matched++;
+            if (matched === colors.length) {
+              document.getElementById('au-wire-msg').textContent = 'âœ… Complete!';
+              setTimeout(() => { auCompleteTask(t); auCloseTask(); }, 600);
+            }
+          } else {
+            selected.style.border='3px solid #F87171'; dot.style.border='3px solid #F87171';
+            setTimeout(()=>{ selected.style.border='3px solid rgba(255,255,255,.3)'; dot.style.border='3px solid rgba(255,255,255,.3)'; selected=null; },500);
+            return;
+          }
+          selected = null;
+        }
+      };
+    });
+  }
+
+  function auCompleteTask(t) {
+    t.done = true;
+    auTasksDone++;
+    auUpdateHUD();
+    auCheckWin();
+  }
+
+  function auCloseTask() {
+    const overlay = document.getElementById('au-task-overlay');
+    if (overlay) overlay.style.display = 'none';
+    auActiveTask = null;
+  }
+
+  function auCallMeeting() {
+    if (auPhase !== 'game') return;
+    auShowMeeting('Emergency meeting called!');
+  }
+
+  function auShowMeeting(reason) {
+    auPhase = 'meeting';
+    auMeetingReason = reason;
+    auMyVote = null;
+    auVotes = {};
+    if (auRaf) { cancelAnimationFrame(auRaf); auRaf = null; }
+
+    document.getElementById('au-meeting-reason').textContent = reason;
+    const alive = auPlayers.filter(p=>p.alive);
+    const me = auPlayers[auMyIdx];
+
+    document.getElementById('au-vote-list').innerHTML = [
+      ...alive.map(p => `
+        <div class="au-vote-card${p.isMe?' au-vote-card-me':''}" id="vcard-${p.name}" onclick="auVote('${p.name}')">
+          <div class="au-vote-avatar" style="background:${p.color}33;border:2px solid ${p.color}">
+            <svg width="28" height="28" viewBox="0 0 40 50">${auCrewmateSVG(p.color)}</svg>
+          </div>
+          <div class="au-vote-name">${p.name}${p.isMe?' (You)':''}</div>
+          <div class="au-vote-count" id="vcount-${p.name}">0 votes</div>
+          ${me.role==='impostor'&&p.role==='impostor'&&!p.isMe?'<div class="au-vote-badge" style="background:#F87171;color:#fff">IMP</div>':''}
+        </div>`),
+      `<div class="au-vote-card skip-card" id="vcard-skip" onclick="auVote('skip')">
+        <div class="au-vote-avatar" style="background:#37415133;border:2px solid #6B7280;font-size:24px">â­</div>
+        <div class="au-vote-name">Skip</div>
+        <div class="au-vote-count" id="vcount-skip">0 votes</div>
+      </div>`
+    ].join('');
+
+    // Bots vote after 2-5s
+    alive.filter(p=>p.isBot).forEach(p => {
+      setTimeout(() => {
+        const targets = alive.filter(t=>t.name!==p.name);
+        const pick = p.role==='impostor'
+          ? targets.filter(t=>t.role==='crewmate')[Math.floor(Math.random()*targets.filter(t=>t.role==='crewmate').length)]||targets[0]
+          : targets[Math.floor(Math.random()*targets.length)];
+        if (pick) { auVotes[p.name]=pick.name; auUpdateVoteCounts(); }
+      }, 2000 + Math.random()*3000);
+    });
+
+    let t = 30;
+    auVoteTimer = setInterval(() => {
+      t--;
+      const el = document.getElementById('au-vote-timer');
+      if (el) el.textContent = `Auto-skip in ${t}s`;
+      if (t <= 0) { clearInterval(auVoteTimer); auVoteTimer=null; auVote('skip'); }
+    }, 1000);
+
+    auScreen('au-meeting-screen');
+  }
+
+  function auVote(target) {
+    if (auMyVote) return;
+    auMyVote = target;
+    auVotes['__me__'] = target;
+    const card = document.getElementById('vcard-'+target);
+    if (card) card.classList.add('voted');
+    auUpdateVoteCounts();
+    // Resolve after 2s
+    setTimeout(auResolveVote, 2000);
+  }
+
+  function auUpdateVoteCounts() {
+    const tally = {};
+    Object.values(auVotes).forEach(v => tally[v]=(tally[v]||0)+1);
+    Object.entries(tally).forEach(([name,count]) => {
+      const el = document.getElementById('vcount-'+name);
+      if (el) el.textContent = `${count} vote${count!==1?'s':''}`;
+    });
+  }
+
+  function auResolveVote() {
+    if (auVoteTimer) { clearInterval(auVoteTimer); auVoteTimer=null; }
+    const tally = {};
+    Object.values(auVotes).forEach(v => tally[v]=(tally[v]||0)+1);
+    let maxV=0, ejected=null;
+    Object.entries(tally).forEach(([name,count]) => {
+      if (name!=='skip' && count>maxV) { maxV=count; ejected=name; }
+    });
+    if (ejected) {
+      const p = auPlayers.find(p=>p.name===ejected);
+      if (p) p.alive = false;
+    }
+    if (!auCheckWin()) {
+      auPhase = 'game';
+      auScreen('au-game-screen');
+      auLastTime = performance.now();
+      auRaf = requestAnimationFrame(auLoop);
+    }
+  }
+
+  function auCheckWin() {
+    const aliveImps = auPlayers.filter(p=>p.alive&&p.role==='impostor').length;
+    const aliveCrew = auPlayers.filter(p=>p.alive&&p.role==='crewmate').length;
+    if (aliveImps===0 || auTasksDone>=auTasksTotal) { auEndGame('crew'); return true; }
+    if (aliveImps>=aliveCrew) { auEndGame('impostor'); return true; }
+    auUpdateHUD();
+    return false;
+  }
+
+  function auEndGame(winner) {
+    auPhase = 'over';
+    if (auRaf) { cancelAnimationFrame(auRaf); auRaf=null; }
+    if (auVoteTimer) { clearInterval(auVoteTimer); auVoteTimer=null; }
+    const me = auPlayers[auMyIdx];
+    const iWon = (winner==='crew'&&me.role==='crewmate')||(winner==='impostor'&&me.role==='impostor');
+    const title = document.getElementById('au-gameover-title');
+    title.textContent = winner==='crew' ? 'CREWMATES WIN' : 'IMPOSTORS WIN';
+    title.className = 'au-gameover-title ' + (winner==='crew'?'au-gameover-crew':'au-gameover-imp');
+    document.getElementById('au-gameover-sub').textContent = iWon ? 'ðŸ† You were on the winning side!' : 'ðŸ’€ Better luck next time...';
+    document.getElementById('au-reveal-list').innerHTML = auPlayers.map(p=>`
+      <div class="au-player-chip" style="border-color:${p.color};color:${p.color}">
+        <div class="au-chip-dot" style="background:${p.color}"></div>
+        ${p.name}: ${p.role==='impostor'?'ðŸ”ª Impostor':'ðŸ§‘â€ðŸš€ Crewmate'}
+      </div>`).join('');
+    auScreen('au-gameover-screen');
+  }
+
+  function auUpdateHUD() {
+    const alive = auPlayers.filter(p=>p.alive);
+    const crewEl = document.getElementById('au-crew-count');
+    const impEl  = document.getElementById('au-imp-count');
+    const taskEl = document.getElementById('au-task-label');
+    const bar    = document.getElementById('au-task-bar');
+    if (crewEl) crewEl.textContent = alive.filter(p=>p.role==='crewmate').length;
+    if (impEl)  impEl.textContent  = alive.filter(p=>p.role==='impostor').length;
+    if (taskEl) taskEl.textContent = `Tasks: ${auTasksDone}/${auTasksTotal}`;
+    if (bar)    bar.style.width    = auTasksTotal ? (auTasksDone/auTasksTotal*100)+'%' : '0%';
+  }
+
+  function auCanvasClick(e) {
+    if (auPhase!=='game') return;
+    const rect = e.target.getBoundingClientRect();
+    const sx = AU_W / rect.width;
+    const me = auPlayers[auMyIdx];
+    if (me) { me.x=(e.clientX-rect.left)*sx; me.y=(e.clientY-rect.top)*sx; }
+  }
+
+  // â”€â”€ Drawing â”€â”€
+  function auCrewmateSVG(color) {
+    return `<ellipse cx="20" cy="32" rx="14" ry="16" fill="${color}"/>
+    <ellipse cx="20" cy="18" rx="12" ry="12" fill="${color}"/>
+    <ellipse cx="24" cy="15" rx="7" ry="6" fill="#99d6ff" opacity=".9"/>
+    <rect x="6" y="28" width="6" height="12" rx="3" fill="${color}"/>
+    <rect x="28" y="28" width="6" height="12" rx="3" fill="${color}"/>`;
+  }
+
+  function auDraw() {
+    const canvas = document.getElementById('au-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0,0,AU_W,AU_H);
+
+    // Space background
+    ctx.fillStyle = '#060610';
+    ctx.fillRect(0,0,AU_W,AU_H);
+
+    // Stars
+    ctx.fillStyle = 'rgba(255,255,255,.4)';
+    for (let i=0;i<60;i++) {
+      const sx=(i*137.5)%AU_W, sy=(i*97.3)%AU_H;
+      ctx.fillRect(sx,sy,1,1);
+    }
+
+    // Draw corridors first
+    ctx.strokeStyle = '#1a2a3a';
+    ctx.lineWidth = 28;
+    ctx.lineCap = 'round';
+    AU_CORRIDORS.forEach(([a,b]) => {
+      const ra = AU_ROOMS.find(r=>r.id===a), rb = AU_ROOMS.find(r=>r.id===b);
+      if (!ra||!rb) return;
+      ctx.beginPath();
+      ctx.moveTo(ra.x+ra.w/2, ra.y+ra.h/2);
+      ctx.lineTo(rb.x+rb.w/2, rb.y+rb.h/2);
+      ctx.stroke();
+    });
+    // Corridor highlight
+    ctx.strokeStyle = '#243040';
+    ctx.lineWidth = 20;
+    AU_CORRIDORS.forEach(([a,b]) => {
+      const ra = AU_ROOMS.find(r=>r.id===a), rb = AU_ROOMS.find(r=>r.id===b);
+      if (!ra||!rb) return;
+      ctx.beginPath();
+      ctx.moveTo(ra.x+ra.w/2, ra.y+ra.h/2);
+      ctx.lineTo(rb.x+rb.w/2, rb.y+rb.h/2);
+      ctx.stroke();
+    });
+
+    // Rooms
+    AU_ROOMS.forEach(r => {
+      // Shadow
+      ctx.shadowColor = 'rgba(0,0,0,.6)';
+      ctx.shadowBlur = 12;
+      ctx.fillStyle = r.fill;
+      ctx.beginPath();
+      ctx.roundRect(r.x, r.y, r.w, r.h, 10);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      // Border
+      ctx.strokeStyle = 'rgba(255,255,255,.08)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Floor grid lines
+      ctx.strokeStyle = 'rgba(255,255,255,.04)';
+      ctx.lineWidth = 1;
+      for (let gx=r.x+20; gx<r.x+r.w; gx+=20) {
+        ctx.beginPath(); ctx.moveTo(gx,r.y); ctx.lineTo(gx,r.y+r.h); ctx.stroke();
+      }
+      for (let gy=r.y+20; gy<r.y+r.h; gy+=20) {
+        ctx.beginPath(); ctx.moveTo(r.x,gy); ctx.lineTo(r.x+r.w,gy); ctx.stroke();
+      }
+
+      // Room name
+      ctx.fillStyle = 'rgba(255,255,255,.5)';
+      ctx.font = 'bold 9px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(r.name.toUpperCase(), r.x+r.w/2, r.y+14);
+    });
+
+    // Task markers
+    const me = auPlayers[auMyIdx];
+    if (me && me.role==='crewmate') {
+      me.tasks.forEach(t => {
+        if (t.done) return;
+        const r = t.room;
+        const inRoom = me.x>r.x&&me.x<r.x+r.w&&me.y>r.y&&me.y<r.y+r.h;
+        ctx.fillStyle = inRoom ? '#4ADE80' : '#22C55E88';
+        ctx.beginPath();
+        ctx.arc(r.x+r.w/2, r.y+r.h-14, inRoom?7:5, 0, Math.PI*2);
+        ctx.fill();
+        if (inRoom) {
+          ctx.fillStyle = '#fff';
+          ctx.font = '8px monospace';
+          ctx.textAlign = 'center';
+          ctx.fillText(t.task.slice(0,12), r.x+r.w/2, r.y+r.h-4);
+        }
+      });
+    }
+
+    // Dead bodies
+    auDeadBodies.forEach(b => {
+      ctx.save();
+      ctx.translate(b.x, b.y);
+      ctx.rotate(Math.PI/2);
+      ctx.scale(.7,.7);
+      // Body lying down
+      ctx.fillStyle = b.color;
+      ctx.beginPath(); ctx.ellipse(0,0,14,10,0,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle = '#99d6ff88';
+      ctx.beginPath(); ctx.ellipse(4,-3,6,4,0,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+      // Bone icon
+      ctx.fillStyle = '#fff';
+      ctx.font = '12px serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ðŸ’€', b.x, b.y-14);
+    });
+
+    // Players
+    auPlayers.forEach((p,i) => {
+      const isMe = i===auMyIdx;
+      const walk = Math.sin(p.walkFrame*0.4)*3;
+
+      if (!p.alive) {
+        // Ghost
+        ctx.globalAlpha = 0.35;
+        ctx.save();
+        ctx.translate(p.x, p.y+walk);
+        ctx.scale(p.facing*0.7, 0.7);
+        auDrawCrewmate(ctx, p.color, true);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+        return;
+      }
+
+      ctx.save();
+      ctx.translate(p.x, p.y+walk);
+      ctx.scale(p.facing * (isMe?1.1:0.9), isMe?1.1:0.9);
+
+      // Glow for local player
+      if (isMe) {
+        ctx.shadowColor = p.color;
+        ctx.shadowBlur = 14;
+      }
+      auDrawCrewmate(ctx, p.color, false);
+      ctx.shadowBlur = 0;
+      ctx.restore();
+
+      // Name tag
+      ctx.fillStyle = isMe ? '#fff' : 'rgba(255,255,255,.75)';
+      ctx.font = `${isMe?'bold ':''} ${isMe?10:9}px monospace`;
+      ctx.textAlign = 'center';
+      ctx.fillText(p.name.slice(0,10), p.x, p.y - (isMe?22:18));
+
+      // Impostor marker (only visible to impostors)
+      if (me && me.role==='impostor' && p.role==='impostor' && !p.isMe) {
+        ctx.fillStyle = '#F87171';
+        ctx.font = '11px serif';
+        ctx.fillText('ðŸ”ª', p.x+14, p.y-18);
+      }
+    });
+
+    // Kill range indicator for impostor
+    if (me && me.alive && me.role==='impostor' && auKillCooldown<=0) {
+      ctx.strokeStyle = 'rgba(197,17,17,.2)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4,4]);
+      ctx.beginPath();
+      ctx.arc(me.x, me.y, 45, 0, Math.PI*2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  function auDrawCrewmate(ctx, color, ghost) {
+    const alpha = ghost ? 0.5 : 1;
+    // Legs
+    ctx.fillStyle = color;
+    ctx.globalAlpha = alpha;
+    ctx.fillRect(-8, 14, 6, 10);
+    ctx.fillRect(2, 14, 6, 10);
+    // Body
+    ctx.beginPath();
+    ctx.ellipse(0, 6, 12, 14, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Head
+    ctx.beginPath();
+    ctx.ellipse(0, -8, 11, 11, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Visor
+    ctx.fillStyle = ghost ? 'rgba(153,214,255,.4)' : '#99d6ff';
+    ctx.beginPath();
+    ctx.ellipse(3, -10, 7, 6, -0.2, 0, Math.PI*2);
+    ctx.fill();
+    // Visor shine
+    ctx.fillStyle = 'rgba(255,255,255,.5)';
+    ctx.beginPath();
+    ctx.ellipse(1, -12, 3, 2, -0.3, 0, Math.PI*2);
+    ctx.fill();
+    // Backpack
+    ctx.fillStyle = color;
+    ctx.fillRect(-16, 0, 6, 12);
+    ctx.globalAlpha = 1;
+  }
+
+
+    // â”€â”€ Chat â”€â”€
+  // messages[username] = [{from, text, time}]
+  const chatMessages = {};
+  const BOT_REPLIES = [
+    "haha yeah ðŸ˜‚", "no way!", "let's play a game later?",
+    "that's actually wild", "bro same ðŸ’€", "ok ok I see you",
+    "when are you free?", "facts fr", "lmaooo", "say less ðŸ‘Œ",
+  ];
+  let activeChatUser = null;
+
+  function openChat(username) {
+    if (!chatMessages[username]) chatMessages[username] = [];
+    showPage('chat');
+    document.getElementById('chat-sidebar-username').textContent =
+      '@' + (currentUser ? currentUser.username : 'you');
+    renderConvoList(username);
+    openConvo(username);
+  }
+
+  function renderConvoList(activeUser) {
+    const container = document.getElementById('convo-items');
+    const users = getUsers();
+    container.innerHTML = users.map(u => {
+      const msgs = chatMessages[u.username] || [];
+      const last = msgs[msgs.length - 1];
+      const unread = msgs.filter(m => m.from !== 'me' && !m.read).length;
+      return `
+        <div class="convo-item ${activeUser === u.username ? 'active' : ''}" onclick="openConvo('${u.username}')">
+          <div class="convo-avatar">
+            ${u.username.slice(0,2).toUpperCase()}
+            ${u.online ? '<div class="online-dot"></div>' : ''}
+          </div>
+          <div class="convo-meta">
+            <div class="convo-name">@${u.username}</div>
+            <div class="convo-preview">${last ? (last.from === 'me' ? 'You: ' : '') + last.text : 'Say hello!'}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+            ${last ? `<span class="convo-time">${last.time}</span>` : ''}
+            ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
+          </div>
+        </div>`;
+    }).join('');
+  }
+
+  function openConvo(username) {
+    activeChatUser = username;
+    // Mark all as read
+    if (chatMessages[username]) chatMessages[username].forEach(m => m.read = true);
+    renderConvoList(username);
+
+    const user = getUsers().find(u => u.username === username);
+    const isOnline = user && user.online;
+    const myInitials = currentUser ? currentUser.username.slice(0,2).toUpperCase() : 'ME';
+
+    document.getElementById('chat-window').innerHTML = `
+      <div class="chat-header">
+        <div class="convo-avatar" style="width:38px;height:38px;font-size:13px">
+          ${username.slice(0,2).toUpperCase()}
+          ${isOnline ? '<div class="online-dot"></div>' : ''}
+        </div>
+        <div class="chat-header-info">
+          <div class="chat-header-name">@${username}</div>
+          <div class="chat-header-status ${isOnline ? '' : 'offline'}">${isOnline ? 'â— Online' : 'â—‹ Offline'}</div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="icon-btn" title="Voice call" onclick="toggleCall('${username}');showPage('dashboard')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="icon-btn" title="Play a game" onclick="showPage('arcade')">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-msgs"></div>
+      <div class="chat-input-bar">
+        <textarea class="chat-input" id="chat-input" placeholder="Message @${username}..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    `;
+    renderMessages();
+    setTimeout(() => document.getElementById('chat-input') && document.getElementById('chat-input').focus(), 50);
+  }
+
+  function renderMessages() {
+    const container = document.getElementById('chat-msgs');
+    if (!container || !activeChatUser) return;
+    const msgs = chatMessages[activeChatUser] || [];
+    const myInitials = currentUser ? currentUser.username.slice(0,2).toUpperCase() : 'ME';
+
+    if (!msgs.length) {
+      container.innerHTML = `<div class="chat-empty">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <p>No messages yet. Say hi!</p>
+      </div>`;
+      return;
+    }
+
+    // Group consecutive messages from same sender
+    let html = '';
+    let i = 0;
+    while (i < msgs.length) {
+      const m = msgs[i];
+      const isMine = m.from === 'me';
+      const initials = isMine ? myInitials : activeChatUser.slice(0,2).toUpperCase();
+      let bubbles = `<div class="bubble">${escapeHtml(m.text)}</div>`;
+      let j = i + 1;
+      while (j < msgs.length && msgs[j].from === m.from) {
+        bubbles += `<div class="bubble">${escapeHtml(msgs[j].text)}</div>`;
+        j++;
+      }
+      html += `
+        <div class="msg-group ${isMine ? 'mine' : ''}">
+          <div class="msg-avatar">${initials}</div>
+          <div class="msg-bubbles">
+            ${bubbles}
+            <span class="msg-time">${m.time}</span>
+          </div>
+        </div>`;
+      i = j;
+    }
+    container.innerHTML = html;
+    container.scrollTop = container.scrollHeight;
+  }
+
+  function sendMessage() {
+    const input = document.getElementById('chat-input');
+    if (!input || !activeChatUser) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    if (!chatMessages[activeChatUser]) chatMessages[activeChatUser] = [];
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    chatMessages[activeChatUser].push({ from: 'me', text, time, read: true });
+    input.value = '';
+    input.style.height = 'auto';
+    renderMessages();
+    renderConvoList(activeChatUser);
+
+    // Bot reply after short delay
+    setTimeout(() => {
+      const reply = BOT_REPLIES[Math.floor(Math.random() * BOT_REPLIES.length)];
+      const replyTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      chatMessages[activeChatUser].push({ from: activeChatUser, text: reply, time: replyTime, read: true });
+      renderMessages();
+      renderConvoList(activeChatUser);
+    }, 800 + Math.random() * 700);
+  }
+
+  function handleChatKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  // â”€â”€ Boot â”€â”€
+  init();
+</script>
+</body>
+</html>
