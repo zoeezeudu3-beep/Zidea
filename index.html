@@ -1073,7 +1073,16 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       currentUser={email:googlePendingEmail,username};saveSession(currentUser);setLoggedInUI();startFirebaseSync();showPage('dashboard');
     }
   }
-  function handleLogout(){currentUser=null;clearSession();showPage('landing');}
+  function handleLogout(){
+    if(State.currentUser && fbSyncStarted){
+      db._patch('users/' + State.currentUser.username, { online: false, lastSeen: Date.now() });
+    }
+    if(fbListenerInterval){ fbListenerInterval.close(); fbListenerInterval = null; }
+    fbSyncStarted = false;
+    currentUser = null;
+    clearSession();
+    showPage('landing');
+  }
 
   // -- Users: Firebase-backed shared profiles --
   function getUsers(){
@@ -1113,6 +1122,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
             if (u && u.username && u.username !== State.currentUser?.username) next[k] = u;
           });
           State.setUsers(next);
+          renderOnlinePanel();
+          renderUsers(State.searchQuery || '');
         } catch(_) {}
       });
 
@@ -1125,6 +1136,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
               State.patchUser(key, u);
             }
           });
+          renderOnlinePanel();
+          renderUsers(State.searchQuery || '');
         } catch(_) {}
       });
 
@@ -1169,7 +1182,16 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       db._patch('users/' + State.currentUser.username, { lastSeen: now, online: true });
     }
   }
-  setInterval(touchLastSeen, 20000);
+  setInterval(touchLastSeen, 15000);
+
+  // Live-refresh the online panel and user list every 10s while on dashboard
+  setInterval(() => {
+    const dash = document.getElementById('page-dashboard');
+    if (dash && dash.classList.contains('active')) {
+      renderOnlinePanel();
+      renderUsers(State.searchQuery || '');
+    }
+  }, 10000);
 
   function renderOnlinePanel(){
     const users = getAllUsers();
