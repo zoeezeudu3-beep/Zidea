@@ -1108,6 +1108,18 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       online: true
     });
 
+    // Immediately read all users so panel populates before SSE fires
+    db._read('users').then(data => {
+      if (!data) return;
+      const next = {};
+      Object.entries(data).forEach(([k, u]) => {
+        if (u && u.username && u.username !== State.currentUser?.username) next[k] = u;
+      });
+      State.setUsers(next);
+      renderOnlinePanel();
+      renderUsers(State.searchQuery || '');
+    });
+
     // SSE listener � Firebase pushes updates only when data changes
     function startSSE() {
       if (fbListenerInterval) { fbListenerInterval.close(); fbListenerInterval = null; }
@@ -1166,10 +1178,10 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   }
 
   function isOnline(u){
-    if(typeof u === 'number') return Date.now() - u < 90000; // legacy lastSeen number
     if(!u) return false;
-    if(u.online === true && Date.now() - (u.lastSeen||0) < 90000) return true;
-    return Date.now() - (u.lastSeen||0) < 90000;
+    if(typeof u === 'number') return Date.now() - u < 180000;
+    if(u.online === true && Date.now() - (u.lastSeen||0) < 180000) return true;
+    return Date.now() - (u.lastSeen||0) < 180000;
   }
 
   function touchLastSeen(){
@@ -1712,41 +1724,171 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   }
 
   // ── Chat ──
-  const chatMessages={};
-  const BOT_REPLIES=["haha yeah","no way!","let's play a game later?","that's wild","same lol","ok I see you","when are you free?","facts","lmao","say less"];
-  let activeChatUser=null;
-  function openChat(username){if(!chatMessages[username])chatMessages[username]=[];showPage('chat');document.getElementById('chat-sidebar-username').textContent='@'+(currentUser?currentUser.username:'you');renderConvoList(username);openConvo(username);}
-  function renderConvoList(activeUser){
-    const container=document.getElementById('convo-items');const users=getAllUsers();
-    if(!users.length){container.innerHTML='<div style="padding:16px;font-size:13px;color:#6B7280">No users yet</div>';return;}
-    container.innerHTML=users.map(u=>{const msgs=chatMessages[u.username]||[],last=msgs[msgs.length-1],unread=msgs.filter(m=>m.from!=='me'&&!m.read).length,online=isOnline(u);return`<div class="convo-item ${activeUser===u.username?'active':''}" onclick="openConvo('${u.username}')"><div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online?'<div class="online-dot"></div>':''}</div><div class="convo-meta"><div class="convo-name">@${u.username}</div><div class="convo-preview">${last?(last.from==='me'?'You: ':'')+last.text:'Say hello!'}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;}).join('');
+  // ── Real Firebase Chat ────────────────────────────────────────────────────
+  let activeChatUser = null;
+  let chatSSE = null; // SSE listener for active convo
+  const chatCache = {}; // username -> [{from, text, time, ts}]
+
+  function chatKey(a, b) {
+    // Deterministic key for a conversation between two users
+    return [a, b].sort().join('__');
   }
-  function openConvo(username){
-    activeChatUser=username;if(chatMessages[username])chatMessages[username].forEach(m=>m.read=true);renderConvoList(username);
-    const user=getAllUsers().find(u=>u.username===username),isOnlineUser=user&&isOnline(user),myInitials=currentUser?currentUser.username.slice(0,2).toUpperCase():'ME';
-    document.getElementById('chat-window').innerHTML=`<div class="chat-header"><div class="convo-avatar" style="width:36px;height:36px;font-size:12px">${username.slice(0,2).toUpperCase()}${isOnlineUser?'<div class="online-dot"></div>':''}</div><div class="chat-header-info"><div class="chat-header-name">@${username}</div><div class="chat-header-status ${isOnlineUser?'':'offline'}">${isOnlineUser?'Online':'Offline'}</div></div><div class="chat-header-actions"><button class="icon-btn" title="Call" onclick="toggleCall('${username}');showPage('dashboard')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button><button class="icon-btn" title="Play" onclick="showPage('arcade')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></button></div></div><div class="chat-messages" id="chat-msgs"></div><div class="chat-input-bar"><textarea class="chat-input" id="chat-input" placeholder="Message @${username}..." rows="1" onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea><button class="send-btn" onclick="sendMessage()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button></div>`;
-    renderMessages();setTimeout(()=>{const inp=document.getElementById('chat-input');if(inp)inp.focus();},50);
+
+  function openChat(username) {
+    showPage('chat');
+    document.getElementById('chat-sidebar-username').textContent = '@' + (currentUser ? currentUser.username : 'you');
+    renderConvoList(username);
+    openConvo(username);
   }
-  function renderMessages(){
-    const container=document.getElementById('chat-msgs');if(!container||!activeChatUser)return;
-    const msgs=chatMessages[activeChatUser]||[],myInitials=currentUser?currentUser.username.slice(0,2).toUpperCase():'ME';
-    if(!msgs.length){container.innerHTML='<div class="chat-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet. Say hi!</p></div>';return;}
-    let html='',i=0;
-    while(i<msgs.length){const m=msgs[i],isMine=m.from==='me',initials=isMine?myInitials:activeChatUser.slice(0,2).toUpperCase();let bubbles=`<div class="bubble">${escapeHtml(m.text)}</div>`;let j=i+1;while(j<msgs.length&&msgs[j].from===m.from){bubbles+=`<div class="bubble">${escapeHtml(msgs[j].text)}</div>`;j++;}html+=`<div class="msg-group ${isMine?'mine':''}"><div class="msg-avatar">${initials}</div><div class="msg-bubbles">${bubbles}<span class="msg-time">${m.time}</span></div></div>`;i=j;}
-    container.innerHTML=html;container.scrollTop=container.scrollHeight;
+
+  function renderConvoList(activeUser) {
+    const container = document.getElementById('convo-items');
+    const users = getAllUsers();
+    if (!users.length) { container.innerHTML = '<div style="padding:16px;font-size:13px;color:#6B7280">No users yet</div>'; return; }
+    container.innerHTML = users.map(u => {
+      const msgs = chatCache[u.username] || [];
+      const last = msgs[msgs.length - 1];
+      const unread = msgs.filter(m => m.from !== currentUser?.username && !m.read).length;
+      const online = isOnline(u);
+      return `<div class="convo-item ${activeUser === u.username ? 'active' : ''}" onclick="openConvo('${u.username}')">
+        <div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online ? '<div class="online-dot"></div>' : ''}</div>
+        <div class="convo-meta">
+          <div class="convo-name">@${u.username}</div>
+          <div class="convo-preview">${last ? (last.from === currentUser?.username ? 'You: ' : '') + last.text : 'Say hello!'}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+          ${last ? `<span class="convo-time">${last.time}</span>` : ''}
+          ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
   }
-  function sendMessage(){
-    const input=document.getElementById('chat-input');if(!input||!activeChatUser)return;
-    const text=input.value.trim();if(!text)return;
-    if(!chatMessages[activeChatUser])chatMessages[activeChatUser]=[];
-    const time=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    chatMessages[activeChatUser].push({from:'me',text,time,read:true});
-    input.value='';input.style.height='auto';renderMessages();renderConvoList(activeChatUser);
-    setTimeout(()=>{const reply=BOT_REPLIES[Math.floor(Math.random()*BOT_REPLIES.length)],replyTime=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});chatMessages[activeChatUser].push({from:activeChatUser,text:reply,time:replyTime,read:true});renderMessages();renderConvoList(activeChatUser);},800+Math.random()*700);
+
+  async function openConvo(username) {
+    activeChatUser = username;
+    // Stop previous SSE
+    if (chatSSE) { chatSSE.close(); chatSSE = null; }
+
+    const user = getAllUsers().find(u => u.username === username);
+    const isOnlineUser = user && isOnline(user);
+    const myInitials = currentUser ? currentUser.username.slice(0,2).toUpperCase() : 'ME';
+
+    document.getElementById('chat-window').innerHTML = `
+      <div class="chat-header">
+        <div class="convo-avatar" style="width:36px;height:36px;font-size:12px">
+          ${username.slice(0,2).toUpperCase()}${isOnlineUser ? '<div class="online-dot"></div>' : ''}
+        </div>
+        <div class="chat-header-info">
+          <div class="chat-header-name">@${username}</div>
+          <div class="chat-header-status ${isOnlineUser ? '' : 'offline'}">${isOnlineUser ? 'Online' : 'Offline'}</div>
+        </div>
+        <div class="chat-header-actions">
+          <button class="icon-btn" title="Call" onclick="toggleCall('${username}');showPage('dashboard')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </button>
+          <button class="icon-btn" title="Play" onclick="showPage('arcade')">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="chat-messages" id="chat-msgs"></div>
+      <div class="chat-input-bar">
+        <textarea class="chat-input" id="chat-input" placeholder="Message @${username}..." rows="1"
+          onkeydown="handleChatKey(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" onclick="sendMessage()">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>`;
+
+    // Load existing messages from Firebase
+    const key = chatKey(currentUser.username, username);
+    const data = await db._read('chats/' + key + '/messages');
+    chatCache[username] = data ? Object.values(data).sort((a,b) => a.ts - b.ts) : [];
+    renderMessages();
+
+    // Subscribe to live updates via SSE
+    const sse = new EventSource(`${FB_URL}/chats/${key}/messages.json`);
+    chatSSE = sse;
+    sse.addEventListener('put', e => {
+      try {
+        const { data } = JSON.parse(e.data);
+        if (!data) return;
+        chatCache[username] = Object.values(data).sort((a,b) => a.ts - b.ts);
+        renderMessages();
+        renderConvoList(activeChatUser);
+      } catch(_) {}
+    });
+    sse.addEventListener('patch', e => {
+      try {
+        const { data } = JSON.parse(e.data);
+        if (!data) return;
+        Object.values(data).forEach(msg => {
+          if (!chatCache[username]) chatCache[username] = [];
+          if (!chatCache[username].find(m => m.ts === msg.ts && m.from === msg.from)) {
+            chatCache[username].push(msg);
+            chatCache[username].sort((a,b) => a.ts - b.ts);
+          }
+        });
+        renderMessages();
+        renderConvoList(activeChatUser);
+      } catch(_) {}
+    });
+
+    setTimeout(() => { const inp = document.getElementById('chat-input'); if (inp) inp.focus(); }, 50);
   }
-  function handleChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}
-  function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
-  function escapeHtml(str){return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function renderMessages() {
+    const container = document.getElementById('chat-msgs');
+    if (!container || !activeChatUser) return;
+    const msgs = chatCache[activeChatUser] || [];
+    const myInitials = currentUser ? currentUser.username.slice(0,2).toUpperCase() : 'ME';
+    if (!msgs.length) {
+      container.innerHTML = '<div class="chat-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet. Say hi!</p></div>';
+      return;
+    }
+    let html = '', i = 0;
+    while (i < msgs.length) {
+      const m = msgs[i];
+      const isMine = m.from === currentUser?.username;
+      const initials = isMine ? myInitials : activeChatUser.slice(0,2).toUpperCase();
+      let bubbles = `<div class="bubble">${escapeHtml(m.text)}</div>`;
+      let j = i + 1;
+      while (j < msgs.length && msgs[j].from === m.from) {
+        bubbles += `<div class="bubble">${escapeHtml(msgs[j].text)}</div>`;
+        j++;
+      }
+      html += `<div class="msg-group ${isMine ? 'mine' : ''}"><div class="msg-avatar">${initials}</div><div class="msg-bubbles">${bubbles}<span class="msg-time">${m.time}</span></div></div>`;
+      i = j;
+    }
+    container.innerHTML = html;
+    container.scrollTop = container.scrollHeight;
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('chat-input');
+    if (!input || !activeChatUser || !currentUser) return;
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = ''; input.style.height = 'auto';
+
+    const ts = Date.now();
+    const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const msg = { from: currentUser.username, text, time, ts };
+
+    // Optimistic local update
+    if (!chatCache[activeChatUser]) chatCache[activeChatUser] = [];
+    chatCache[activeChatUser].push(msg);
+    renderMessages();
+    renderConvoList(activeChatUser);
+
+    // Write to Firebase
+    const key = chatKey(currentUser.username, activeChatUser);
+    await db._patch('chats/' + key + '/messages', { [ts]: msg });
+  }
+
+  function handleChatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+  function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 100) + 'px'; }
+  function escapeHtml(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   // ── Init ──
   touchLastSeen();
@@ -1760,7 +1902,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   const ZIDAI_SYSTEM = "You are ZiD AI, a friendly and helpful AI assistant built into Zidea � a social platform where people connect, make voice calls, and play games. Answer all questions accurately and helpfully. Be concise, warm, and conversational. You know Zidea's features: Discover (find users by username), voice calls, Zidea Arcade (Tic-Tac-Toe, Among Us), and Groups.";
 
   function zidAiGetKey() {
-    return localStorage.getItem('zidai_gemini_key') || '';
+    return 'AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
   }
 
   function zidAiAppendMsg(role, text) {
@@ -1812,10 +1954,6 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     if (!text) return;
 
     const apiKey = zidAiGetKey();
-    if (!apiKey) {
-      zidAiPromptForKey();
-      return;
-    }
 
     input.value = '';
     input.style.height = 'auto';
@@ -1832,7 +1970,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
         generationConfig: { temperature: 0.8, maxOutputTokens: 1024 }
       };
       const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`,
         { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }
       );
       const data = await res.json();
@@ -1880,17 +2018,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   }
 
   function initZidAiChat() {
-    const hasKey = !!zidAiGetKey();
-    zidAiAppendMsg('ai', "Hey! I'm ZiD AI ? " + (hasKey
-      ? "Ask me anything � I'm powered by Gemini!"
-      : 'To get started, click the <strong>Set API Key</strong> button below and enter your free Gemini key.'));
-    if (!hasKey) {
-      const container = document.getElementById('zidai-messages');
-      const btn = document.createElement('div');
-      btn.style.cssText = 'display:flex;justify-content:center;padding:4px 0';
-      btn.innerHTML = `<button onclick="zidAiPromptForKey()" style="background:var(--brand);color:#fff;border:none;border-radius:10px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">? Set API Key</button>`;
-      container.appendChild(btn);
-    }
+    zidAiAppendMsg('ai', "Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!");
   }
 </script>
 </body>
