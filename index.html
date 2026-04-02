@@ -447,7 +447,9 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     </div>
     <div class="game-list" id="game-picker">
       <div class="card game-item" onclick="startGame('tictactoe')"><div class="game-emoji">⭕</div><div class="game-info"><strong>Tic-Tac-Toe</strong><p>Classic 3x3 strategy game</p></div></div>
+      <div class="card game-item" onclick="startGame('chess')"><div class="game-emoji">♟️</div><div class="game-info"><strong>Chess</strong><p>Full chess vs AI or a friend</p></div></div>
       <div class="card game-item" onclick="startGame('rps')"><div class="game-emoji">✊</div><div class="game-info"><strong>Rock Paper Scissors</strong><p>Best of 5 rounds</p></div></div>
+      <div class="card game-item" onclick="startGame('amongus')"><div class="game-emoji">🚀</div><div class="game-info"><strong>Among Us</strong><p>Find the impostor — WASD to move</p></div></div>
     </div>
     <!-- TTT -->
     <div id="game-ttt" style="display:none;flex-direction:column;gap:16px">
@@ -475,6 +477,44 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
           <button class="card" style="cursor:pointer;padding:16px;font-size:28px;text-align:center" onclick="rpsPlay('scissors')">✌️<div style="font-size:11px;color:#9CA3AF;margin-top:4px">Scissors</div></button>
         </div>
         <div id="rps-result" style="font-size:15px;font-weight:600;color:#fff;min-height:24px"></div>
+      </div>
+    </div>
+    <!-- CHESS -->
+    <div id="game-chess" style="display:none;flex-direction:column;gap:16px">
+      <button class="back-link" onclick="exitGame()">← Back</button>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div style="font-size:13px;color:#9CA3AF" id="chess-status">Your turn (White)</div>
+        <div id="chess-board" style="display:grid;grid-template-columns:repeat(8,1fr);width:min(360px,90vw);border:2px solid var(--border);border-radius:8px;overflow:hidden"></div>
+        <div id="chess-result" style="display:none;text-align:center;display:flex;flex-direction:column;gap:10px;align-items:center">
+          <p id="chess-result-text" style="font-size:16px;font-weight:700;color:#fff"></p>
+          <button class="btn-primary" style="font-size:13px" onclick="resetChess()">Play Again</button>
+        </div>
+      </div>
+    </div>
+    <!-- AMONG US -->
+    <div id="game-amongus" style="display:none;flex-direction:column;gap:16px">
+      <button class="back-link" onclick="exitGame()">← Back</button>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;align-items:center;justify-content:space-between;font-size:13px;color:#9CA3AF">
+          <span id="au-role-display">Role: ?</span>
+          <span id="au-alive-display">Alive: 5/5</span>
+          <span id="au-room-display">Room: Cafeteria</span>
+        </div>
+        <canvas id="au-canvas" width="560" height="420" style="width:100%;max-width:560px;border-radius:12px;border:1px solid var(--border);background:#060d18;display:block"></canvas>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button id="au-kill-btn" class="btn-primary" style="background:#DC2626;display:none;font-size:13px" onclick="auKill()">☠ Kill</button>
+          <button class="btn-ghost" style="font-size:13px" onclick="auMeeting()">🚨 Meeting</button>
+        </div>
+        <p style="color:#6B7280;font-size:12px;text-align:center">WASD / Arrow keys to move</p>
+        <div id="au-vote-panel" style="display:none;flex-direction:column;gap:8px">
+          <p style="color:#F87171;font-weight:700;text-align:center">🗳 Vote to eject</p>
+          <div id="au-vote-list" style="display:flex;flex-direction:column;gap:6px"></div>
+          <button class="btn-ghost" style="font-size:13px" onclick="auSkipVote()">Skip Vote</button>
+        </div>
+        <div id="au-end-panel" style="display:none;text-align:center;flex-direction:column;gap:10px;align-items:center">
+          <p id="au-end-text" style="font-size:18px;font-weight:700;color:#fff"></p>
+          <button class="btn-primary" style="font-size:13px" onclick="startGame('amongus')">Play Again</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1290,12 +1330,16 @@ function setMode(m) {
 }
 function startGame(type) {
   document.getElementById('game-picker').style.display='none';
+  ['game-ttt','game-chess','game-rps','game-amongus'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   if(type==='tictactoe'){document.getElementById('game-ttt').style.display='flex';resetTTT();}
+  if(type==='chess'){document.getElementById('game-chess').style.display='flex';resetChess();}
   if(type==='rps'){document.getElementById('game-rps').style.display='flex';resetRPS();}
+  if(type==='amongus'){document.getElementById('game-amongus').style.display='flex';resetAmongUs();}
 }
 function exitGame() {
-  ['game-ttt','game-rps'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  ['game-ttt','game-chess','game-rps','game-amongus'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
   document.getElementById('game-picker').style.display='flex';
+  if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}
 }
 
 // TTT
