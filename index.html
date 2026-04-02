@@ -627,7 +627,10 @@ function showPage(name) {
     if (b) b.classList.toggle('active', (k==='discover'&&name==='dashboard')||(k===name));
   });
   if (name === 'dashboard') { renderUsers(); renderOnline(); }
-  if (name === 'chat') { document.getElementById('chat-username').textContent = '@'+(currentUser?.username||''); renderConvos(null); }
+  if (name === 'chat') {
+    document.getElementById('chat-username').textContent = '@'+(currentUser?.username||'');
+    loadAllConvos().then(() => renderConvos(null));
+  }
   if (name === 'zidai') { if (!document.querySelector('.zidai-msg')) initZidAi(); }
 }
 
@@ -922,21 +925,53 @@ function openChat(username) {
   openConvo(username);
 }
 
+// Pre-load all conversations from Firebase for the current user
+async function loadAllConvos() {
+  if (!currentUser) return;
+  const data = await db.read('chats');
+  if (!data) return;
+  // Find all chat keys that include current user
+  const myName = currentUser.username;
+  for (const [key, val] of Object.entries(data)) {
+    const parts = key.split('__');
+    if (!parts.includes(myName)) continue;
+    const otherUser = parts.find(p => p !== myName);
+    if (!otherUser || chatCache[otherUser]) continue; // already loaded
+    const msgs = val?.messages ? Object.values(val.messages).sort((a,b) => a.ts - b.ts) : [];
+    chatCache[otherUser] = msgs;
+  }
+}
+
 function renderConvos(active) {
   const el = document.getElementById('convo-items'); if (!el) return;
   const users = getAllUsers();
-  if (!users.length) { el.innerHTML = '<div style="padding:16px;font-size:13px;color:#6B7280">No users yet</div>'; return; }
-  el.innerHTML = users.map(u => {
+  // Also include users we've chatted with (from chatCache) even if offline/not in presence
+  const chatted = Object.keys(chatCache).filter(u => !users.find(x => x.username === u));
+  const allUsers = [...users, ...chatted.map(u => ({ username: u, wins: 0, losses: 0, lastSeen: 0 }))];
+  if (!allUsers.length) { el.innerHTML = '<div style="padding:16px;font-size:13px;color:#6B7280">No users yet</div>'; return; }
+  // Sort by most recent message
+  allUsers.sort((a, b) => {
+    const ma = chatCache[a.username] || [], mb = chatCache[b.username] || [];
+    return (mb[mb.length-1]?.ts || 0) - (ma[ma.length-1]?.ts || 0);
+  });
+  el.innerHTML = allUsers.map(u => {
     const msgs = chatCache[u.username] || [];
     const last = msgs[msgs.length - 1];
     const online = isOnline(u);
+    const unread = msgs.filter(m => m.from !== currentUser?.username && !m.read).length;
+    const preview = last
+      ? (last.type && last.type !== 'text' ? '📎 ' + (last.name || last.type) : (last.from === currentUser?.username ? 'You: ' : '') + esc(last.text || ''))
+      : 'Say hello!';
     return `<div class="convo-item${active === u.username ? ' active' : ''}" onclick="openConvo('${u.username}')">
       <div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online ? '<div class="online-dot"></div>' : ''}</div>
       <div class="convo-meta">
         <div class="convo-name">@${u.username}</div>
-        <div class="convo-preview">${last ? (last.from === currentUser?.username ? 'You: ' : '') + esc(last.text) : 'Say hello!'}</div>
+        <div class="convo-preview">${preview}</div>
       </div>
-      ${last ? `<span class="convo-time">${last.time}</span>` : ''}
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+        ${last ? `<span class="convo-time">${last.time}</span>` : ''}
+        ${unread > 0 ? `<span style="background:var(--brand);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px">${unread}</span>` : ''}
+      </div>
     </div>`;
   }).join('');
 }
