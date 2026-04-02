@@ -1359,6 +1359,309 @@ function tttClick(i){
 function tttEnd(r){tttOver=true;renderTTT();document.getElementById('ttt-status').style.display='none';document.getElementById('ttt-result').style.display='flex';document.getElementById('ttt-result-text').textContent=r==='draw'?"It's a draw!":r==='X'?'You win! 🎉':gameMode==='bot'?'Bot wins!':'Player 2 wins!';}
 function resetTTT(){tttBoard=Array(9).fill(null);tttX=true;tttOver=false;document.getElementById('ttt-status').style.display='block';document.getElementById('ttt-status').textContent='Your turn (X)';document.getElementById('ttt-result').style.display='none';renderTTT();}
 
+// ── CHESS ─────────────────────────────────────────────────────────────────
+let chessBoard=[],chessSelected=null,chessTurn='w',chessOver=false,chessHighlights=[];
+const CHESS_UNICODE={K:['♔','♚'],Q:['♕','♛'],R:['♖','♜'],B:['♗','♝'],N:['♘','♞'],P:['♙','♟']};
+function chessInit(){
+  const order=['R','N','B','Q','K','B','N','R'];
+  chessBoard=Array(8).fill(null).map(()=>Array(8).fill(null));
+  for(let c=0;c<8;c++){chessBoard[0][c]={t:order[c],col:'b'};chessBoard[1][c]={t:'P',col:'b'};chessBoard[6][c]={t:'P',col:'w'};chessBoard[7][c]={t:order[c],col:'w'};}
+}
+function chessMoves(b,r,c){
+  const p=b[r][c];if(!p)return[];
+  const {t,col}=p,moves=[];
+  const inB=(r,c)=>r>=0&&r<8&&c>=0&&c<8;
+  const empty=(r,c)=>!b[r][c];
+  const enemy=(r,c)=>b[r][c]&&b[r][c].col!==col;
+  const slide=(dr,dc)=>{let nr=r+dr,nc=c+dc;while(inB(nr,nc)){if(empty(nr,nc)){moves.push([nr,nc]);}else{if(enemy(nr,nc))moves.push([nr,nc]);break;}nr+=dr;nc+=dc;}};
+  if(t==='P'){const d=col==='w'?-1:1,s=col==='w'?6:1;if(inB(r+d,c)&&empty(r+d,c)){moves.push([r+d,c]);if(r===s&&empty(r+d*2,c))moves.push([r+d*2,c]);}for(const dc of[-1,1])if(inB(r+d,c+dc)&&enemy(r+d,c+dc))moves.push([r+d,c+dc]);}
+  if(t==='N'){for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc]);}}
+  if(t==='K'){for(const[dr,dc]of[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc]);}}
+  if(t==='R'||t==='Q'){slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);}
+  if(t==='B'||t==='Q'){slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);}
+  return moves;
+}
+function chessApply(b,fr,fc,tr,tc){
+  const next=b.map(row=>[...row]);
+  const p=next[fr][fc];
+  next[tr][tc]=p;next[fr][fc]=null;
+  if(p.t==='P'&&(tr===0||tr===7))next[tr][tc]={t:'Q',col:p.col};
+  return next;
+}
+function chessBotMove(){
+  const all=[];
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(chessBoard[r][c]?.col==='b')for(const to of chessMoves(chessBoard,r,c))all.push([[r,c],to]);
+  if(!all.length)return;
+  const caps=all.filter(([,[tr,tc]])=>chessBoard[tr][tc]?.col==='w');
+  const [from,to]=(caps.length?caps:all)[Math.floor(Math.random()*(caps.length||all.length))];
+  chessBoard=chessApply(chessBoard,from[0],from[1],to[0],to[1]);
+  const wk=chessBoard.flat().some(p=>p?.t==='K'&&p.col==='w');
+  if(!wk){renderChess();chessEndGame('Black wins! ♚');return;}
+  chessTurn='w';renderChess();
+  document.getElementById('chess-status').textContent='Your turn (White)';
+}
+function chessSquareClick(r,c){
+  if(chessOver)return;
+  if(chessSelected){
+    const[sr,sc]=chessSelected;
+    const valid=chessHighlights.some(([hr,hc])=>hr===r&&hc===c);
+    if(valid){
+      chessBoard=chessApply(chessBoard,sr,sc,r,c);
+      chessSelected=null;chessHighlights=[];
+      const bk=chessBoard.flat().some(p=>p?.t==='K'&&p.col==='b');
+      if(!bk){renderChess();chessEndGame('White wins! ♔');return;}
+      if(gameMode==='bot'){chessTurn='b';renderChess();document.getElementById('chess-status').textContent='Bot thinking...';setTimeout(chessBotMove,450);}
+      else{chessTurn=chessTurn==='w'?'b':'w';renderChess();document.getElementById('chess-status').textContent=chessTurn==='w'?'White\'s turn':'Black\'s turn';}
+      return;
+    }
+    chessSelected=null;chessHighlights=[];
+  }
+  const p=chessBoard[r][c];
+  const myColor=gameMode==='bot'?'w':chessTurn;
+  if(p&&p.col===myColor&&chessTurn===myColor){chessSelected=[r,c];chessHighlights=chessMoves(chessBoard,r,c);}
+  renderChess();
+}
+function renderChess(){
+  const el=document.getElementById('chess-board');
+  let html='';
+  for(let r=0;r<8;r++){for(let c=0;c<8;c++){
+    const p=chessBoard[r][c];
+    const light=(r+c)%2===0;
+    const isSel=chessSelected&&chessSelected[0]===r&&chessSelected[1]===c;
+    const isHi=chessHighlights.some(([hr,hc])=>hr===r&&hc===c);
+    const isCap=isHi&&!!p;
+    const bg=isSel?'#7C3AED':isHi?(isCap?'rgba(239,68,68,0.6)':'rgba(124,58,237,0.4)'):light?'#f0d9b5':'#b58863';
+    const piece=p?`<span style="font-size:clamp(18px,4vw,26px);color:${p.col==='w'?'#fff':'#111'};text-shadow:${p.col==='w'?'0 1px 3px rgba(0,0,0,0.9)':'0 1px 2px rgba(255,255,255,0.4)'};line-height:1;user-select:none">${CHESS_UNICODE[p.t][p.col==='w'?0:1]}</span>`:'';
+    const dot=isHi&&!p?'<span style="width:10px;height:10px;border-radius:50%;background:rgba(124,58,237,0.7);display:block;position:absolute"></span>':'';
+    html+=`<button onclick="chessSquareClick(${r},${c})" style="aspect-ratio:1;background:${bg};border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative;transition:background .1s">${piece}${dot}</button>`;
+  }}
+  el.innerHTML=html;
+}
+function chessEndGame(msg){
+  chessOver=true;
+  document.getElementById('chess-status').style.display='none';
+  const res=document.getElementById('chess-result');
+  res.style.display='flex';
+  document.getElementById('chess-result-text').textContent=msg;
+}
+function resetChess(){
+  chessInit();chessSelected=null;chessTurn='w';chessOver=false;chessHighlights=[];
+  document.getElementById('chess-status').style.display='block';
+  document.getElementById('chess-status').textContent='Your turn (White)';
+  document.getElementById('chess-result').style.display='none';
+  renderChess();
+}
+
+// ── AMONG US ──────────────────────────────────────────────────────────────
+let auPlayers=[],auPhase='playing',auRaf=null,auKeys=new Set(),auKillCooldown=0,auKillTimer=null;
+const AU_ROOMS=[
+  {id:'cafeteria', label:'Cafeteria', x:160,y:20, w:200,h:130,fill:'#162840'},
+  {id:'electrical',label:'Electrical',x:20, y:200,w:130,h:110,fill:'#2a1010'},
+  {id:'reactor',   label:'Reactor',   x:20, y:360,w:130,h:120,fill:'#0f2a0f'},
+  {id:'security',  label:'Security',  x:200,y:310,w:130,h:100,fill:'#252510'},
+  {id:'medbay',    label:'MedBay',    x:390,y:200,w:130,h:110,fill:'#0f2030'},
+  {id:'storage',   label:'Storage',   x:390,y:360,w:130,h:120,fill:'#1e1030'},
+];
+const AU_HALLS=[[0,1],[0,4],[0,5],[1,2],[1,3],[2,3],[3,4],[4,5]];
+const AU_COLORS=['#e74c3c','#3498db','#2ecc71','#f39c12','#9b59b6'];
+const AU_NAMES=['You','Bot A','Bot B','Bot C','Bot D'];
+const AU_W=560,AU_H=500,AU_R=11,AU_SPEED=3;
+
+function auRoomAt(x,y){return AU_ROOMS.find(r=>x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h)||null;}
+function auInHall(x,y){
+  for(const[a,b]of AU_HALLS){
+    const ra=AU_ROOMS[a],rb=AU_ROOMS[b];
+    const cax=ra.x+ra.w/2,cay=ra.y+ra.h/2,cbx=rb.x+rb.w/2,cby=rb.y+rb.h/2;
+    const minX=Math.min(cax,cbx)-14,maxX=Math.max(cax,cbx)+14;
+    const minY=Math.min(cay,cby)-14,maxY=Math.max(cay,cby)+14;
+    if(x>=minX&&x<=maxX&&y>=minY&&y<=maxY)return true;
+  }
+  return false;
+}
+function auCanMove(x,y){return !!auRoomAt(x,y)||auInHall(x,y);}
+function auClamp(x,y){return[Math.max(AU_R,Math.min(AU_W-AU_R,x)),Math.max(AU_R,Math.min(AU_H-AU_R,y))];}
+
+function resetAmongUs(){
+  if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}
+  if(auKillTimer){clearInterval(auKillTimer);auKillTimer=null;}
+  auKeys=new Set();
+  const startRoom=AU_ROOMS[0];
+  const cx=startRoom.x+startRoom.w/2,cy=startRoom.y+startRoom.h/2;
+  auPlayers=AU_NAMES.map((name,i)=>({
+    id:i,name,color:AU_COLORS[i],
+    x:cx+(i-2)*24,y:cy+(i%2===0?-12:12),
+    alive:true,role:'crewmate',isBot:i!==0,
+    room:'cafeteria'
+  }));
+  // Assign one impostor (not player 0)
+  const impIdx=1+Math.floor(Math.random()*(auPlayers.length-1));
+  auPlayers[impIdx].role='impostor';
+  auPhase='playing';
+  auKillCooldown=15;
+  document.getElementById('au-vote-panel').style.display='none';
+  document.getElementById('au-end-panel').style.display='none';
+  document.getElementById('au-kill-btn').style.display='none';
+  auUpdateHUD();
+  auStartLoop();
+}
+
+function auUpdateHUD(){
+  const me=auPlayers[0];
+  document.getElementById('au-role-display').textContent='Role: '+(me.role==='impostor'?'⚠ Impostor':'✓ Crewmate');
+  document.getElementById('au-role-display').style.color=me.role==='impostor'?'#F87171':'#4ADE80';
+  document.getElementById('au-alive-display').textContent='Alive: '+auPlayers.filter(p=>p.alive).length+'/'+auPlayers.length;
+  document.getElementById('au-room-display').textContent='Room: '+(me.room||'Hallway');
+  const killBtn=document.getElementById('au-kill-btn');
+  if(me.role==='impostor'&&me.alive&&auPhase==='playing'){
+    const nearby=auPlayers.find(p=>p.id!==0&&p.alive&&Math.hypot(p.x-me.x,p.y-me.y)<60);
+    killBtn.style.display=nearby?'inline-flex':'none';
+    killBtn.textContent=auKillCooldown>0?`☠ Kill (${auKillCooldown}s)`:nearby?`☠ Kill ${nearby.name}`:'☠ Kill';
+    killBtn.disabled=auKillCooldown>0||!nearby;
+  } else {killBtn.style.display='none';}
+}
+
+function auStartLoop(){
+  if(!document.getElementById('au-canvas'))return;
+  const canvas=document.getElementById('au-canvas');
+  const ctx=canvas.getContext('2d');
+  function loop(){
+    if(auPhase!=='playing'){auRaf=null;return;}
+    // Move player
+    const me=auPlayers[0];
+    if(me.alive){
+      let nx=me.x,ny=me.y;
+      if(auKeys.has('ArrowUp')||auKeys.has('w'))ny-=AU_SPEED;
+      if(auKeys.has('ArrowDown')||auKeys.has('s'))ny+=AU_SPEED;
+      if(auKeys.has('ArrowLeft')||auKeys.has('a'))nx-=AU_SPEED;
+      if(auKeys.has('ArrowRight')||auKeys.has('d'))nx+=AU_SPEED;
+      const[cx,cy]=auClamp(nx,ny);
+      if(auCanMove(cx,cy)){me.x=cx;me.y=cy;}
+      const r=auRoomAt(me.x,me.y);me.room=r?r.id:null;
+    }
+    // Move bots
+    for(let i=1;i<auPlayers.length;i++){
+      const bot=auPlayers[i];if(!bot.alive)continue;
+      const target=AU_ROOMS[Math.floor(Math.random()*AU_ROOMS.length)];
+      const tx=target.x+target.w/2,ty=target.y+target.h/2;
+      const dx=tx-bot.x,dy=ty-bot.y,dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist>5){
+        const[bx,by]=auClamp(bot.x+dx/dist*AU_SPEED*0.6,bot.y+dy/dist*AU_SPEED*0.6);
+        if(auCanMove(bx,by)){bot.x=bx;bot.y=by;}
+      }
+      const r=auRoomAt(bot.x,bot.y);bot.room=r?r.id:null;
+    }
+    auDraw(ctx,canvas.width,canvas.height);
+    auUpdateHUD();
+    auRaf=requestAnimationFrame(loop);
+  }
+  auRaf=requestAnimationFrame(loop);
+}
+
+function auDraw(ctx,W,H){
+  ctx.fillStyle='#060d18';ctx.fillRect(0,0,W,H);
+  // Hallways
+  for(const[a,b]of AU_HALLS){
+    const ra=AU_ROOMS[a],rb=AU_ROOMS[b];
+    const cax=ra.x+ra.w/2,cay=ra.y+ra.h/2,cbx=rb.x+rb.w/2,cby=rb.y+rb.h/2;
+    const dx=cbx-cax,dy=cby-cay,len=Math.sqrt(dx*dx+dy*dy);
+    const nx=-dy/len*11,ny=dx/len*11;
+    ctx.beginPath();ctx.moveTo(cax+nx,cay+ny);ctx.lineTo(cbx+nx,cby+ny);ctx.lineTo(cbx-nx,cby-ny);ctx.lineTo(cax-nx,cay-ny);ctx.closePath();
+    ctx.fillStyle='#0d1520';ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.08)';ctx.lineWidth=1;ctx.stroke();
+  }
+  // Rooms
+  for(const r of AU_ROOMS){
+    ctx.fillStyle=r.fill;ctx.beginPath();ctx.roundRect(r.x,r.y,r.w,r.h,4);ctx.fill();
+    ctx.strokeStyle='rgba(255,255,255,0.12)';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,0.35)';ctx.font='bold 9px monospace';ctx.textAlign='center';
+    ctx.fillText(r.label.toUpperCase(),r.x+r.w/2,r.y+18);
+  }
+  // Players
+  for(const p of auPlayers){
+    if(!p.alive){
+      ctx.globalAlpha=0.4;
+      ctx.fillStyle=p.color;ctx.beginPath();ctx.ellipse(p.x,p.y+4,9,4,0,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle='rgba(255,0,0,0.8)';ctx.lineWidth=2.5;ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(p.x-7,p.y);ctx.lineTo(p.x+7,p.y+8);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(p.x+7,p.y);ctx.lineTo(p.x-7,p.y+8);ctx.stroke();
+      ctx.globalAlpha=1;continue;
+    }
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,0.4)';ctx.beginPath();ctx.ellipse(p.x+3,p.y+16,AU_R-1,4,0,0,Math.PI*2);ctx.fill();
+    // Body
+    ctx.fillStyle=p.color;ctx.beginPath();ctx.ellipse(p.x,p.y+2,AU_R,AU_R+4,0,0,Math.PI*2);ctx.fill();
+    // Highlight
+    ctx.fillStyle='rgba(255,255,255,0.15)';ctx.beginPath();ctx.ellipse(p.x-3,p.y-1,AU_R*0.5,AU_R*0.55,0,0,Math.PI*2);ctx.fill();
+    // Visor
+    ctx.fillStyle='#0a1a2a';ctx.beginPath();ctx.ellipse(p.x-1,p.y-3,8,6,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(91,200,245,0.9)';ctx.beginPath();ctx.ellipse(p.x-1,p.y-3,7,5,0,0,Math.PI*2);ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.55)';ctx.beginPath();ctx.ellipse(p.x-3,p.y-5,3,2,0,0,Math.PI*2);ctx.fill();
+    // Selection ring for player
+    if(p.id===0){ctx.strokeStyle='rgba(255,255,255,0.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);ctx.beginPath();ctx.arc(p.x,p.y,AU_R+5,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);}
+    // Name
+    ctx.fillStyle='#fff';ctx.font='bold 8px monospace';ctx.textAlign='center';
+    ctx.strokeStyle='#000';ctx.lineWidth=2.5;ctx.strokeText(p.name+(p.id===0?' ◀':''),p.x,p.y-AU_R-6);
+    ctx.fillText(p.name+(p.id===0?' ◀':''),p.x,p.y-AU_R-6);
+  }
+}
+
+function auKill(){
+  const me=auPlayers[0];
+  if(me.role!=='impostor'||auKillCooldown>0)return;
+  const nearby=auPlayers.find(p=>p.id!==0&&p.alive&&Math.hypot(p.x-me.x,p.y-me.y)<60);
+  if(!nearby)return;
+  nearby.alive=false;
+  auKillCooldown=15;
+  if(auKillTimer)clearInterval(auKillTimer);
+  auKillTimer=setInterval(()=>{auKillCooldown=Math.max(0,auKillCooldown-1);if(auKillCooldown===0&&auKillTimer){clearInterval(auKillTimer);auKillTimer=null;}auUpdateHUD();},1000);
+  auCheckWin();
+}
+
+function auMeeting(){
+  if(auPhase!=='playing')return;
+  auPhase='vote';
+  if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}
+  const list=document.getElementById('au-vote-list');
+  list.innerHTML=auPlayers.filter(p=>p.alive).map(p=>`<button onclick="auCastVote(${p.id})" style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px;color:#fff;font-size:13px;cursor:pointer;font-family:inherit;width:100%;transition:border-color .2s" onmouseover="this.style.borderColor='#DC2626'" onmouseout="this.style.borderColor='var(--border)'"><span style="width:12px;height:12px;border-radius:50%;background:${p.color};flex-shrink:0;display:inline-block"></span>${p.name}</button>`).join('');
+  document.getElementById('au-vote-panel').style.display='flex';
+}
+
+function auCastVote(id){
+  const target=auPlayers.find(p=>p.id===id);
+  if(target)target.alive=false;
+  document.getElementById('au-vote-panel').style.display='none';
+  auPhase='playing';
+  if(!auCheckWin())auStartLoop();
+}
+
+function auSkipVote(){
+  document.getElementById('au-vote-panel').style.display='none';
+  auPhase='playing';
+  auStartLoop();
+}
+
+function auCheckWin(){
+  const crews=auPlayers.filter(p=>p.alive&&p.role==='crewmate').length;
+  const imps=auPlayers.filter(p=>p.alive&&p.role==='impostor').length;
+  if(imps===0){auEndGame('🎉 Crewmates Win!');return true;}
+  if(crews<=imps){auEndGame('💀 Impostors Win!');return true;}
+  return false;
+}
+
+function auEndGame(msg){
+  auPhase='end';
+  if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}
+  document.getElementById('au-end-text').textContent=msg;
+  document.getElementById('au-end-panel').style.display='flex';
+  document.getElementById('au-kill-btn').style.display='none';
+}
+
+// Key listeners for Among Us (attached once)
+(function(){
+  window.addEventListener('keydown',e=>{if(auPhase==='playing')auKeys.add(e.key);});
+  window.addEventListener('keyup',e=>auKeys.delete(e.key));
+})();
+
 // RPS
 let rpsYou=0,rpsBot=0,rpsRound=0;
 const RPS_EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};
