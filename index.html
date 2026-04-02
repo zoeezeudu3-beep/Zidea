@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED' stroke='%237C3AED' stroke-width='1'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
 <!-- Firebase Realtime Database via REST - no config needed -->
 <script>
   // Using Firebase REST API with a public demo project
@@ -1050,6 +1051,39 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   </div>
 </div>
 
+<!-- CALL OVERLAY -->
+<div id="call-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:20px">
+  <div style="width:80px;height:80px;border-radius:50%;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--brand-light);border:2px solid rgba(124,58,237,.4)" id="call-avatar">??</div>
+  <div style="text-align:center">
+    <div style="color:#fff;font-size:18px;font-weight:700" id="call-name">@username</div>
+    <div style="color:#9CA3AF;font-size:13px;margin-top:4px" id="call-status-text">Calling...</div>
+  </div>
+  <!-- mute / speaker indicators -->
+  <div style="display:flex;gap:12px;align-items:center" id="call-indicators">
+    <div id="call-mute-indicator" style="display:none;background:rgba(220,38,38,.2);border:1px solid rgba(220,38,38,.4);border-radius:999px;padding:4px 10px;font-size:11px;color:#F87171">🎤 Muted</div>
+  </div>
+  <div style="display:flex;gap:16px">
+    <button onclick="toggleMute()" id="call-mute-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer;transition:all .2s" title="Mute">🎤</button>
+    <button onclick="endCall()" style="width:64px;height:64px;border-radius:50%;background:#DC2626;border:none;color:#fff;font-size:22px;cursor:pointer;transition:background .2s" title="End call">📵</button>
+  </div>
+  <div id="call-duration" style="color:#6B7280;font-size:12px;font-family:monospace">00:00</div>
+</div>
+
+<!-- INCOMING CALL -->
+<div id="incoming-overlay" style="display:none;position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;z-index:201;min-width:260px;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:slideUp .2s ease">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+    <div style="width:44px;height:44px;border-radius:50%;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand-light)" id="incoming-avatar">??</div>
+    <div>
+      <div style="color:#fff;font-weight:700;font-size:14px" id="incoming-name">@user</div>
+      <div style="color:#22C55E;font-size:12px">Incoming call...</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button onclick="acceptCall()" style="flex:1;background:#16A34A;color:#fff;border:none;border-radius:12px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Accept</button>
+    <button onclick="declineCall()" style="flex:1;background:#DC2626;color:#fff;border:none;border-radius:12px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Decline</button>
+  </div>
+</div>
+
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
@@ -1531,26 +1565,165 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     render('users');
   }
 
-  function toggleCall(username){
-    const btn=document.getElementById('call-'+username);
-    const status=document.getElementById('call-status-'+username);
-    if(!btn)return;
-    if(btn.classList.contains('active')){
-      btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call';
-      btn.classList.remove('active');if(status)status.textContent='';
-      callGroup.delete(username);activeCallBtn=callGroup.size>0?[...callGroup][0]:null;
-    } else {
-      btn.innerHTML='End Call';btn.classList.add('active');
-      if(status)status.textContent='In call with @'+username;
-      callGroup.add(username);activeCallBtn=username;
+  // ── Real Voice Calls via Agora ────────────────────────────────────────────
+  const AGORA_APP_ID = 'e2a96031c2ab44d786887fbf12052546';
+  let agoraClient = null;
+  let localTrack = null;
+  let activeCallUser = null;
+  let callMuted = false;
+  let callTimer = null;
+  let callSeconds = 0;
+  let incomingCallUser = null;
+  let incomingSSE = null;
+
+  function callChannelName(a, b) {
+    return 'zidea_' + [a, b].sort().join('_');
+  }
+
+  async function toggleCall(username) {
+    if (activeCallUser) { endCall(); return; }
+    await startCall(username);
+  }
+
+  async function startCall(username) {
+    if (!currentUser) return;
+    activeCallUser = username;
+
+    // Show overlay
+    const overlay = document.getElementById('call-overlay');
+    overlay.style.display = 'flex';
+    document.getElementById('call-name').textContent = '@' + username;
+    document.getElementById('call-avatar').textContent = username.slice(0,2).toUpperCase();
+    document.getElementById('call-status-text').textContent = 'Connecting...';
+    document.getElementById('call-duration').textContent = '00:00';
+
+    // Signal the other user via Firebase
+    const channel = callChannelName(currentUser.username, username);
+    await db._write('calls/' + username + '/incoming', {
+      from: currentUser.username,
+      channel,
+      ts: Date.now()
+    });
+
+    try {
+      agoraClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+      await agoraClient.join(AGORA_APP_ID, channel, null, currentUser.username);
+      localTrack = await AgoraRTC.createMicrophoneAudioTrack();
+      await agoraClient.publish([localTrack]);
+      document.getElementById('call-status-text').textContent = 'In call with @' + username;
+      startCallTimer();
+
+      agoraClient.on('user-published', async (user, mediaType) => {
+        await agoraClient.subscribe(user, mediaType);
+        if (mediaType === 'audio') user.audioTrack.play();
+      });
+    } catch (err) {
+      document.getElementById('call-status-text').textContent = 'Failed: ' + err.message;
+      setTimeout(endCall, 2000);
     }
-    updateAmongUsEntry();
+
+    // Update call button
+    const btn = document.getElementById('call-' + username);
+    if (btn) { btn.textContent = 'End'; btn.classList.add('active'); }
+  }
+
+  async function endCall() {
+    if (!activeCallUser) return;
+    const username = activeCallUser;
+    activeCallUser = null;
+    callMuted = false;
+
+    // Clear Firebase signal
+    if (currentUser) {
+      await db._write('calls/' + currentUser.username + '/incoming', null);
+      await db._write('calls/' + username + '/incoming', null);
+    }
+
+    // Stop Agora
+    if (localTrack) { localTrack.stop(); localTrack.close(); localTrack = null; }
+    if (agoraClient) { await agoraClient.leave(); agoraClient = null; }
+
+    // Hide overlay
+    document.getElementById('call-overlay').style.display = 'none';
+    stopCallTimer();
+
+    // Reset button
+    const btn = document.getElementById('call-' + username);
+    if (btn) {
+      btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Call';
+      btn.classList.remove('active');
+    }
+  }
+
+  function toggleMute() {
+    if (!localTrack) return;
+    callMuted = !callMuted;
+    localTrack.setMuted(callMuted);
+    document.getElementById('call-mute-btn').textContent = callMuted ? '🔇' : '🎤';
+    document.getElementById('call-mute-indicator').style.display = callMuted ? 'block' : 'none';
+  }
+
+  function startCallTimer() {
+    callSeconds = 0;
+    callTimer = setInterval(() => {
+      callSeconds++;
+      const m = String(Math.floor(callSeconds / 60)).padStart(2, '0');
+      const s = String(callSeconds % 60).padStart(2, '0');
+      const el = document.getElementById('call-duration');
+      if (el) el.textContent = m + ':' + s;
+    }, 1000);
+  }
+
+  function stopCallTimer() {
+    if (callTimer) { clearInterval(callTimer); callTimer = null; }
+    callSeconds = 0;
+  }
+
+  // Listen for incoming calls via Firebase SSE
+  function listenForIncomingCalls() {
+    if (!currentUser || incomingSSE) return;
+    const sse = new EventSource(`${FB_URL}/calls/${currentUser.username}/incoming.json`);
+    incomingSSE = sse;
+    sse.addEventListener('put', e => {
+      try {
+        const { data } = JSON.parse(e.data);
+        if (!data || !data.from || data.from === currentUser?.username) return;
+        // Don't show if already in a call
+        if (activeCallUser) return;
+        incomingCallUser = data.from;
+        document.getElementById('incoming-name').textContent = '@' + data.from;
+        document.getElementById('incoming-avatar').textContent = data.from.slice(0,2).toUpperCase();
+        document.getElementById('incoming-overlay').style.display = 'block';
+        // Auto-dismiss after 30s
+        setTimeout(() => { if (incomingCallUser === data.from) declineCall(); }, 30000);
+      } catch(_) {}
+    });
+    sse.addEventListener('patch', e => {
+      try {
+        const { data } = JSON.parse(e.data);
+        if (!data) { declineCall(); }
+      } catch(_) {}
+    });
+  }
+
+  async function acceptCall() {
+    if (!incomingCallUser) return;
+    document.getElementById('incoming-overlay').style.display = 'none';
+    const username = incomingCallUser;
+    incomingCallUser = null;
+    await startCall(username);
+  }
+
+  function declineCall() {
+    incomingCallUser = null;
+    document.getElementById('incoming-overlay').style.display = 'none';
+    if (currentUser) db._write('calls/' + currentUser.username + '/incoming', null);
   }
 
   function updateAmongUsEntry(){
     const el=document.getElementById('among-us-entry');if(!el)return;
-    el.querySelector('.game-info p').textContent=callGroup.size>0
-      ?`${callGroup.size} friend${callGroup.size>1?'s':''} on call - ready to play!`
+    el.querySelector('.game-info p').textContent=activeCallUser
+      ?`On call with @${activeCallUser} - ready to play!`
       :'Play with friends on a call or vs bots';
   }
 </script>
