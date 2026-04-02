@@ -1068,8 +1068,22 @@ function renderBubble(m) {
   if (m.type === 'image') return `<div class="bubble"><img class="bubble-img" src="${m.url}" alt="${esc(m.name||'image')}" onclick="window.open('${m.url}','_blank')"/></div>`;
   if (m.type === 'video') return `<div class="bubble"><video class="bubble-video" src="${m.url}" controls></video></div>`;
   if (m.type === 'audio') return `<div class="bubble">🎤 Voice message<br><audio class="bubble-audio" src="${m.url}" controls></audio></div>`;
+  if (m.type === 'audio_ref') return `<div class="bubble">🎤 Voice message<br><audio class="bubble-audio" id="audio_${m.ts}" controls onplay="loadAudioRef(this,'${m.ref}','${m.ts}')"></audio></div>`;
   if (m.type === 'file') return `<div class="bubble"><a class="bubble-file" href="${m.url}" target="_blank" download="${esc(m.name||'file')}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>${esc(m.name||'file')}</a></div>`;
   return `<div class="bubble">${esc(m.text)}</div>`;
+}
+
+const audioRefCache = {};
+async function loadAudioRef(audioEl, ref, ts) {
+  if (audioRefCache[ts]) { audioEl.src = audioRefCache[ts]; return; }
+  audioEl.src = ''; // clear while loading
+  const data = await db.read('chatmedia/' + ref);
+  if (!data) return;
+  let full = '';
+  for (let i = 0; i < data.total; i++) full += data[`chunk_${i}`] || '';
+  audioRefCache[ts] = full;
+  audioEl.src = full;
+  audioEl.play().catch(() => {});
 }
 
 async function sendMsg() {
@@ -1182,11 +1196,34 @@ async function toggleVoiceRecord() {
       clearInterval(voiceTimerInterval);
 
       const blob = new Blob(audioChunks, { type: mimeType });
-      if (blob.size > 8 * 1024 * 1024) { alert('Voice message too long (max ~8MB).'); return; }
 
       const reader = new FileReader();
       reader.onload = async () => {
-        await sendMediaMsg('audio', reader.result, `voice_${Date.now()}.webm`, mimeType);
+        const dataUrl = reader.result;
+        // Split into chunks of ~700KB each to stay under Firebase's write limit
+        const CHUNK = 700000;
+        const ts = Date.now();
+        const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const key = [currentUser.username, activeChatUser].sort().join('__');
+
+        if (dataUrl.length <= CHUNK) {
+          // Small enough — send directly
+          await sendMediaMsg('audio', dataUrl, `voice_${ts}.webm`, mimeType);
+        } else {
+          // Store chunks separately, then a pointer message
+          const totalChunks = Math.ceil(dataUrl.length / CHUNK);
+          const chunkWrites = {};
+          for (let i = 0; i < totalChunks; i++) {
+            chunkWrites[`chunk_${i}`] = dataUrl.slice(i * CHUNK, (i + 1) * CHUNK);
+          }
+          await db.patch(`chatmedia/${key}/${ts}`, { ...chunkWrites, total: totalChunks, mime: mimeType });
+          // Send a pointer message
+          const msg = { from: currentUser.username, type: 'audio_ref', ref: `${key}/${ts}`, name: `voice_${ts}.webm`, time, ts };
+          if (!chatCache[activeChatUser]) chatCache[activeChatUser] = [];
+          chatCache[activeChatUser].push(msg);
+          renderMsgs();
+          await db.patch('chats/' + key + '/messages', { [ts]: msg });
+        }
       };
       reader.readAsDataURL(blob);
     };
@@ -1199,7 +1236,7 @@ async function toggleVoiceRecord() {
       voiceSecs++;
       const m = Math.floor(voiceSecs / 60), s = voiceSecs % 60;
       timer.textContent = m + ':' + String(s).padStart(2, '0');
-      if (voiceSecs >= 120) mediaRecorder.stop(); // 2 min max
+      if (voiceSecs >= 30) mediaRecorder.stop(); // 30s max
     }, 1000);
 
   } catch(err) {
