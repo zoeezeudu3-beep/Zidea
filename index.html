@@ -7,7 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED' stroke='%237C3AED' stroke-width='1'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js"></script>
+<script src="https://download.agora.io/sdk/release/AgoraRTC_N-4.20.0.js" onerror="console.warn('Agora SDK failed to load - calls disabled')"></script>
 <!-- Firebase Realtime Database via REST - no config needed -->
 <script>
   // Using Firebase REST API with a public demo project
@@ -381,8 +381,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       Zidea
     </div>
     <div class="nav-actions">
-      <button class="btn-ghost p-sm" onclick="showPage('auth');switchAuthTab('login')">Log In</button>
-      <button class="btn-primary p-sm" onclick="showPage('auth');switchAuthTab('signup')">Sign Up</button>
+      <button class="btn-ghost p-sm" onclick="openAuth('login')">Log In</button>
+      <button class="btn-primary p-sm" onclick="openAuth('signup')">Sign Up</button>
     </div>
   </nav>
 
@@ -395,8 +395,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     <h1>Connect. Call. <em>Play.</em></h1>
     <p>Find friends by username, jump into voice calls, challenge them to games, and chat with AI &mdash; all in one place.</p>
     <div class="hero-actions">
-      <button class="btn-primary p-md text-md" onclick="showPage('auth');switchAuthTab('signup')">Get Started Free</button>
-      <button class="btn-ghost p-md text-md" onclick="showPage('auth');switchAuthTab('login')">Log In</button>
+      <button class="btn-primary p-md text-md" onclick="openAuth('signup')">Get Started Free</button>
+      <button class="btn-ghost p-md text-md" onclick="openAuth('login')">Log In</button>
     </div>
     <!-- Social proof numbers -->
     <div style="display:flex;gap:32px;margin-top:8px;flex-wrap:wrap;justify-content:center">
@@ -576,7 +576,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   <div style="text-align:center;padding:0 20px 60px">
     <h2 style="font-size:clamp(20px,5vw,32px);font-weight:800;color:#fff;margin-bottom:12px">Ready to connect?</h2>
     <p style="color:#9CA3AF;font-size:14px;margin-bottom:24px">Join free. No credit card. No download.</p>
-    <button class="btn-primary p-md text-md" onclick="showPage('auth');switchAuthTab('signup')">Create your account</button>
+    <button class="btn-primary p-md text-md" onclick="openAuth('signup')">Create your account</button>
   </div>
 
 <!-- HOW IT WORKS - injected into landing before footer -->
@@ -1158,7 +1158,6 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   const State = {
     currentUser: null,
     activeCallBtn: null,
-    callGroup: new Set(),
     gameMode: 'bot',
     users: {},        // keyed by username � single source of truth (replaces fbUsers)
     searchQuery: '',
@@ -1207,7 +1206,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   // -- Boot --
   function init(){
     const s=loadSession();
-    if(s){currentUser=s;setLoggedInUI();startFirebaseSync();showPage('dashboard');}
+    if(s){currentUser=s;setLoggedInUI();startFirebaseSync();showPage('dashboard');setTimeout(listenForIncomingCalls,1000);}
   }
 
   function setLoggedInUI(){
@@ -1220,7 +1219,9 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   // -- Routing --
   function showPage(name){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    document.getElementById('page-'+name).classList.add('active');
+    const el = document.getElementById('page-'+name);
+    if (!el) { console.warn('showPage: no element for', name); return; }
+    el.classList.add('active');
     // mobile nav highlight
     ['discover','chat','arcade','zidai'].forEach(k=>{
       const b=document.getElementById('mob-'+k);
@@ -1239,6 +1240,11 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   }
 
   // -- Unified Auth UI --
+  function openAuth(tab) {
+    showPage('auth');
+    switchAuthTab(tab || 'signup');
+  }
+
   function switchAuthTab(tab) {
     const isSignup = tab === 'signup';
     document.getElementById('auth-tab-signup').style.background = isSignup ? 'var(--brand)' : 'transparent';
@@ -1313,6 +1319,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     err.classList.remove('show');
     currentUser={email,username:account.username};
     saveSession(currentUser);setLoggedInUI();startFirebaseSync();showPage('dashboard');
+    setTimeout(listenForIncomingCalls, 1000);
   }
 
   function handleSignup(e){
@@ -1331,6 +1338,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     currentUser={email:em,username:u};saveSession(currentUser);setLoggedInUI();startFirebaseSync();
     document.getElementById('welcome-username').textContent='@'+u;
     showPage('welcome');
+    setTimeout(listenForIncomingCalls, 1000);
   }
 
   const GOOGLE_ACCOUNTS={'nova@gmail.com':'nova1234','pixel@gmail.com':'pixel999','demo@gmail.com':'demo123'};
@@ -1371,10 +1379,12 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       if(storedPw!==password){err.textContent='Incorrect password. Access not granted.';err.classList.add('show');document.getElementById('google-password-input').value='';return;}
       closeGoogleModal();
       const username=(accounts[googlePendingEmail]&&accounts[googlePendingEmail].username)||googlePendingEmail.split('@')[0].replace(/[^a-z0-9_]/gi,'_');
-      currentUser={email:googlePendingEmail,username};saveSession(currentUser);setLoggedInUI();startFirebaseSync();showPage('dashboard');
+      currentUser={email:googlePendingEmail,username};saveSession(currentUser);setLoggedInUI();startFirebaseSync();showPage('dashboard');setTimeout(listenForIncomingCalls,1000);
     }
   }
   function handleLogout(){
+    if(activeCallUser) endCall();
+    if(incomingSSE){ incomingSSE.close(); incomingSSE = null; }
     if(State.currentUser && fbSyncStarted){
       db._patch('users/' + State.currentUser.username, { online: false, lastSeen: Date.now() });
     }
@@ -1600,10 +1610,14 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     // Signal the other user via Firebase
     const channel = callChannelName(currentUser.username, username);
     await db._write('calls/' + username + '/incoming', {
-      from: currentUser.username,
-      channel,
-      ts: Date.now()
+      from: currentUser.username, channel, ts: Date.now()
     });
+
+    if (typeof AgoraRTC === 'undefined') {
+      document.getElementById('call-status-text').textContent = 'Voice SDK unavailable — signalling only';
+      startCallTimer();
+      return;
+    }
 
     try {
       agoraClient = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
@@ -1612,17 +1626,15 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       await agoraClient.publish([localTrack]);
       document.getElementById('call-status-text').textContent = 'In call with @' + username;
       startCallTimer();
-
       agoraClient.on('user-published', async (user, mediaType) => {
         await agoraClient.subscribe(user, mediaType);
         if (mediaType === 'audio') user.audioTrack.play();
       });
     } catch (err) {
-      document.getElementById('call-status-text').textContent = 'Failed: ' + err.message;
-      setTimeout(endCall, 2000);
+      document.getElementById('call-status-text').textContent = 'Error: ' + err.message;
+      setTimeout(endCall, 3000);
     }
 
-    // Update call button
     const btn = document.getElementById('call-' + username);
     if (btn) { btn.textContent = 'End'; btn.classList.add('active'); }
   }
@@ -2051,7 +2063,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}
     if(auVoteTimer){clearInterval(auVoteTimer);auVoteTimer=null;}
     auPhase='lobby';auDeadBodies=[];auKillCooldown=0;auActiveTask=null;auTasksDone=0;auVotes={};auMyVote=null;
-    const friends=[...callGroup],myName=currentUser?currentUser.username:'You',allNames=[myName,...friends];
+    const friends=activeCallUser?[activeCallUser]:[],myName=currentUser?currentUser.username:'You',allNames=[myName,...friends];
     const bots=['Crewbot','Redbot','Bluebot','Greenbot','Pinkbot','Orangebot'];
     while(allNames.length<6)allNames.push(bots[allNames.length-friends.length-1]);
     const startRoom=AU_ROOMS[0];
