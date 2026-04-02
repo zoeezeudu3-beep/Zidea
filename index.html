@@ -916,74 +916,158 @@ function renderConvos(active) {
   if (!users.length) { el.innerHTML = '<div style="padding:16px;font-size:13px;color:#6B7280">No users yet</div>'; return; }
   el.innerHTML = users.map(u => {
     const msgs = chatCache[u.username] || [];
-    const last = msgs[msgs.length-1];
+    const last = msgs[msgs.length - 1];
     const online = isOnline(u);
-    return `<div class="convo-item${active===u.username?' active':''}" onclick="openConvo('${u.username}')">
-      <div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online?'<div class="online-dot"></div>':''}</div>
-      <div class="convo-meta"><div class="convo-name">@${u.username}</div><div class="convo-preview">${last?(last.from===currentUser?.username?'You: ':'')+last.text:'Say hello!'}</div></div>
-      ${last?`<span class="convo-time">${last.time}</span>`:''}
+    return `<div class="convo-item${active === u.username ? ' active' : ''}" onclick="openConvo('${u.username}')">
+      <div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online ? '<div class="online-dot"></div>' : ''}</div>
+      <div class="convo-meta">
+        <div class="convo-name">@${u.username}</div>
+        <div class="convo-preview">${last ? (last.from === currentUser?.username ? 'You: ' : '') + esc(last.text) : 'Say hello!'}</div>
+      </div>
+      ${last ? `<span class="convo-time">${last.time}</span>` : ''}
     </div>`;
   }).join('');
 }
 
 async function openConvo(username) {
   activeChatUser = username;
+  // Close previous SSE
   if (chatSSE) { chatSSE.close(); chatSSE = null; }
+
   const user = getAllUsers().find(u => u.username === username);
   const online = user && isOnline(user);
+
   document.getElementById('chat-window').innerHTML = `
     <div class="chat-header">
-      <div class="convo-avatar" style="width:36px;height:36px;font-size:12px">${username.slice(0,2).toUpperCase()}${online?'<div class="online-dot"></div>':''}</div>
-      <div class="chat-header-info"><div class="chat-header-name">@${username}</div><div class="chat-header-status${online?'':' offline'}">${online?'Online':'Offline'}</div></div>
+      <div class="convo-avatar" style="width:36px;height:36px;font-size:12px">
+        ${username.slice(0,2).toUpperCase()}${online ? '<div class="online-dot"></div>' : ''}
+      </div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">@${username}</div>
+        <div class="chat-header-status${online ? '' : ' offline'}">${online ? 'Online' : 'Offline'}</div>
+      </div>
       <div class="chat-header-actions">
-        <button class="icon-btn" onclick="toggleCall('${username}');showPage('dashboard')" title="Call"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button>
+        <button class="icon-btn" onclick="toggleCall('${username}');showPage('dashboard')" title="Call">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </button>
       </div>
     </div>
     <div class="chat-messages" id="chat-msgs"></div>
     <div class="chat-input-bar">
-      <textarea class="chat-input" id="chat-input" placeholder="Message @${username}..." rows="1" onkeydown="chatKey(event)" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
-      <button class="send-btn" onclick="sendMsg()"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></button>
+      <textarea class="chat-input" id="chat-input" placeholder="Message @${username}..." rows="1"
+        onkeydown="chatKey(event)"
+        oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'"></textarea>
+      <button class="send-btn" onclick="sendMsg()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
     </div>`;
+
+  // Load history from Firebase
   const key = [currentUser.username, username].sort().join('__');
-  const data = await db.read('chats/'+key+'/messages');
-  chatCache[username] = data ? Object.values(data).sort((a,b)=>a.ts-b.ts) : [];
+  const data = await db.read('chats/' + key + '/messages');
+  chatCache[username] = data ? Object.values(data).sort((a, b) => a.ts - b.ts) : [];
   renderMsgs();
+
+  // Live updates via SSE — only use patch after initial load to avoid flicker
+  let initialPutDone = false;
   const sse = new EventSource(`${FB}/chats/${key}/messages.json`);
   chatSSE = sse;
-  sse.addEventListener('put', e => { try { const {data}=JSON.parse(e.data); if(!data)return; chatCache[username]=Object.values(data).sort((a,b)=>a.ts-b.ts); renderMsgs(); renderConvos(activeChatUser); } catch(_){} });
-  sse.addEventListener('patch', e => { try { const {data}=JSON.parse(e.data); if(!data)return; Object.values(data).forEach(m=>{ if(!chatCache[username])chatCache[username]=[]; if(!chatCache[username].find(x=>x.ts===m.ts))chatCache[username].push(m); }); chatCache[username].sort((a,b)=>a.ts-b.ts); renderMsgs(); renderConvos(activeChatUser); } catch(_){} });
-  setTimeout(() => { const i=document.getElementById('chat-input'); if(i)i.focus(); }, 50);
+
+  sse.addEventListener('put', e => {
+    try {
+      const parsed = JSON.parse(e.data);
+      const d = parsed.data;
+      if (!initialPutDone) {
+        // First put is the initial snapshot — merge with cache instead of replacing
+        initialPutDone = true;
+        if (!d) return;
+        const incoming = Object.values(d);
+        incoming.forEach(m => {
+          if (m && m.ts && !chatCache[username].find(x => x.ts === m.ts)) {
+            chatCache[username].push(m);
+          }
+        });
+        chatCache[username].sort((a, b) => a.ts - b.ts);
+        renderMsgs();
+        renderConvos(activeChatUser);
+      }
+      // Subsequent puts (rare) — safe to merge
+    } catch(_) {}
+  });
+
+  sse.addEventListener('patch', e => {
+    try {
+      const parsed = JSON.parse(e.data);
+      const d = parsed.data;
+      if (!d) return;
+      if (!chatCache[username]) chatCache[username] = [];
+      Object.values(d).forEach(m => {
+        if (m && m.ts && !chatCache[username].find(x => x.ts === m.ts && x.from === m.from)) {
+          chatCache[username].push(m);
+        }
+      });
+      chatCache[username].sort((a, b) => a.ts - b.ts);
+      renderMsgs();
+      renderConvos(activeChatUser);
+    } catch(_) {}
+  });
+
+  sse.onerror = () => { sse.close(); chatSSE = null; };
+
+  setTimeout(() => { const i = document.getElementById('chat-input'); if (i) i.focus(); }, 50);
 }
 
 function renderMsgs() {
-  const el = document.getElementById('chat-msgs'); if (!el || !activeChatUser) return;
+  const el = document.getElementById('chat-msgs');
+  if (!el || !activeChatUser) return;
   const msgs = chatCache[activeChatUser] || [];
-  const myInit = currentUser?.username.slice(0,2).toUpperCase() || 'ME';
-  if (!msgs.length) { el.innerHTML='<div class="chat-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet. Say hi!</p></div>'; return; }
-  let html='', i=0;
-  while(i<msgs.length){
-    const m=msgs[i], mine=m.from===currentUser?.username, init=mine?myInit:activeChatUser.slice(0,2).toUpperCase();
-    let bubbles=`<div class="bubble">${esc(m.text)}</div>`;
-    let j=i+1; while(j<msgs.length&&msgs[j].from===m.from){bubbles+=`<div class="bubble">${esc(msgs[j].text)}</div>`;j++;}
-    html+=`<div class="msg-group${mine?' mine':''}"><div class="msg-avatar">${init}</div><div class="msg-bubbles">${bubbles}<span class="msg-time">${m.time}</span></div></div>`;
-    i=j;
+  const myInit = currentUser?.username.slice(0, 2).toUpperCase() || 'ME';
+  if (!msgs.length) {
+    el.innerHTML = '<div class="chat-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet. Say hi!</p></div>';
+    return;
   }
-  el.innerHTML=html; el.scrollTop=el.scrollHeight;
+  let html = '', i = 0;
+  while (i < msgs.length) {
+    const m = msgs[i];
+    const mine = m.from === currentUser?.username;
+    const init = mine ? myInit : activeChatUser.slice(0, 2).toUpperCase();
+    let bubbles = `<div class="bubble">${esc(m.text)}</div>`;
+    let j = i + 1;
+    while (j < msgs.length && msgs[j].from === m.from) {
+      bubbles += `<div class="bubble">${esc(msgs[j].text)}</div>`;
+      j++;
+    }
+    html += `<div class="msg-group${mine ? ' mine' : ''}"><div class="msg-avatar">${init}</div><div class="msg-bubbles">${bubbles}<span class="msg-time">${m.time}</span></div></div>`;
+    i = j;
+  }
+  el.innerHTML = html;
+  el.scrollTop = el.scrollHeight;
 }
 
 async function sendMsg() {
-  const input=document.getElementById('chat-input'); if(!input||!activeChatUser||!currentUser)return;
-  const text=input.value.trim(); if(!text)return;
-  input.value=''; input.style.height='auto';
-  const ts=Date.now(), time=new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-  const msg={from:currentUser.username,text,time,ts};
-  if(!chatCache[activeChatUser])chatCache[activeChatUser]=[];
-  chatCache[activeChatUser].push(msg); renderMsgs(); renderConvos(activeChatUser);
-  const key=[currentUser.username,activeChatUser].sort().join('__');
-  await db.patch('chats/'+key+'/messages',{[ts]:msg});
+  const input = document.getElementById('chat-input');
+  if (!input || !activeChatUser || !currentUser) return;
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  input.style.height = 'auto';
+  const ts = Date.now();
+  const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  const msg = { from: currentUser.username, text, time, ts };
+  // Optimistic update — mark as local so SSE patch won't duplicate it
+  if (!chatCache[activeChatUser]) chatCache[activeChatUser] = [];
+  if (!chatCache[activeChatUser].find(x => x.ts === ts)) {
+    chatCache[activeChatUser].push(msg);
+  }
+  renderMsgs();
+  renderConvos(activeChatUser);
+  // Write to Firebase
+  const key = [currentUser.username, activeChatUser].sort().join('__');
+  await db.patch('chats/' + key + '/messages', { [ts]: msg });
 }
-function chatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function chatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 </script>
 
 <script>
