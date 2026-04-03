@@ -1176,13 +1176,13 @@ async function loadAllConvos() {
   if (!currentUser) return;
   const data = await db.read('chats');
   if (!data) return;
-  // Find all chat keys that include current user
   const myName = currentUser.username;
   for (const [key, val] of Object.entries(data)) {
     const parts = key.split('__');
     if (!parts.includes(myName)) continue;
     const otherUser = parts.find(p => p !== myName);
-    if (!otherUser || chatCache[otherUser]) continue; // already loaded
+    if (!otherUser) continue;
+    // Always refresh — don't skip cached users, so new messages appear in sidebar
     const msgs = val?.messages ? Object.values(val.messages).sort((a,b) => a.ts - b.ts) : [];
     chatCache[otherUser] = msgs;
   }
@@ -1206,7 +1206,9 @@ function renderConvos(active) {
     const online = isOnline(u);
     const unread = msgs.filter(m => m.from !== currentUser?.username && !m.read).length;
     const preview = last
-      ? (last.type && last.type !== 'text' ? '📎 ' + (last.name || last.type) : (last.from === currentUser?.username ? 'You: ' : '') + esc(last.text || ''))
+      ? (last.type && last.type !== 'text'
+          ? '📎 ' + (last.name || last.type.replace('_ref',''))
+          : (last.from === currentUser?.username ? 'You: ' : '') + esc(last.text || ''))
       : 'Say hello!';
     return `<div class="convo-item${active === u.username ? ' active' : ''}" onclick="openConvo('${u.username}')">
       <div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online ? '<div class="online-dot"></div>' : ''}</div>
@@ -1216,13 +1218,13 @@ function renderConvos(active) {
       </div>
       <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
         ${last ? `<span class="convo-time">${last.time}</span>` : ''}
-        ${unread > 0 ? `<span style="background:var(--brand);color:#fff;font-size:10px;font-weight:700;min-width:17px;height:17px;border-radius:999px;display:flex;align-items:center;justify-content:center;padding:0 3px">${unread}</span>` : ''}
+        ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
       </div>
     </div>`;
   }).join('');
 }
 
-async function openConvo(username) {
+function openConvo(username) {
   activeChatUser = username;
   if (chatSSE) { chatSSE.close(); chatSSE = null; }
 
@@ -1264,16 +1266,14 @@ async function openConvo(username) {
       </button>
     </div>`;
 
-  // Load history from Firebase
-  const key = [currentUser.username, username].sort().join('__');
-  const data = await db.read('chats/' + key + '/messages');
-  const msgs = data ? Object.values(data).sort((a, b) => a.ts - b.ts) : [];
-  chatCache[username] = msgs;
-  markRead(username);
+  // Skip db.read() — SSE first 'put' event IS the full snapshot, arrives in ~200ms
+  // Show loading state immediately
+  chatCache[username] = chatCache[username] || [];
   renderMsgs();
-  renderConvos(username);
 
-  // SSE for live updates — always merge new messages
+  const key = [currentUser.username, username].sort().join('__');
+
+  // SSE — single source of truth for all messages
   const sse = new EventSource(`${FB}/chats/${key}/messages.json`);
   chatSSE = sse;
   let seeded = false;
@@ -1284,8 +1284,10 @@ async function openConvo(username) {
     let changed = false;
     vals.forEach(m => {
       if (!m || !m.ts || !m.from) return;
-      const exists = chatCache[username].find(x => x.ts === m.ts && x.from === m.from);
-      if (!exists) { chatCache[username].push(m); changed = true; }
+      if (!chatCache[username].find(x => x.ts === m.ts && x.from === m.from)) {
+        chatCache[username].push(m);
+        changed = true;
+      }
     });
     if (changed) {
       chatCache[username].sort((a, b) => a.ts - b.ts);
@@ -1300,10 +1302,15 @@ async function openConvo(username) {
       const { data: d } = JSON.parse(e.data);
       if (!seeded) {
         seeded = true;
-        // First put = full snapshot, merge anything not already in cache
-        mergeMessages(d);
+        // First put = complete snapshot — replace cache entirely for accuracy
+        if (d) {
+          chatCache[username] = Object.values(d).filter(m => m && m.ts && m.from);
+          chatCache[username].sort((a, b) => a.ts - b.ts);
+          markRead(username);
+          renderMsgs();
+          renderConvos(username);
+        }
       } else {
-        // Subsequent put = full replace (rare), just merge
         mergeMessages(d);
       }
     } catch(_) {}
@@ -1316,7 +1323,15 @@ async function openConvo(username) {
     } catch(_) {}
   });
 
-  sse.onerror = () => { sse.close(); chatSSE = null; };
+  // Reconnect on error with backoff
+  sse.onerror = () => {
+    sse.close();
+    chatSSE = null;
+    if (activeChatUser === username) {
+      const delay = (openConvo._delay = Math.min((openConvo._delay || 2000) * 2, 30000));
+      setTimeout(() => { if (activeChatUser === username) { openConvo._delay = 2000; openConvo(username); } }, delay);
+    }
+  };
   setTimeout(() => { const i = document.getElementById('chat-input'); if (i) i.focus(); }, 50);
 }
 
@@ -1360,6 +1375,13 @@ function renderMsgs() {
   }
   el.innerHTML = html;
   el.scrollTop = el.scrollHeight;
+  // Load image_ref images now that DOM is set
+  el.querySelectorAll('img[data-ref]').forEach(img => {
+    const ref = img.dataset.ref, ts = img.dataset.ts;
+    if (!ref) return;
+    if (mediaRefCache[ts]) { img.src = mediaRefCache[ts]; return; }
+    loadMediaRef(ts, ref).then(url => { if (url) { img.src = url; img.onclick = () => window.open(url, '_blank'); } });
+  });
 }
 
 function renderBubble(m) {
@@ -1367,7 +1389,7 @@ function renderBubble(m) {
   if (m.type === 'video') return `<div class="bubble" style="padding:6px"><video class="bubble-video" src="${m.url}" controls preload="metadata"></video></div>`;
   if (m.type === 'audio') return `<div class="bubble"><div class="voice-msg-wrap"><div class="voice-msg-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice message</div><audio class="bubble-audio" src="${m.url}" controls></audio></div></div>`;
   if (m.type === 'audio_ref') return `<div class="bubble"><div class="voice-msg-wrap"><div class="voice-msg-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice message</div><audio class="bubble-audio" id="audio_${m.ts}" controls onplay="loadAudioRef(this,'${m.ref}','${m.ts}')"></audio></div></div>`;
-  if (m.type === 'image_ref') return `<div class="bubble" style="padding:6px"><img class="bubble-img" src="" id="img_${m.ts}" alt="${esc(m.name||'image')}" style="min-width:80px;min-height:60px;background:rgba(255,255,255,.05)" onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u)window.open(u,'_blank')})" onload="this.style.minHeight=''" /><script>loadMediaRef('${m.ts}','${m.ref}').then(u=>{const e=document.getElementById('img_${m.ts}');if(e&&u)e.src=u});<\/script></div>`;
+  if (m.type === 'image_ref') return `<div class="bubble" style="padding:6px"><img class="bubble-img" src="" data-ref="${m.ref}" data-ts="${m.ts}" alt="${esc(m.name||'image')}" style="min-width:80px;min-height:60px;background:rgba(255,255,255,.05);border-radius:12px" loading="lazy"/></div>`;
   if (m.type === 'video_ref') { const ext=(m.name||'').split('.').pop().toUpperCase().slice(0,4)||'VIDEO'; return `<div class="bubble" style="padding:6px 10px"><a class="bubble-file" href="#" onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u){const a=document.createElement('a');a.href=u;a.download='${esc(m.name||'video')}';a.click();}});return false"><div class="bubble-file-icon" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#f1f5f9">${esc(m.name||'video')}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${ext} · tap to download</div></div></a></div>`; }
   if (m.type === 'file') {
     const ext = (m.name||'').split('.').pop().toUpperCase().slice(0,4)||'FILE';
@@ -1428,8 +1450,8 @@ async function sendMsg() {
   input.style.height = 'auto';
   const ts = Date.now();
   const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const msg = { from: currentUser.username, text, time, ts };
-  // Optimistic update — mark as local so SSE patch won't duplicate it
+  const msg = { from: currentUser.username, text, time, ts, read: true };
+  // Optimistic update
   if (!chatCache[activeChatUser]) chatCache[activeChatUser] = [];
   if (!chatCache[activeChatUser].find(x => x.ts === ts)) {
     chatCache[activeChatUser].push(msg);
@@ -1450,7 +1472,7 @@ async function sendMediaMsg(type, dataUrl, name, mimeType) {
   if (!activeChatUser || !currentUser) return;
   const ts = Date.now();
   const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const msg = { from: currentUser.username, type, url: dataUrl, name: name || type, mime: mimeType || '', time, ts };
+  const msg = { from: currentUser.username, type, url: dataUrl, name: name || type, mime: mimeType || '', time, ts, read: true };
   if (!chatCache[activeChatUser]) chatCache[activeChatUser] = [];
   chatCache[activeChatUser].push(msg);
   renderMsgs();
@@ -1473,59 +1495,71 @@ async function handleFileAttach(event) {
   event.target.value = '';
   if (!file) return;
 
-  // 200MB limit — files stored as base64 chunks in Firebase RTDB
   const MAX = 200 * 1024 * 1024;
-  if (file.size > MAX) {
-    alert('File too large. Max 200MB.');
-    return;
-  }
+  if (file.size > MAX) { alert('File too large. Max 200MB.'); return; }
 
-  // Show progress UI
+  // Show progress bar
   const bar = document.createElement('div');
-  bar.className = 'upload-progress';
-  bar.id = 'upload-progress';
-  bar.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> Uploading ${file.name.slice(0,24)}...<div class="upload-bar"><div class="upload-bar-fill" id="upload-fill" style="width:0%"></div></div>`;
+  bar.className = 'upload-progress'; bar.id = 'upload-progress';
+  bar.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg> ${file.name.slice(0,28)}...<div class="upload-bar"><div class="upload-bar-fill" id="upload-fill" style="width:5%"></div></div>`;
   const inputBar = document.querySelector('.chat-input-bar');
   if (inputBar) inputBar.appendChild(bar);
 
+  const setProgress = pct => { const f = document.getElementById('upload-fill'); if (f) f.style.width = pct + '%'; };
+
   try {
     const dataUrl = await fileToBase64(file);
+    setProgress(20);
+
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
     const isAudio = file.type.startsWith('audio/');
     const type = isImage ? 'image' : isVideo ? 'video' : isAudio ? 'audio' : 'file';
 
-    const CHUNK = 700000; // ~700KB per Firebase node
-    if (dataUrl.length <= CHUNK) {
-      document.getElementById('upload-fill') && (document.getElementById('upload-fill').style.width = '60%');
+    // Use 9MB chunks — Firebase RTDB node limit is ~10MB
+    const CHUNK = 9 * 1024 * 1024 * 1.33; // base64 is ~33% larger, so 9MB raw ≈ 12MB base64 — use 6MB base64 to be safe
+    const CHUNK_B64 = 8000000; // 8MB base64 chunks
+
+    if (dataUrl.length <= CHUNK_B64) {
+      // Small file — send directly as one message
+      setProgress(70);
       await sendMediaMsg(type, dataUrl, file.name, file.type);
-      document.getElementById('upload-fill') && (document.getElementById('upload-fill').style.width = '100%');
+      setProgress(100);
     } else {
-      // Chunked upload
+      // Large file — parallel chunked upload
       const ts = Date.now();
       const key = [currentUser.username, activeChatUser].sort().join('__');
-      const totalChunks = Math.ceil(dataUrl.length / CHUNK);
-      for (let i = 0; i < totalChunks; i++) {
-        const chunk = dataUrl.slice(i * CHUNK, (i + 1) * CHUNK);
-        await db.patch(`chatmedia/${key}/${ts}`, { [`chunk_${i}`]: chunk });
-        const pct = Math.round(((i + 1) / totalChunks) * 85);
-        const fill = document.getElementById('upload-fill');
-        if (fill) fill.style.width = pct + '%';
+      const totalChunks = Math.ceil(dataUrl.length / CHUNK_B64);
+
+      // Upload all chunks in parallel (batches of 4 to avoid overwhelming Firebase)
+      const BATCH = 4;
+      for (let b = 0; b < totalChunks; b += BATCH) {
+        const batch = [];
+        for (let i = b; i < Math.min(b + BATCH, totalChunks); i++) {
+          const chunk = dataUrl.slice(i * CHUNK_B64, (i + 1) * CHUNK_B64);
+          batch.push(db.patch(`chatmedia/${key}/${ts}`, { [`chunk_${i}`]: chunk }));
+        }
+        await Promise.all(batch);
+        setProgress(20 + Math.round(((b + BATCH) / totalChunks) * 70));
       }
+
+      // Write metadata
       await db.patch(`chatmedia/${key}/${ts}`, { total: totalChunks, mime: file.type, name: file.name, type });
+      setProgress(95);
+
       const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const msg = { from: currentUser.username, type: type+'_ref', ref: `${key}/${ts}`, name: file.name, time, ts };
+      const msg = { from: currentUser.username, type: type + '_ref', ref: `${key}/${ts}`, name: file.name, time, ts };
       if (!chatCache[activeChatUser]) chatCache[activeChatUser] = [];
       chatCache[activeChatUser].push(msg);
       renderMsgs();
-      await db.patch('chats/' + key + '/messages', { [ts]: msg });
-      const fill = document.getElementById('upload-fill');
-      if (fill) fill.style.width = '100%';
+      const chatKey = [currentUser.username, activeChatUser].sort().join('__');
+      await db.patch('chats/' + chatKey + '/messages', { [ts]: msg });
+      setProgress(100);
     }
   } catch(err) {
     alert('Upload failed: ' + err.message);
   } finally {
-    setTimeout(() => { const p = document.getElementById('upload-progress'); if (p) p.remove(); }, 800);
+    setTimeout(() => { const p = document.getElementById('upload-progress'); if (p) p.remove(); }, 600);
   }
 }
 
@@ -1577,12 +1611,13 @@ async function toggleVoiceRecord() {
           // Small enough — send directly
           await sendMediaMsg('audio', dataUrl, `voice_${ts}.webm`, mimeType);
         } else {
-          // Store chunks separately, then a pointer message
+          // Parallel chunked upload for large voice messages
           const totalChunks = Math.ceil(dataUrl.length / CHUNK);
           const chunkWrites = {};
           for (let i = 0; i < totalChunks; i++) {
             chunkWrites[`chunk_${i}`] = dataUrl.slice(i * CHUNK, (i + 1) * CHUNK);
           }
+          // Send all chunks in one PATCH (they're already small at 700KB each)
           await db.patch(`chatmedia/${key}/${ts}`, { ...chunkWrites, total: totalChunks, mime: mimeType });
           // Send a pointer message
           const msg = { from: currentUser.username, type: 'audio_ref', ref: `${key}/${ts}`, name: `voice_${ts}.webm`, time, ts };
