@@ -393,9 +393,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   #page-dashboard,#page-arcade,#page-chat,#page-zidai{padding-bottom:72px;flex-direction:column}
   .dashboard-grid{grid-template-columns:1fr}
   .online-panel{display:none}
-  .convo-list{width:100%;border-right:none;border-bottom:1px solid var(--border);max-height:180px}
   .mobile-nav{display:block}
-  .chat-layout{flex-direction:column;height:calc(100vh - 72px)}
   .main-content{padding:14px;width:100%}
 }
 </style>
@@ -1469,9 +1467,15 @@ function renderBubble(m) {
   if (m.type === 'video') return `<div class="bubble" style="padding:6px"><video class="bubble-video" src="${m.url}" controls preload="metadata"></video></div>`;
   if (m.type === 'audio') return `<div class="bubble"><div class="voice-msg-wrap"><div class="voice-msg-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice message</div><audio class="bubble-audio" src="${m.url}" controls></audio></div></div>`;
   if (m.type === 'audio_ref') return `<div class="bubble"><div class="voice-msg-wrap"><div class="voice-msg-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice message</div><audio class="bubble-audio" id="audio_${m.ts}" controls onplay="loadAudioRef(this,'${m.ref}','${m.ts}')"></audio></div></div>`;
+  if (m.type === 'image_ref') return `<div class="bubble" style="padding:6px"><img class="bubble-img" src="" id="img_${m.ts}" alt="${esc(m.name||'image')}" style="min-width:80px;min-height:60px;background:rgba(255,255,255,.05)" onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u)window.open(u,'_blank')})" onload="this.style.minHeight=''" /><script>loadMediaRef('${m.ts}','${m.ref}').then(u=>{const e=document.getElementById('img_${m.ts}');if(e&&u)e.src=u});<\/script></div>`;
+  if (m.type === 'video_ref') { const ext=(m.name||'').split('.').pop().toUpperCase().slice(0,4)||'VIDEO'; return `<div class="bubble" style="padding:6px 10px"><a class="bubble-file" href="#" onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u){const a=document.createElement('a');a.href=u;a.download='${esc(m.name||'video')}';a.click();}});return false"><div class="bubble-file-icon" style="background:linear-gradient(135deg,#0ea5e9,#38bdf8)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#f1f5f9">${esc(m.name||'video')}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${ext} · tap to download</div></div></a></div>`; }
   if (m.type === 'file') {
     const ext = (m.name||'').split('.').pop().toUpperCase().slice(0,4)||'FILE';
     return `<div class="bubble" style="padding:6px 10px"><a class="bubble-file" href="${m.url||'#'}" target="_blank" download="${esc(m.name||'file')}"><div class="bubble-file-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#f1f5f9">${esc(m.name||'file')}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${ext} · tap to download</div></div></a></div>`;
+  }
+  if (m.type === 'file_ref') {
+    const ext = (m.name||'').split('.').pop().toUpperCase().slice(0,4)||'FILE';
+    return `<div class="bubble" style="padding:6px 10px"><a class="bubble-file" href="#" onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u){const a=document.createElement('a');a.href=u;a.download='${esc(m.name||'file')}';a.click();}});return false"><div class="bubble-file-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#f1f5f9">${esc(m.name||'file')}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${ext} · tap to download</div></div></a></div>`;
   }
   return `<div class="bubble">${esc(m.text)}</div>`;
 }
