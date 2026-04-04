@@ -239,8 +239,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 .group-member-row.selected{background:rgba(124,58,237,.18);border-color:rgba(124,58,237,.4)}
 .group-member-row .gm-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#c026d3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
 .group-member-row .gm-name{font-size:13px;color:#e2e8f0;font-weight:600}
-.group-member-row .gm-check{margin-left:auto;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.group-member-row.selected .gm-check{background:#7C3AED;border-color:#7C3AED}
+.group-member-row .gm-check{margin-left:auto;width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
+.group-member-row.selected .gm-check{background:#7C3AED;border-color:#7C3AED;box-shadow:0 0 8px rgba(124,58,237,.5)}
 /* Group call overlay */
 .gcall-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:210;flex-direction:column;align-items:center;justify-content:center;gap:20px}
 .gcall-overlay.show{display:flex}
@@ -1550,25 +1550,42 @@ let gcallSigSSE = null;
 // ── Group creation ────────────────────────────────────────────────────────
 function openCreateGroup() {
   const list = document.getElementById('group-member-list');
-  const users = getAllUsers();
-  if (!users.length) { alert('No other users found. Search for someone first.'); return; }
-  list.innerHTML = users.map(u => `
-    <div class="group-member-row" id="gmr-${u.username}" onclick="toggleGroupMember('${u.username}')">
-      <div class="gm-avatar">${u.username.slice(0,2).toUpperCase()}</div>
-      <span class="gm-name">@${u.username}</span>
-      <div class="gm-check" id="gmc-${u.username}"></div>
-    </div>`).join('');
   document.getElementById('group-name-input').value = '';
   document.getElementById('group-modal-overlay').classList.add('show');
-}
 
-function closeCreateGroup() {
-  document.getElementById('group-modal-overlay').classList.remove('show');
+  // Load users from Firebase directly to ensure we have the latest
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:#4b5563;font-size:13px">Loading users...</div>';
+
+  db.read('users').then(data => {
+    const users = data
+      ? Object.values(data).filter(u => u && u.username && u.username !== currentUser?.username)
+      : getAllUsers();
+
+    if (!users.length) {
+      list.innerHTML = '<div style="padding:20px;text-align:center;color:#4b5563;font-size:13px">No other users found yet.</div>';
+      return;
+    }
+    list.innerHTML = users.map(u => `
+      <div class="group-member-row" id="gmr-${u.username}" onclick="toggleGroupMember('${u.username}')">
+        <div class="gm-avatar">${u.username.slice(0,2).toUpperCase()}</div>
+        <span class="gm-name">@${u.username}</span>
+        <div class="gm-check" id="gmc-${u.username}">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </div>`).join('');
+  });
 }
 
 function toggleGroupMember(username) {
   const row = document.getElementById('gmr-' + username);
+  if (!row) return;
   row.classList.toggle('selected');
+  const check = row.querySelector('.gm-check svg');
+  if (check) check.style.display = row.classList.contains('selected') ? 'block' : 'none';
+}
+
+function closeCreateGroup() {
+  document.getElementById('group-modal-overlay').classList.remove('show');
 }
 
 async function confirmCreateGroup() {
