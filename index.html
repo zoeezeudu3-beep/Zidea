@@ -228,8 +228,32 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   .chat-layout{flex-direction:column;height:calc(100vh - 72px)}
   .msg-bubbles{max-width:82%}
 }
-/* ZID AI */
-#page-zidai{flex-direction:row;min-height:100vh}
+/* GROUPS */
+.group-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:150;align-items:center;justify-content:center;padding:20px}
+.group-modal-overlay.show{display:flex}
+.group-modal{background:#0f0f1e;border:1px solid rgba(124,58,237,.3);border-radius:20px;padding:24px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.group-modal h3{font-size:16px;font-weight:800;color:#fff}
+.group-member-list{display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto}
+.group-member-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:12px;cursor:pointer;transition:background .15s;border:1px solid transparent}
+.group-member-row:hover{background:rgba(124,58,237,.1)}
+.group-member-row.selected{background:rgba(124,58,237,.18);border-color:rgba(124,58,237,.4)}
+.group-member-row .gm-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#c026d3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0}
+.group-member-row .gm-name{font-size:13px;color:#e2e8f0;font-weight:600}
+.group-member-row .gm-check{margin-left:auto;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.group-member-row.selected .gm-check{background:#7C3AED;border-color:#7C3AED}
+/* Group call overlay */
+.gcall-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:210;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.gcall-overlay.show{display:flex}
+.gcall-grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:700px}
+.gcall-tile{width:140px;height:120px;border-radius:16px;background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(192,38,211,.15));border:1px solid rgba(124,58,237,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative}
+.gcall-tile .gcall-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#c026d3);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff}
+.gcall-tile .gcall-name{font-size:11px;color:#a78bfa;font-weight:600}
+.gcall-tile .gcall-speaking{position:absolute;inset:0;border-radius:16px;border:2px solid #22d3a0;opacity:0;transition:opacity .3s;pointer-events:none}
+.gcall-tile.speaking .gcall-speaking{opacity:1}
+/* Convo list tabs */
+.convo-tabs{display:flex;gap:0;border-bottom:1px solid rgba(124,58,237,.15)}
+.convo-tab{flex:1;padding:10px 0;font-size:12px;font-weight:700;color:#4b5563;background:none;border:none;cursor:pointer;transition:all .2s;font-family:inherit;border-bottom:2px solid transparent}
+.convo-tab.active{color:#a78bfa;border-bottom-color:#a78bfa}
 .zidai-layout{flex:1;display:flex;flex-direction:column;height:100vh;min-width:0}
 .zidai-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
 .zidai-avatar-icon{width:36px;height:36px;border-radius:10px;background:rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -598,8 +622,15 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     <div class="convo-list">
       <div class="convo-list-header">
         <span>💬 Messages</span>
+        <button onclick="openCreateGroup()" title="New Group" style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;border-radius:10px;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+        </button>
       </div>
-      <input class="convo-search" id="convo-search" placeholder="Search conversations..." oninput="filterConvos(this.value)"/>
+      <div class="convo-tabs">
+        <button class="convo-tab active" id="tab-dms" onclick="switchConvoTab('dms')">💬 Direct</button>
+        <button class="convo-tab" id="tab-groups" onclick="switchConvoTab('groups')">👥 Groups</button>
+      </div>
+      <input class="convo-search" id="convo-search" placeholder="Search..." oninput="filterConvos(this.value)"/>
       <div class="convo-items" id="convo-items"></div>
     </div>
     <div class="chat-window" id="chat-window">
@@ -608,6 +639,33 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
         <p>Pick a conversation to start chatting</p>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- CREATE GROUP MODAL -->
+<div class="group-modal-overlay" id="group-modal-overlay">
+  <div class="group-modal">
+    <h3>👥 Create Group</h3>
+    <input class="input-field" id="group-name-input" placeholder="Group name..." maxlength="40" style="background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.1)"/>
+    <p style="font-size:12px;color:#4b5563;margin-bottom:-8px">Select members</p>
+    <div class="group-member-list" id="group-member-list"></div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="btn-ghost" style="flex:1;font-size:13px" onclick="closeCreateGroup()">Cancel</button>
+      <button class="btn-primary" style="flex:1;font-size:13px" onclick="confirmCreateGroup()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- GROUP CALL OVERLAY -->
+<div class="gcall-overlay" id="gcall-overlay">
+  <div style="text-align:center">
+    <p style="color:#a78bfa;font-size:13px;font-weight:700;margin-bottom:4px" id="gcall-group-name">Group Call</p>
+    <p style="color:#4b5563;font-size:12px" id="gcall-timer-display">00:00</p>
+  </div>
+  <div class="gcall-grid" id="gcall-grid"></div>
+  <div style="display:flex;gap:12px;margin-top:8px">
+    <button id="gcall-mute-btn" onclick="gcallToggleMute()" style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">🎤</button>
+    <button onclick="endGroupCall()" style="width:60px;height:60px;border-radius:50%;background:#DC2626;border:none;color:#fff;font-size:22px;cursor:pointer">📵</button>
   </div>
 </div>
 
@@ -729,13 +787,17 @@ function showPage(name) {
     const b = document.getElementById('mob-' + k);
     if (b) b.classList.toggle('active', (k==='discover'&&name==='dashboard')||(k===name));
   });
-  if (name === 'dashboard') { renderUsers(); renderOnline(); }
+  if (name === 'dashboard') {
+    searchQuery = '';
+    const si = document.getElementById('search-input'); if (si) si.value = '';
+    renderUsers(); renderOnline();
+  }
   if (name === 'chat') {
     document.getElementById('chat-username').textContent = '@'+(currentUser?.username||'');
     loadAllConvos().then(() => {
       renderConvos(activeChatUser);
       // Auto-open last conversation if none is open
-      if (!activeChatUser) {
+      if (!activeChatUser && !activeGroupId) {
         const users = getAllUsers();
         const chatted = Object.keys(chatCache);
         const allU = [...new Set([...chatted, ...users.map(u=>u.username)])];
@@ -746,6 +808,7 @@ function showPage(name) {
         if (allU[0]) openConvo(allU[0]);
       }
     });
+    loadMyGroups().then(() => { if (activeConvoTab === 'groups') renderGroupList(); });
   }
   if (name === 'zidai') { if (!document.querySelector('.zidai-msg')) initZidAi(); }
 }
@@ -901,8 +964,25 @@ function filterUsers() { searchQuery = document.getElementById('search-input').v
 
 function renderUsers() {
   const list = document.getElementById('user-list'); if (!list) return;
-  const users = getAllUsers().filter(u => !searchQuery || u.username.toLowerCase().includes(searchQuery.toLowerCase()));
-  if (!users.length) { list.innerHTML = '<p style="color:#6B7280;font-size:14px;text-align:center;padding:40px 0">' + (searchQuery ? 'No users found.' : 'No other users yet.') + '</p>'; return; }
+  // Show empty state until user types a search query
+  if (!searchQuery) {
+    list.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center">
+        <div style="width:64px;height:64px;border-radius:20px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <div>
+          <p style="color:#e2e8f0;font-size:15px;font-weight:700;margin-bottom:6px">Find someone</p>
+          <p style="color:#4b5563;font-size:13px;line-height:1.6">Search by @username to find<br>people to chat and play with</p>
+        </div>
+      </div>`;
+    return;
+  }
+  const users = getAllUsers().filter(u => u.username.toLowerCase().includes(searchQuery.toLowerCase()));
+  if (!users.length) {
+    list.innerHTML = `<p style="color:#4b5563;font-size:14px;text-align:center;padding:40px 20px">No users found for "<strong style="color:#a78bfa">${esc(searchQuery)}</strong>"</p>`;
+    return;
+  }
   list.innerHTML = users.map(u => `
     <div class="card user-card">
       <div style="display:flex;align-items:center;gap:12px">
@@ -1433,6 +1513,17 @@ async function playRefAudio(btn, ts, ref) {
   if (el) { el.src = url; el.play().catch(()=>{}); }
 }
 
+// ── Convo tab state ───────────────────────────────────────────────────────
+let activeConvoTab = 'dms'; // 'dms' | 'groups'
+
+function switchConvoTab(tab) {
+  activeConvoTab = tab;
+  document.getElementById('tab-dms').classList.toggle('active', tab === 'dms');
+  document.getElementById('tab-groups').classList.toggle('active', tab === 'groups');
+  if (tab === 'dms') renderConvos(activeChatUser);
+  else renderGroupList();
+}
+
 function filterConvos(q) {
   const items = document.querySelectorAll('.convo-item');
   items.forEach(el => {
@@ -1440,6 +1531,448 @@ function filterConvos(q) {
     el.style.display = (!q || name.includes(q.toLowerCase())) ? '' : 'none';
   });
 }
+
+// ── Groups ────────────────────────────────────────────────────────────────
+// Groups stored in Firebase: groups/{groupId} = { id, name, members:[], createdBy, ts }
+// Group messages: groupchats/{groupId}/messages/{ts} = { from, text, time, ts }
+
+let activeGroupId = null;
+let groupSSE = null;
+const groupCache = {}; // groupId -> messages[]
+let myGroups = {}; // groupId -> group object
+let gcallPeers = {}; // username -> RTCPeerConnection
+let gcallStream = null;
+let gcallTimer = null, gcallSecs = 0;
+let gcallMuted = false;
+let gcallGroupId = null;
+let gcallSigSSE = null;
+
+// ── Group creation ────────────────────────────────────────────────────────
+function openCreateGroup() {
+  const list = document.getElementById('group-member-list');
+  const users = getAllUsers();
+  if (!users.length) { alert('No other users found. Search for someone first.'); return; }
+  list.innerHTML = users.map(u => `
+    <div class="group-member-row" id="gmr-${u.username}" onclick="toggleGroupMember('${u.username}')">
+      <div class="gm-avatar">${u.username.slice(0,2).toUpperCase()}</div>
+      <span class="gm-name">@${u.username}</span>
+      <div class="gm-check" id="gmc-${u.username}"></div>
+    </div>`).join('');
+  document.getElementById('group-name-input').value = '';
+  document.getElementById('group-modal-overlay').classList.add('show');
+}
+
+function closeCreateGroup() {
+  document.getElementById('group-modal-overlay').classList.remove('show');
+}
+
+function toggleGroupMember(username) {
+  const row = document.getElementById('gmr-' + username);
+  row.classList.toggle('selected');
+}
+
+async function confirmCreateGroup() {
+  const name = document.getElementById('group-name-input').value.trim();
+  if (!name) { alert('Enter a group name.'); return; }
+  const selected = [...document.querySelectorAll('.group-member-row.selected')]
+    .map(el => el.id.replace('gmr-',''));
+  if (!selected.length) { alert('Select at least one member.'); return; }
+  const members = [currentUser.username, ...selected];
+  const groupId = 'g_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+  const group = { id: groupId, name, members, createdBy: currentUser.username, ts: Date.now() };
+  await db.write(`groups/${groupId}`, group);
+  myGroups[groupId] = group;
+  closeCreateGroup();
+  switchConvoTab('groups');
+  openGroupConvo(groupId);
+}
+
+// ── Load groups ───────────────────────────────────────────────────────────
+async function loadMyGroups() {
+  if (!currentUser) return;
+  const data = await db.read('groups');
+  if (!data) return;
+  myGroups = {};
+  Object.values(data).forEach(g => {
+    if (g && g.members && g.members.includes(currentUser.username)) {
+      myGroups[g.id] = g;
+    }
+  });
+}
+
+function renderGroupList() {
+  const el = document.getElementById('convo-items'); if (!el) return;
+  const groups = Object.values(myGroups);
+  if (!groups.length) {
+    el.innerHTML = `<div style="padding:30px 16px;text-align:center;color:#374151;font-size:13px">
+      No groups yet.<br><span style="color:#7C3AED;cursor:pointer" onclick="openCreateGroup()">+ Create one</span>
+    </div>`;
+    return;
+  }
+  groups.sort((a,b) => {
+    const ma = groupCache[a.id] || [], mb = groupCache[b.id] || [];
+    return (mb[mb.length-1]?.ts||b.ts) - (ma[ma.length-1]?.ts||a.ts);
+  });
+  el.innerHTML = groups.map(g => {
+    const msgs = groupCache[g.id] || [];
+    const last = msgs[msgs.length-1];
+    const unread = msgs.filter(m => m.from !== currentUser.username && !m.read).length;
+    const preview = last ? (last.type ? '📎 ' + (last.name||'file') : (last.from === currentUser.username ? 'You: ' : last.from + ': ') + esc(last.text||'')) : 'No messages yet';
+    return `<div class="convo-item${activeGroupId === g.id ? ' active' : ''}" onclick="openGroupConvo('${g.id}')">
+      <div class="convo-avatar" style="background:linear-gradient(135deg,#f97316,#ec4899)">${g.name.slice(0,2).toUpperCase()}</div>
+      <div class="convo-meta">
+        <div class="convo-name">${esc(g.name)}</div>
+        <div class="convo-preview">${preview}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">
+        ${last ? `<span class="convo-time">${last.time}</span>` : ''}
+        ${unread > 0 ? `<span class="unread-badge">${unread}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Group convo ───────────────────────────────────────────────────────────
+function openGroupConvo(groupId) {
+  activeGroupId = groupId;
+  activeChatUser = null;
+  if (chatSSE) { chatSSE.close(); chatSSE = null; }
+  if (groupSSE) { groupSSE.close(); groupSSE = null; }
+
+  const group = myGroups[groupId];
+  if (!group) return;
+
+  const memberStr = group.members.filter(m => m !== currentUser.username).join(', @');
+
+  document.getElementById('chat-window').innerHTML = `
+    <div class="chat-header">
+      <div class="convo-avatar" style="width:40px;height:40px;font-size:13px;flex-shrink:0;background:linear-gradient(135deg,#f97316,#ec4899)">
+        ${group.name.slice(0,2).toUpperCase()}
+      </div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">${esc(group.name)}</div>
+        <div class="chat-header-status" style="-webkit-text-fill-color:unset;background:none;color:#64748b;font-size:11px">@${memberStr}</div>
+      </div>
+      <div class="chat-header-actions">
+        <button class="icon-btn" onclick="startGroupCall('${groupId}')" title="Group call" style="background:rgba(34,211,160,.1);border-color:rgba(34,211,160,.3);color:#22d3a0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="chat-messages" id="chat-msgs"></div>
+    <div class="chat-input-bar" style="position:relative">
+      <input type="file" id="chat-file-input" style="display:none" accept="image/*,video/*,audio/*,.pdf,.doc,.docx,.txt,.zip" onchange="handleGroupFileAttach(event)"/>
+      <button class="attach-btn" onclick="document.getElementById('chat-file-input').click()" title="Attach">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+      </button>
+      <div class="chat-input-wrap">
+        <textarea class="chat-input" id="chat-input" placeholder="Message ${esc(group.name)}..." rows="1"
+          onkeydown="groupChatKey(event)"
+          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px'"></textarea>
+      </div>
+      <button class="send-btn" onclick="sendGroupMsg()" title="Send">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>`;
+
+  groupCache[groupId] = groupCache[groupId] || [];
+  renderGroupMsgs(groupId);
+
+  const sse = new EventSource(`${FB}/groupchats/${groupId}/messages.json`);
+  groupSSE = sse;
+  let seeded = false;
+
+  sse.addEventListener('put', e => {
+    try {
+      const { data: d } = JSON.parse(e.data);
+      if (!seeded) {
+        seeded = true;
+        if (d) {
+          groupCache[groupId] = Object.values(d).filter(m => m && m.ts && m.from);
+          groupCache[groupId].sort((a,b) => a.ts - b.ts);
+          groupCache[groupId].forEach(m => { if (m.from !== currentUser.username) m.read = true; });
+          renderGroupMsgs(groupId);
+          if (activeConvoTab === 'groups') renderGroupList();
+        }
+      }
+    } catch(_) {}
+  });
+
+  sse.addEventListener('patch', e => {
+    try {
+      const { data: d } = JSON.parse(e.data);
+      if (!d) return;
+      Object.values(d).forEach(m => {
+        if (!m || !m.ts || !m.from) return;
+        if (!groupCache[groupId].find(x => x.ts === m.ts && x.from === m.from)) {
+          m.read = (m.from === currentUser.username);
+          groupCache[groupId].push(m);
+        }
+      });
+      groupCache[groupId].sort((a,b) => a.ts - b.ts);
+      renderGroupMsgs(groupId);
+      if (activeConvoTab === 'groups') renderGroupList();
+    } catch(_) {}
+  });
+
+  sse.onerror = () => { sse.close(); groupSSE = null; };
+  setTimeout(() => { const i = document.getElementById('chat-input'); if (i) i.focus(); }, 50);
+}
+
+function renderGroupMsgs(groupId) {
+  const el = document.getElementById('chat-msgs');
+  if (!el) return;
+  const msgs = groupCache[groupId] || [];
+  const myInit = currentUser.username.slice(0,2).toUpperCase();
+  if (!msgs.length) {
+    el.innerHTML = '<div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet — say hi! 👋</p></div>';
+    return;
+  }
+  let html = '', i = 0, lastDate = '';
+  while (i < msgs.length) {
+    const m = msgs[i];
+    const msgDate = new Date(m.ts).toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' });
+    if (msgDate !== lastDate) {
+      const isToday = msgDate === new Date().toLocaleDateString([], { weekday:'long', month:'short', day:'numeric' });
+      html += `<div class="msg-date-divider">${isToday ? 'Today' : msgDate}</div>`;
+      lastDate = msgDate;
+    }
+    const mine = m.from === currentUser.username;
+    const init = mine ? myInit : m.from.slice(0,2).toUpperCase();
+    let bubbles = renderBubble(m);
+    // Show sender name for others in group
+    if (!mine) bubbles = `<div style="font-size:10px;color:#7C3AED;font-weight:700;margin-bottom:2px;padding-left:2px">@${esc(m.from)}</div>` + bubbles;
+    let j = i + 1;
+    while (j < msgs.length && msgs[j].from === m.from && !msgs[j].type && !m.type) {
+      bubbles += renderBubble(msgs[j]); j++;
+    }
+    html += `<div class="msg-group${mine ? ' mine' : ''}"><div class="msg-avatar">${init}</div><div class="msg-bubbles">${bubbles}<span class="msg-time">${m.time}</span></div></div>`;
+    i = j;
+  }
+  el.innerHTML = html;
+  el.scrollTop = el.scrollHeight;
+  el.querySelectorAll('img[data-ref]').forEach(img => {
+    const ref = img.dataset.ref, ts = img.dataset.ts;
+    if (!ref) return;
+    if (mediaRefCache[ts]) { img.src = mediaRefCache[ts]; return; }
+    loadMediaRef(ts, ref).then(url => { if (url) { img.src = url; img.onclick = () => window.open(url,'_blank'); } });
+  });
+}
+
+async function sendGroupMsg() {
+  const input = document.getElementById('chat-input');
+  if (!input || !activeGroupId || !currentUser) return;
+  const text = input.value.trim(); if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  const ts = Date.now();
+  const time = new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+  const msg = { from: currentUser.username, text, time, ts, read: true };
+  if (!groupCache[activeGroupId]) groupCache[activeGroupId] = [];
+  if (!groupCache[activeGroupId].find(x => x.ts === ts)) groupCache[activeGroupId].push(msg);
+  renderGroupMsgs(activeGroupId);
+  await db.patch(`groupchats/${activeGroupId}/messages`, { [ts]: msg });
+}
+
+function groupChatKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendGroupMsg(); } }
+
+async function handleGroupFileAttach(event) {
+  const file = event.target.files[0]; event.target.value = ''; if (!file) return;
+  if (file.size > 200 * 1024 * 1024) { alert('Max 200MB'); return; }
+  try {
+    const dataUrl = await fileToBase64(file);
+    const isImage = file.type.startsWith('image/'), isVideo = file.type.startsWith('video/');
+    const type = isImage ? 'image' : isVideo ? 'video' : 'file';
+    const ts = Date.now();
+    const time = new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+    const msg = { from: currentUser.username, type, url: dataUrl, name: file.name, time, ts, read: true };
+    if (!groupCache[activeGroupId]) groupCache[activeGroupId] = [];
+    groupCache[activeGroupId].push(msg);
+    renderGroupMsgs(activeGroupId);
+    await db.patch(`groupchats/${activeGroupId}/messages`, { [ts]: msg });
+  } catch(err) { alert('Upload failed: ' + err.message); }
+}
+
+// ── Group Call (WebRTC mesh) ───────────────────────────────────────────────
+// Signaling: groupcalls/{groupId}/signals/{from}/{to} = { offer/answer/ice }
+
+async function startGroupCall(groupId) {
+  const group = myGroups[groupId];
+  if (!group) return;
+  gcallGroupId = groupId;
+  gcallPeers = {};
+  gcallMuted = false;
+
+  try {
+    gcallStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch(err) { alert('Mic error: ' + err.message); return; }
+
+  // Announce we're joining
+  await db.write(`groupcalls/${groupId}/members/${currentUser.username}`, { joined: true, ts: Date.now() });
+
+  // Show overlay
+  showGcallOverlay(group);
+
+  // Listen for other members joining / signaling
+  listenGroupCallSignals(groupId);
+
+  // Connect to any members already in the call
+  const existing = await db.read(`groupcalls/${groupId}/members`);
+  if (existing) {
+    const others = Object.keys(existing).filter(u => u !== currentUser.username);
+    for (const u of others) {
+      await gcallConnectTo(groupId, u, true); // we are the initiator
+    }
+  }
+}
+
+function showGcallOverlay(group) {
+  document.getElementById('gcall-group-name').textContent = '📞 ' + group.name;
+  document.getElementById('gcall-timer-display').textContent = '00:00';
+  renderGcallGrid(group);
+  document.getElementById('gcall-overlay').classList.add('show');
+  gcallSecs = 0;
+  gcallTimer = setInterval(() => {
+    gcallSecs++;
+    const m = String(Math.floor(gcallSecs/60)).padStart(2,'0');
+    const s = String(gcallSecs%60).padStart(2,'0');
+    const el = document.getElementById('gcall-timer-display'); if (el) el.textContent = m+':'+s;
+  }, 1000);
+}
+
+function renderGcallGrid(group) {
+  const grid = document.getElementById('gcall-grid'); if (!grid) return;
+  const members = group.members;
+  grid.innerHTML = members.map(u => `
+    <div class="gcall-tile" id="gcall-tile-${u}">
+      <div class="gcall-avatar">${u.slice(0,2).toUpperCase()}</div>
+      <div class="gcall-name">@${esc(u)}${u === currentUser.username ? ' (you)' : ''}</div>
+      <div class="gcall-speaking"></div>
+    </div>`).join('');
+}
+
+async function gcallConnectTo(groupId, remoteUser, isInitiator) {
+  if (gcallPeers[remoteUser]) return; // already connected
+  const pc = new RTCPeerConnection({ iceServers: [{ urls:'stun:stun.l.google.com:19302' },{ urls:'stun:stun1.l.google.com:19302' }] });
+  gcallPeers[remoteUser] = pc;
+
+  if (gcallStream) gcallStream.getTracks().forEach(t => pc.addTrack(t, gcallStream));
+
+  pc.ontrack = e => {
+    // Play remote audio
+    let audio = document.getElementById('gcall-audio-' + remoteUser);
+    if (!audio) {
+      audio = document.createElement('audio');
+      audio.id = 'gcall-audio-' + remoteUser;
+      audio.autoplay = true;
+      document.body.appendChild(audio);
+    }
+    audio.srcObject = e.streams[0];
+    // Visual speaking indicator via audio level
+    const ctx = new AudioContext();
+    const src = ctx.createMediaStreamSource(e.streams[0]);
+    const analyser = ctx.createAnalyser();
+    src.connect(analyser);
+    const buf = new Uint8Array(analyser.frequencyBinCount);
+    setInterval(() => {
+      analyser.getByteFrequencyData(buf);
+      const vol = buf.reduce((a,b) => a+b,0) / buf.length;
+      const tile = document.getElementById('gcall-tile-' + remoteUser);
+      if (tile) tile.classList.toggle('speaking', vol > 10);
+    }, 200);
+  };
+
+  pc.onicecandidate = async e => {
+    if (e.candidate) {
+      const key = Date.now() + '_' + Math.random().toString(36).slice(2);
+      await db.patch(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/ice`, { [key]: JSON.stringify(e.candidate) });
+    }
+  };
+
+  if (isInitiator) {
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+    await db.write(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/offer`, { sdp: offer.sdp, type: offer.type });
+  }
+}
+
+function listenGroupCallSignals(groupId) {
+  if (gcallSigSSE) { gcallSigSSE.close(); gcallSigSSE = null; }
+  const sse = new EventSource(`${FB}/groupcalls/${groupId}.json`);
+  gcallSigSSE = sse;
+
+  sse.addEventListener('put', e => { try { handleGcallData(groupId, JSON.parse(e.data).data); } catch(_) {} });
+  sse.addEventListener('patch', e => { try { handleGcallData(groupId, JSON.parse(e.data).data); } catch(_) {} });
+  sse.onerror = () => { sse.close(); gcallSigSSE = null; };
+}
+
+async function handleGcallData(groupId, data) {
+  if (!data) return;
+  const me = currentUser.username;
+
+  // New member joined — connect to them
+  if (data.members) {
+    for (const u of Object.keys(data.members)) {
+      if (u !== me && !gcallPeers[u]) {
+        await gcallConnectTo(groupId, u, false); // they will send offer
+      }
+    }
+  }
+
+  // Process signals directed at me
+  if (data.signals) {
+    for (const [fromUser, toMap] of Object.entries(data.signals)) {
+      if (fromUser === me) continue;
+      const sig = toMap[me];
+      if (!sig) continue;
+      const pc = gcallPeers[fromUser];
+
+      // Offer from remote
+      if (sig.offer && (!pc || !pc.remoteDescription)) {
+        let peer = pc;
+        if (!peer) { await gcallConnectTo(groupId, fromUser, false); peer = gcallPeers[fromUser]; }
+        if (!peer || peer.remoteDescription) continue;
+        await peer.setRemoteDescription(new RTCSessionDescription({ type: sig.offer.type, sdp: sig.offer.sdp }));
+        const answer = await peer.createAnswer();
+        await peer.setLocalDescription(answer);
+        await db.write(`groupcalls/${groupId}/signals/${me}/${fromUser}/answer`, { sdp: answer.sdp, type: answer.type });
+      }
+
+      // Answer from remote
+      if (sig.answer && pc && !pc.remoteDescription) {
+        await pc.setRemoteDescription(new RTCSessionDescription({ type: sig.answer.type, sdp: sig.answer.sdp }));
+      }
+
+      // ICE candidates
+      if (sig.ice && pc && pc.remoteDescription) {
+        for (const key of Object.keys(sig.ice)) {
+          try { await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(sig.ice[key]))); } catch(_) {}
+        }
+      }
+    }
+  }
+}
+
+function gcallToggleMute() {
+  gcallMuted = !gcallMuted;
+  if (gcallStream) gcallStream.getAudioTracks().forEach(t => t.enabled = !gcallMuted);
+  document.getElementById('gcall-mute-btn').textContent = gcallMuted ? '🔇' : '🎤';
+}
+
+async function endGroupCall() {
+  if (gcallGroupId && currentUser) {
+    await db.del(`groupcalls/${gcallGroupId}/members/${currentUser.username}`);
+  }
+  if (gcallSigSSE) { gcallSigSSE.close(); gcallSigSSE = null; }
+  Object.values(gcallPeers).forEach(pc => pc.close());
+  gcallPeers = {};
+  if (gcallStream) { gcallStream.getTracks().forEach(t => t.stop()); gcallStream = null; }
+  document.querySelectorAll('[id^="gcall-audio-"]').forEach(a => a.remove());
+  if (gcallTimer) { clearInterval(gcallTimer); gcallTimer = null; }
+  gcallGroupId = null;
+  document.getElementById('gcall-overlay').classList.remove('show');
+}
+
+// loadMyGroups is called from showPage's chat branch
 
 async function sendMsg() {
   const input = document.getElementById('chat-input');
