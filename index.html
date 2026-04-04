@@ -277,6 +277,27 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 .zidai-input:focus{border-color:var(--brand)}
 .zidai-send-btn{width:40px;height:40px;border-radius:12px;background:var(--brand);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
 .zidai-send-btn:hover{background:var(--brand-dark)}
+/* SKELETONS & LOADING */
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+.skeleton{background:linear-gradient(90deg,rgba(255,255,255,.04) 25%,rgba(255,255,255,.09) 50%,rgba(255,255,255,.04) 75%);background-size:800px 100%;animation:shimmer 1.4s infinite linear;border-radius:8px}
+.skeleton-line{height:12px;margin-bottom:8px}
+.skeleton-line.short{width:55%}
+.skeleton-line.medium{width:75%}
+.skeleton-line.full{width:100%}
+.skeleton-circle{border-radius:50%}
+.skeleton-card{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:16px;display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.skeleton-convo{display:flex;align-items:center;gap:12px;padding:12px 14px}
+.skeleton-bubble{border-radius:18px;height:38px;margin-bottom:6px}
+/* Page transition */
+.page{opacity:0;transition:opacity .18s ease}
+.page.active{opacity:1}
+/* Spinner */
+.spinner{width:22px;height:22px;border:2.5px solid rgba(124,58,237,.2);border-top-color:#7C3AED;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner-lg{width:36px;height:36px;border-width:3px}
+/* Button loading state */
+.btn-loading{position:relative;pointer-events:none;opacity:.75}
+.btn-loading::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 /* MOBILE NAV */
 .mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);z-index:50;padding:8px 0}
 .mobile-nav-inner{display:flex;justify-content:space-around}
@@ -792,6 +813,48 @@ const db = {
   del(p) { return fetch(`${FB}/${p}.json`, { method:'DELETE' }).catch(()=>{}); }
 };
 
+// ── Skeleton helpers ──────────────────────────────────────────────────────
+function skeletonConvos(n = 5) {
+  return Array(n).fill(0).map(() => `
+    <div class="skeleton-convo">
+      <div class="skeleton skeleton-circle" style="width:44px;height:44px;flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <div class="skeleton skeleton-line medium" style="height:13px;margin-bottom:7px"></div>
+        <div class="skeleton skeleton-line short" style="height:11px"></div>
+      </div>
+      <div class="skeleton skeleton-line" style="width:32px;height:10px;margin:0"></div>
+    </div>`).join('');
+}
+
+function skeletonUserCards(n = 3) {
+  return Array(n).fill(0).map(() => `
+    <div class="skeleton-card">
+      <div class="skeleton skeleton-circle" style="width:44px;height:44px;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div class="skeleton skeleton-line medium" style="height:13px;margin-bottom:8px"></div>
+        <div class="skeleton skeleton-line short" style="height:11px"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div>
+        <div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div>
+      </div>
+    </div>`).join('');
+}
+
+function skeletonMessages(n = 6) {
+  const widths = ['55%','70%','45%','65%','50%','75%'];
+  return Array(n).fill(0).map((_, i) => {
+    const mine = i % 3 === 0;
+    const w = widths[i % widths.length];
+    return `<div class="msg-group${mine ? ' mine' : ''}" style="margin-bottom:8px">
+      <div class="skeleton skeleton-circle" style="width:32px;height:32px;flex-shrink:0"></div>
+      <div class="msg-bubbles" style="max-width:${w}">
+        <div class="skeleton skeleton-bubble" style="width:100%;height:${32 + (i%2)*14}px"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ── State ─────────────────────────────────────────────────────────────────
 let currentUser = null;
 let fbUsers = {};
@@ -821,6 +884,9 @@ function showPage(name) {
   }
   if (name === 'chat') {
     document.getElementById('chat-username').textContent = '@'+(currentUser?.username||'');
+    // Show skeleton immediately — no layout jump
+    const ci = document.getElementById('convo-items');
+    if (ci && !Object.keys(chatCache).length) ci.innerHTML = skeletonConvos(5);
     loadAllConvos().then(() => {
       renderConvos(activeChatUser);
       // Auto-open last conversation if none is open
@@ -843,26 +909,30 @@ function showPage(name) {
 // ── Auth ──────────────────────────────────────────────────────────────────
 function handleLogin(e) {
   e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  if (btn) btn.classList.add('btn-loading');
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   const pw = document.getElementById('login-password').value;
   const err = document.getElementById('login-error');
   const accounts = load('zidea_accounts') || {};
   const acc = accounts[email];
-  if (!acc) { err.textContent = 'No account found.'; err.classList.add('show'); return; }
-  if (acc.password !== pw) { err.textContent = 'Wrong password.'; err.classList.add('show'); return; }
+  if (!acc) { err.textContent = 'No account found.'; err.classList.add('show'); if (btn) btn.classList.remove('btn-loading'); return; }
+  if (acc.password !== pw) { err.textContent = 'Wrong password.'; err.classList.add('show'); if (btn) btn.classList.remove('btn-loading'); return; }
   err.classList.remove('show');
   loginSuccess({ email, username: acc.username });
 }
 
 function handleSignup(e) {
   e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  if (btn) btn.classList.add('btn-loading');
   const username = document.getElementById('signup-username').value.trim().toLowerCase();
   const email = document.getElementById('signup-email').value.trim().toLowerCase();
   const pw = document.getElementById('signup-password').value;
   const err = document.getElementById('signup-error');
   const accounts = load('zidea_accounts') || {};
-  if (Object.values(accounts).some(a => a.username === username)) { err.textContent = 'Username taken.'; err.classList.add('show'); return; }
-  if (accounts[email]) { err.textContent = 'Email already registered.'; err.classList.add('show'); return; }
+  if (Object.values(accounts).some(a => a.username === username)) { err.textContent = 'Username taken.'; err.classList.add('show'); if (btn) btn.classList.remove('btn-loading'); return; }
+  if (accounts[email]) { err.textContent = 'Email already registered.'; err.classList.add('show'); if (btn) btn.classList.remove('btn-loading'); return; }
   err.classList.remove('show');
   accounts[email] = { username, password: pw, wins: 0, losses: 0 };
   save('zidea_accounts', accounts);
@@ -937,6 +1007,13 @@ function startFirebase() {
   if (!currentUser || fbStarted) return;
   fbStarted = true;
   db.write('users/'+currentUser.username, { username: currentUser.username, lastSeen: Date.now(), online: true });
+  // Show skeleton while users load
+  const list = document.getElementById('user-list');
+  if (list && !searchQuery) {
+    // Keep the search prompt — don't show skeleton until they search
+  }
+  const ol = document.getElementById('online-list');
+  if (ol) ol.innerHTML = '<div style="display:flex;gap:8px;padding:4px 0">' + Array(3).fill('<div class="skeleton skeleton-circle" style="width:32px;height:32px"></div>').join('') + '</div>';
   db.read('users').then(data => {
     if (!data) return;
     fbUsers = {};
@@ -987,11 +1064,18 @@ function getAllUsers() {
   return Object.entries(accounts).filter(([e]) => e !== currentUser?.email).map(([,a]) => ({ username: a.username, wins: a.wins||0, losses: a.losses||0, lastSeen: a.lastSeen||0 }));
 }
 
-function filterUsers() { searchQuery = document.getElementById('search-input').value; renderUsers(); }
+function filterUsers() {
+  searchQuery = document.getElementById('search-input').value;
+  const list = document.getElementById('user-list');
+  // Show skeleton immediately while we filter/wait for Firebase
+  if (searchQuery && !Object.keys(fbUsers).length && list) {
+    list.innerHTML = skeletonUserCards(3);
+  }
+  renderUsers();
+}
 
 function renderUsers() {
   const list = document.getElementById('user-list'); if (!list) return;
-  // Show empty state until user types a search query
   if (!searchQuery) {
     list.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center">
@@ -1373,10 +1457,15 @@ function openConvo(username) {
       </button>
     </div>`;
 
-  // Skip db.read() — SSE first 'put' event IS the full snapshot, arrives in ~200ms
-  // Show loading state immediately
+  // Show skeleton immediately — no layout jump while SSE connects
+  const msgsEl = document.getElementById('chat-msgs');
+  if (msgsEl) {
+    if (!chatCache[username] || !chatCache[username].length) {
+      msgsEl.innerHTML = skeletonMessages(6);
+    }
+  }
   chatCache[username] = chatCache[username] || [];
-  renderMsgs();
+  if (chatCache[username].length) renderMsgs();
 
   const key = [currentUser.username, username].sort().join('__');
 
@@ -1720,7 +1809,11 @@ function openGroupConvo(groupId) {
     </div>`;
 
   groupCache[groupId] = groupCache[groupId] || [];
-  renderGroupMsgs(groupId);
+  const gMsgsEl = document.getElementById('chat-msgs');
+  if (gMsgsEl) {
+    if (!groupCache[groupId].length) gMsgsEl.innerHTML = skeletonMessages(5);
+    else renderGroupMsgs(groupId);
+  }
 
   const sse = new EventSource(`${FB}/groupchats/${groupId}/messages.json`);
   groupSSE = sse;
