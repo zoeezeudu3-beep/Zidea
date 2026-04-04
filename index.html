@@ -831,9 +831,12 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
     </div>
   </aside>
   <div class="main-content">
-    <div><div class="page-title">💡 Generate Ideas</div><div class="page-subtitle">Describe what you need and let AI spark something great</div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div><div class="page-title">💡 Generate Ideas</div><div class="page-subtitle">AI-powered ideas tailored to you</div></div>
+      <button class="btn-ghost" style="font-size:13px;padding:8px 16px" onclick="randomIdea()">🎲 Random Idea</button>
+    </div>
     <div class="card" style="display:flex;flex-direction:column;gap:14px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
         <div>
           <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Category</label>
           <select id="idea-category" class="input-field" style="cursor:pointer">
@@ -844,6 +847,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
             <option value="startup">🚀 Startup</option>
             <option value="creative">🎨 Creative</option>
             <option value="social">🌍 Social Impact</option>
+            <option value="health">🏥 Health</option>
+            <option value="finance">💰 Finance</option>
             <option value="weird">🤪 Weird / Fun</option>
           </select>
         </div>
@@ -855,19 +860,55 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
             <option value="advanced">🔴 Advanced</option>
           </select>
         </div>
+        <div>
+          <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Budget</label>
+          <select id="idea-budget" class="input-field" style="cursor:pointer">
+            <option value="any">💸 Any budget</option>
+            <option value="low">🪙 Low (under $500)</option>
+            <option value="medium">💵 Medium ($500–5k)</option>
+            <option value="high">💎 High ($5k+)</option>
+          </select>
+        </div>
       </div>
-      <div>
-        <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Target Audience</label>
-        <input class="input-field" id="idea-audience" placeholder="e.g. teenagers, small businesses, students..." />
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Time to Build</label>
+          <select id="idea-time" class="input-field" style="cursor:pointer">
+            <option value="any">⏱ Any timeframe</option>
+            <option value="weekend">🏃 Weekend project</option>
+            <option value="month">📅 1 month</option>
+            <option value="quarter">🗓 3–6 months</option>
+            <option value="year">🚀 1+ year</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Target Audience</label>
+          <input class="input-field" id="idea-audience" placeholder="e.g. teenagers, small businesses..." />
+        </div>
       </div>
       <div>
         <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Describe your idea or topic (optional)</label>
-        <textarea class="input-field" id="idea-prompt" rows="3" placeholder="e.g. I want to build something around fitness and social media..." style="resize:vertical"></textarea>
+        <textarea class="input-field" id="idea-prompt" rows="2" placeholder="e.g. I want to build something around fitness and social media..." style="resize:vertical"></textarea>
       </div>
-      <button class="btn-primary" onclick="generateIdeas()" id="gen-btn" style="align-self:flex-start;padding:11px 28px">✨ Generate Ideas</button>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-primary" onclick="generateIdeas()" id="gen-btn" style="padding:11px 28px">✨ Generate Ideas</button>
+        <button class="btn-ghost" onclick="generateIdeas()" style="font-size:13px;padding:11px 18px" title="Different results, same settings">🔄 Regenerate</button>
+      </div>
     </div>
     <div id="ideas-output" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
+</div>
+
+<!-- IDEA DETAIL MODAL (Improve / Breakdown / Edit / Chat) -->
+<div id="idea-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:160;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)closeIdeaModal()">
+  <div style="background:#0f0f1e;border:1px solid rgba(124,58,237,.3);border-radius:20px;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid rgba(124,58,237,.15)">
+      <h3 id="idea-modal-title" style="color:#fff;font-size:15px;font-weight:800"></h3>
+      <button onclick="closeIdeaModal()" style="background:none;border:none;color:#6B7280;font-size:20px;cursor:pointer;line-height:1">×</button>
+    </div>
+    <div id="idea-modal-body" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</div>
 </div>
 
 <!-- ── LIBRARY ─────────────────────────────────────────────────────────── -->
@@ -897,6 +938,10 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       </div>
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap" id="lib-tag-filter"></div>
+    <div class="input-wrap" style="max-width:360px">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="input-field" id="lib-search" placeholder="Search saved ideas..." oninput="renderLibrary()"/>
+    </div>
     <div id="library-list" style="display:flex;flex-direction:column;gap:10px"></div>
   </div>
 </div>
@@ -3645,6 +3690,8 @@ async function generateIdeas() {
   const cat = document.getElementById('idea-category')?.value || 'business';
   const diff = document.getElementById('idea-difficulty')?.value || 'beginner';
   const audience = document.getElementById('idea-audience')?.value.trim() || 'general audience';
+  const budget = document.getElementById('idea-budget')?.value || 'any';
+  const time = document.getElementById('idea-time')?.value || 'any';
   const prompt = document.getElementById('idea-prompt')?.value.trim();
   const btn = document.getElementById('gen-btn');
   const out = document.getElementById('ideas-output');
@@ -3653,26 +3700,44 @@ async function generateIdeas() {
   btn.classList.add('btn-loading');
   out.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#6B7280;padding:20px 0"><div class="spinner"></div> Generating ideas...</div>';
 
-  const userPrompt = `Generate 5 creative ${cat} ideas for ${audience} at ${diff} level.${prompt ? ' Context: ' + prompt : ''}
-Return a JSON array of 5 objects: [{title, description, tags:[]}]. Tags should be 2-3 short words. Be specific and actionable.`;
+  const filters = [
+    budget !== 'any' ? `budget: ${budget}` : '',
+    time !== 'any' ? `time to build: ${time}` : '',
+  ].filter(Boolean).join(', ');
+
+  const userPrompt = `Generate 5 creative ${cat} ideas for ${audience} at ${diff} level.${filters ? ' Constraints: ' + filters + '.' : ''}${prompt ? ' Context: ' + prompt : ''}
+Return a JSON array of 5 objects with these exact fields:
+[{
+  "title": "short catchy title",
+  "description": "2-3 sentence description",
+  "tags": ["tag1","tag2"],
+  "problem": "what problem it solves",
+  "solution": "how it solves it",
+  "targetUsers": "who uses it",
+  "revenueIdea": "how to make money",
+  "steps": ["step 1","step 2","step 3"],
+  "profitScore": 7,
+  "difficultyScore": 4,
+  "uniquenessScore": 8
+}]
+Scores are 1-10. Be specific and actionable.`;
 
   try {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY_IDEAS}`, {
       method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ contents:[{role:'user',parts:[{text:userPrompt}]}], generationConfig:{temperature:0.9,maxOutputTokens:1024} })
+      body: JSON.stringify({ contents:[{role:'user',parts:[{text:userPrompt}]}], generationConfig:{temperature:0.9,maxOutputTokens:2048} })
     });
     const data = await res.json();
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
     const jsonMatch = raw.match(/\[[\s\S]*\]/);
     const ideas = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
 
-    // Save to history
     const store = loadIdeas();
     const ts = Date.now();
     ideas.forEach((idea, i) => {
       store.history.unshift({ ...idea, id: ts + i, ts, category: cat });
     });
-    store.history = store.history.slice(0, 100); // keep last 100
+    store.history = store.history.slice(0, 100);
     saveIdeas(store);
 
     out.innerHTML = ideas.map((idea, i) => renderIdeaCard(idea, ts + i, 'generate')).join('');
@@ -3682,22 +3747,289 @@ Return a JSON array of 5 objects: [{title, description, tags:[]}]. Tags should b
   btn.classList.remove('btn-loading');
 }
 
+function randomIdea() {
+  const cats = ['business','app','content','startup','creative','social','health','finance','weird'];
+  const diffs = ['beginner','intermediate','advanced'];
+  const el = id => document.getElementById(id);
+  if (el('idea-category')) el('idea-category').value = cats[Math.floor(Math.random()*cats.length)];
+  if (el('idea-difficulty')) el('idea-difficulty').value = diffs[Math.floor(Math.random()*diffs.length)];
+  if (el('idea-prompt')) el('idea-prompt').value = '';
+  if (el('idea-audience')) el('idea-audience').value = '';
+  generateIdeas();
+}
+
 function renderIdeaCard(idea, id, context) {
   const store = loadIdeas();
   const isSaved = store.saved.some(x => x.id === id);
   const isStarred = store.starred.some(x => x.id === id);
   const tags = (idea.tags || []).map(t => `<span class="idea-tag" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('');
+
+  // Score bars
+  const scoreBar = (label, val, color) => val ? `
+    <div style="display:flex;align-items:center;gap:8px;font-size:11px">
+      <span style="color:#6B7280;width:80px;flex-shrink:0">${label}</span>
+      <div style="flex:1;height:5px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden">
+        <div style="width:${(val/10)*100}%;height:100%;background:${color};border-radius:3px"></div>
+      </div>
+      <span style="color:#9CA3AF;width:20px;text-align:right">${val}/10</span>
+    </div>` : '';
+
+  const scores = (idea.profitScore || idea.difficultyScore || idea.uniquenessScore) ? `
+    <div style="display:flex;flex-direction:column;gap:5px;padding:10px;background:rgba(255,255,255,.03);border-radius:10px;margin-top:4px">
+      ${scoreBar('💰 Profit', idea.profitScore, '#22d3a0')}
+      ${scoreBar('🔧 Difficulty', idea.difficultyScore, '#f97316')}
+      ${scoreBar('✨ Uniqueness', idea.uniquenessScore, '#a78bfa')}
+    </div>` : '';
+
   return `<div class="idea-card" id="idea-${id}">
     <div class="idea-card-title">${esc(idea.title || '')}</div>
     <div class="idea-card-body">${esc(idea.description || '')}</div>
+    ${scores}
     ${tags ? `<div class="idea-card-tags">${tags}</div>` : ''}
-    <div class="idea-card-actions">
-      <button class="idea-action-btn${isSaved?' active':''}" onclick="toggleSaveIdea(${id},'${context}')" id="save-btn-${id}">
-        💾 ${isSaved ? 'Saved' : 'Save'}
-      </button>
-      <button class="idea-action-btn${isStarred?' active':''}" onclick="toggleStarIdea(${id},'${context}')" id="star-btn-${id}">
-        ⭐ ${isStarred ? 'Starred' : 'Star'}
-      </button>
+    <div class="idea-card-actions" style="flex-wrap:wrap">
+      <button class="idea-action-btn${isSaved?' active':''}" onclick="toggleSaveIdea(${id},'${context}')" id="save-btn-${id}">💾 ${isSaved?'Saved':'Save'}</button>
+      <button class="idea-action-btn${isStarred?' active':''}" onclick="toggleStarIdea(${id},'${context}')" id="star-btn-${id}">⭐ ${isStarred?'Starred':'Star'}</button>
+      <button class="idea-action-btn" onclick="showBreakdown(${id})">🧩 Breakdown</button>
+      <button class="idea-action-btn" onclick="improveIdea(${id})">🧠 Improve</button>
+      <button class="idea-action-btn" onclick="editIdea(${id})">✏️ Edit</button>
+      <button class="idea-action-btn" onclick="chatWithIdea(${id})">🤖 Chat</button>
+      <button class="idea-action-btn" id="share-btn-${id}" onclick="shareToExplore(${id})">🌍 Share</button>
+      <button class="idea-action-btn" onclick="exportIdea(${id})">📤 Export</button>
+    </div>
+  </div>`;
+}
+
+// ── Idea Modal helpers ────────────────────────────────────────────────────
+function openIdeaModal(title, bodyHtml) {
+  document.getElementById('idea-modal-title').textContent = title;
+  document.getElementById('idea-modal-body').innerHTML = bodyHtml;
+  document.getElementById('idea-modal-overlay').style.display = 'flex';
+}
+function closeIdeaModal() {
+  document.getElementById('idea-modal-overlay').style.display = 'none';
+}
+
+function getIdeaById(id) {
+  const store = loadIdeas();
+  return store.history.find(x => x.id === id) || store.saved.find(x => x.id === id) || store.starred.find(x => x.id === id);
+}
+
+// ── Breakdown ─────────────────────────────────────────────────────────────
+function showBreakdown(id) {
+  const idea = getIdeaById(id); if (!idea) return;
+  const row = (emoji, label, val) => val ? `
+    <div style="padding:12px;background:rgba(255,255,255,.04);border-radius:12px">
+      <div style="font-size:11px;color:#6B7280;margin-bottom:4px">${emoji} ${label}</div>
+      <div style="color:#e2e8f0;font-size:13px;line-height:1.6">${esc(val)}</div>
+    </div>` : '';
+  const steps = idea.steps?.length ? `
+    <div style="padding:12px;background:rgba(255,255,255,.04);border-radius:12px">
+      <div style="font-size:11px;color:#6B7280;margin-bottom:8px">🚀 Steps to Build</div>
+      <ol style="color:#e2e8f0;font-size:13px;line-height:2;padding-left:18px">
+        ${idea.steps.map(s => `<li>${esc(s)}</li>`).join('')}
+      </ol>
+    </div>` : '';
+  openIdeaModal(`🧩 ${idea.title}`,
+    row('❓','Problem', idea.problem) +
+    row('💡','Solution', idea.solution) +
+    row('👥','Target Users', idea.targetUsers) +
+    row('💰','Revenue Idea', idea.revenueIdea) +
+    steps
+  );
+}
+
+// ── Improve ───────────────────────────────────────────────────────────────
+async function improveIdea(id) {
+  const idea = getIdeaById(id); if (!idea) return;
+  openIdeaModal('🧠 Improving idea...', '<div style="display:flex;align-items:center;gap:10px;color:#6B7280;padding:20px 0"><div class="spinner"></div> AI is expanding your idea...</div>');
+  try {
+    const prompt = `Improve and expand this idea: "${idea.title}" — ${idea.description}
+Return a JSON object with:
+{
+  "improvedTitle": "...",
+  "improvedDescription": "...",
+  "monetizationStrategy": "detailed monetization plan",
+  "targetAudience": "specific target audience",
+  "buildSteps": ["step1","step2","step3","step4","step5"],
+  "competitorAnalysis": "who are the competitors and how to differentiate",
+  "mvpFeatures": ["feature1","feature2","feature3"]
+}`;
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY_IDEAS}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{role:'user',parts:[{text:prompt}]}], generationConfig:{temperature:0.7,maxOutputTokens:1024} })
+    });
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    const improved = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+    const section = (emoji, label, val) => val ? `
+      <div style="padding:12px;background:rgba(255,255,255,.04);border-radius:12px">
+        <div style="font-size:11px;color:#6B7280;margin-bottom:4px">${emoji} ${label}</div>
+        <div style="color:#e2e8f0;font-size:13px;line-height:1.6">${esc(val)}</div>
+      </div>` : '';
+    const listSection = (emoji, label, arr) => arr?.length ? `
+      <div style="padding:12px;background:rgba(255,255,255,.04);border-radius:12px">
+        <div style="font-size:11px;color:#6B7280;margin-bottom:8px">${emoji} ${label}</div>
+        <ul style="color:#e2e8f0;font-size:13px;line-height:2;padding-left:18px">${arr.map(s=>`<li>${esc(s)}</li>`).join('')}</ul>
+      </div>` : '';
+    openIdeaModal(`🧠 ${improved.improvedTitle || idea.title}`,
+      section('💡','Improved Description', improved.improvedDescription) +
+      section('💰','Monetization Strategy', improved.monetizationStrategy) +
+      section('👥','Target Audience', improved.targetAudience) +
+      section('🏆','Competitor Analysis', improved.competitorAnalysis) +
+      listSection('🚀','Build Steps', improved.buildSteps) +
+      listSection('⚡','MVP Features', improved.mvpFeatures)
+    );
+  } catch(err) {
+    openIdeaModal('Error', '<p style="color:#ef4444">Failed to improve idea. Try again.</p>');
+  }
+}
+
+// ── Edit ──────────────────────────────────────────────────────────────────
+function editIdea(id) {
+  const idea = getIdeaById(id); if (!idea) return;
+  openIdeaModal('✏️ Edit Idea', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Title</label>
+        <input class="input-field" id="edit-title" value="${esc(idea.title||'')}" style="background:rgba(255,255,255,.05)"/>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Description</label>
+        <textarea class="input-field" id="edit-desc" rows="4" style="background:rgba(255,255,255,.05);resize:vertical">${esc(idea.description||'')}</textarea>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Tags (comma separated)</label>
+        <input class="input-field" id="edit-tags" value="${(idea.tags||[]).join(', ')}" style="background:rgba(255,255,255,.05)"/>
+      </div>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary" style="flex:1;font-size:13px" onclick="saveEditedIdea(${id})">💾 Save Changes</button>
+        <button class="btn-ghost" style="flex:1;font-size:13px" onclick="closeIdeaModal()">Cancel</button>
+      </div>
+    </div>`);
+}
+
+function saveEditedIdea(id) {
+  const store = loadIdeas();
+  const update = idea => {
+    if (idea.id !== id) return idea;
+    return {
+      ...idea,
+      title: document.getElementById('edit-title')?.value.trim() || idea.title,
+      description: document.getElementById('edit-desc')?.value.trim() || idea.description,
+      tags: (document.getElementById('edit-tags')?.value || '').split(',').map(t=>t.trim()).filter(Boolean),
+      edited: true
+    };
+  };
+  store.history = store.history.map(update);
+  store.saved = store.saved.map(update);
+  store.starred = store.starred.map(update);
+  saveIdeas(store);
+  closeIdeaModal();
+  // Re-render the card
+  const card = document.getElementById('idea-' + id);
+  const updated = getIdeaById(id);
+  if (card && updated) card.outerHTML = renderIdeaCard(updated, id, 'generate');
+}
+
+// ── Chat with Idea ────────────────────────────────────────────────────────
+let ideaChatHistory = [];
+let ideaChatId = null;
+
+function chatWithIdea(id) {
+  const idea = getIdeaById(id); if (!idea) return;
+  ideaChatId = id;
+  ideaChatHistory = [{ role:'user', parts:[{text:`I have this idea: "${idea.title}" — ${idea.description}. I want to discuss it.`}] }];
+  openIdeaModal(`🤖 Chat: ${idea.title}`, `
+    <div style="display:flex;flex-direction:column;gap:10px;height:340px">
+      <div id="idea-chat-msgs" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 0">
+        <div style="background:rgba(124,58,237,.15);border-radius:12px;padding:10px 14px;font-size:13px;color:#e2e8f0;align-self:flex-start;max-width:85%">
+          Hi! I'm ready to help you develop "<strong>${esc(idea.title)}</strong>". Ask me anything — monetization, competitors, how to build it, who to target...
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input class="input-field" id="idea-chat-input" placeholder="Ask about this idea..." style="background:rgba(255,255,255,.05)" onkeydown="if(event.key==='Enter')sendIdeaChat()"/>
+        <button class="send-btn" onclick="sendIdeaChat()" style="flex-shrink:0">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>`);
+}
+
+async function sendIdeaChat() {
+  const input = document.getElementById('idea-chat-input');
+  const msgs = document.getElementById('idea-chat-msgs');
+  if (!input || !msgs) return;
+  const text = input.value.trim(); if (!text) return;
+  input.value = '';
+
+  // Add user bubble
+  msgs.innerHTML += `<div style="background:linear-gradient(135deg,#7C3AED,#c026d3);border-radius:12px;padding:10px 14px;font-size:13px;color:#fff;align-self:flex-end;max-width:85%">${esc(text)}</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  ideaChatHistory.push({ role:'user', parts:[{text}] });
+
+  // Typing indicator
+  const typingId = 'typing-' + Date.now();
+  msgs.innerHTML += `<div id="${typingId}" style="background:rgba(124,58,237,.15);border-radius:12px;padding:10px 14px;font-size:13px;color:#6B7280;align-self:flex-start">...</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY_IDEAS}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        system_instruction:{parts:[{text:'You are an expert startup advisor helping the user develop their idea. Be concise, practical, and encouraging.'}]},
+        contents: ideaChatHistory,
+        generationConfig:{temperature:0.8,maxOutputTokens:512}
+      })
+    });
+    const data = await res.json();
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No response.';
+    ideaChatHistory.push({ role:'model', parts:[{text:reply}] });
+    const typing = document.getElementById(typingId);
+    if (typing) typing.outerHTML = `<div style="background:rgba(124,58,237,.15);border-radius:12px;padding:10px 14px;font-size:13px;color:#e2e8f0;align-self:flex-start;max-width:85%;line-height:1.6">${reply.replace(/\n/g,'<br>')}</div>`;
+  } catch(_) {
+    const typing = document.getElementById(typingId);
+    if (typing) typing.textContent = '⚠ Failed to respond.';
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── Export ────────────────────────────────────────────────────────────────
+function exportIdea(id) {
+  const idea = getIdeaById(id); if (!idea) return;
+  const text = [
+    `💡 ${idea.title}`,
+    ``,
+    idea.description,
+    ``,
+    idea.problem ? `❓ Problem: ${idea.problem}` : '',
+    idea.solution ? `💡 Solution: ${idea.solution}` : '',
+    idea.targetUsers ? `👥 Target Users: ${idea.targetUsers}` : '',
+    idea.revenueIdea ? `💰 Revenue: ${idea.revenueIdea}` : '',
+    idea.steps?.length ? `\n🚀 Steps:\n${idea.steps.map((s,i)=>`${i+1}. ${s}`).join('\n')}` : '',
+    ``,
+    `Tags: ${(idea.tags||[]).join(', ')}`,
+    `Generated by Zidea`
+  ].filter(Boolean).join('\n');
+
+  openIdeaModal('📤 Export Idea', `
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <textarea style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:12px;color:#e2e8f0;font-size:12px;font-family:monospace;resize:none;height:200px;outline:none" readonly>${text}</textarea>
+      <div style="display:flex;gap:10px">
+        <button class="btn-primary" style="flex:1;font-size:13px" onclick="navigator.clipboard?.writeText(${JSON.stringify(text)});this.textContent='✅ Copied!'">📋 Copy</button>
+        <button class="btn-ghost" style="flex:1;font-size:13px" onclick="downloadIdea(${JSON.stringify(text)},${JSON.stringify(idea.title)})">⬇️ Download</button>
+      </div>
+    </div>`);
+}
+
+function downloadIdea(text, title) {
+  const blob = new Blob([text], { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (title || 'idea').replace(/[^a-z0-9]/gi,'_') + '.txt';
+  a.click();
+}
       <button class="idea-action-btn" onclick="shareIdea('${esc(idea.title||'')}')">🔗 Share</button>
     </div>
   </div>`;
@@ -3735,6 +4067,31 @@ function shareIdea(title) {
   else { navigator.clipboard?.writeText(title); alert('Idea copied to clipboard!'); }
 }
 
+async function shareToExplore(id) {
+  const store = loadIdeas();
+  const idea = store.history.find(x => x.id === id) || store.saved.find(x => x.id === id);
+  if (!idea) return;
+  const btn = document.getElementById('share-btn-' + id);
+  if (btn) { btn.textContent = '⏳ Sharing...'; btn.disabled = true; }
+  try {
+    const key = 'explore_' + id;
+    await db.write(`explore/${key}`, {
+      title: idea.title,
+      description: idea.description,
+      tags: idea.tags || [],
+      category: idea.category || 'general',
+      author: currentUser?.username || 'anonymous',
+      ts: Date.now(),
+      likes: 0,
+      id: key
+    });
+    if (btn) { btn.textContent = '✅ Shared!'; btn.classList.add('active'); }
+  } catch(err) {
+    if (btn) { btn.textContent = '🌍 Share'; btn.disabled = false; }
+    alert('Failed to share. Check your connection.');
+  }
+}
+
 // ── Library ───────────────────────────────────────────────────────────────
 let libTab = 'saved';
 let libTagFilter = null;
@@ -3756,8 +4113,10 @@ function filterByTag(tag) {
 function renderLibrary() {
   const store = loadIdeas();
   const list = document.getElementById('library-list'); if (!list) return;
+  const searchQ = document.getElementById('lib-search')?.value.toLowerCase() || '';
   let ideas = store[libTab] || [];
   if (libTagFilter) ideas = ideas.filter(x => (x.tags||[]).includes(libTagFilter));
+  if (searchQ) ideas = ideas.filter(x => (x.title||'').toLowerCase().includes(searchQ) || (x.description||'').toLowerCase().includes(searchQ));
 
   // Tag filter bar
   const allTags = [...new Set((store.saved.concat(store.starred).concat(store.history)).flatMap(x => x.tags||[]))];
@@ -3768,23 +4127,11 @@ function renderLibrary() {
 
   if (!ideas.length) {
     list.innerHTML = `<div style="text-align:center;padding:40px;color:#4b5563">
-      ${libTab==='saved'?'No saved ideas yet. Generate some and hit 💾 Save!':libTab==='starred'?'No starred ideas yet. Hit ⭐ on any idea!':'No history yet. Generate your first idea!'}
+      ${searchQ ? `No results for "${esc(searchQ)}"` : libTab==='saved'?'No saved ideas yet. Generate some and hit 💾 Save!':libTab==='starred'?'No starred ideas yet. Hit ⭐ on any idea!':'No history yet. Generate your first idea!'}
     </div>`;
     return;
   }
-  list.innerHTML = ideas.map(idea => `
-    <div class="idea-card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
-        <div class="idea-card-title">${esc(idea.title||'')}</div>
-        <button onclick="deleteIdeaFromLib(${idea.id},'${libTab}')" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:16px;flex-shrink:0" title="Delete">🗑</button>
-      </div>
-      <div class="idea-card-body">${esc(idea.description||'')}</div>
-      <div class="idea-card-tags">${(idea.tags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}</div>
-      <div class="idea-card-actions">
-        <button class="idea-action-btn" onclick="toggleSaveIdea(${idea.id},'lib');renderLibrary()">💾 ${store.saved.some(x=>x.id===idea.id)?'Saved':'Save'}</button>
-        <button class="idea-action-btn" onclick="toggleStarIdea(${idea.id},'lib');renderLibrary()">⭐ ${store.starred.some(x=>x.id===idea.id)?'Starred':'Star'}</button>
-      </div>
-    </div>`).join('');
+  list.innerHTML = ideas.map(idea => renderIdeaCard(idea, idea.id, 'lib')).join('');
 }
 
 function deleteIdeaFromLib(id, tab) {
@@ -3815,22 +4162,56 @@ function filterExplore(cat) {
   renderExplore();
 }
 
-function renderExplore() {
+async function renderExplore() {
   const list = document.getElementById('explore-list'); if (!list) return;
-  const ideas = exploreCat === 'all' ? EXPLORE_SEED : EXPLORE_SEED.filter(x => x.category === exploreCat || (x.tags||[]).includes(exploreCat));
-  list.innerHTML = ideas.map(idea => `
+  list.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#6B7280;padding:20px 0"><div class="spinner"></div> Loading ideas...</div>';
+
+  // Load from Firebase, fall back to seed data
+  let ideas = [];
+  try {
+    const data = await db.read('explore');
+    if (data) {
+      ideas = Object.values(data).sort((a, b) => (b.likes||0) - (a.likes||0) || b.ts - a.ts);
+    }
+  } catch(_) {}
+
+  // Merge with seed data (seed shown if no community ideas yet)
+  if (!ideas.length) ideas = EXPLORE_SEED.map((x, i) => ({ ...x, id: 'seed_' + i, author: 'Zidea', ts: 0 }));
+
+  const filtered = exploreCat === 'all' ? ideas : ideas.filter(x => x.category === exploreCat || (x.tags||[]).includes(exploreCat));
+
+  if (!filtered.length) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:#4b5563">No ideas in this category yet. Be the first to share one!</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(idea => `
     <div class="idea-card">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
         <div class="idea-card-title">${esc(idea.title)}</div>
-        <span style="font-size:12px;color:#6B7280;white-space:nowrap">❤️ ${idea.likes}</span>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0">
+          <span style="font-size:12px;color:#6B7280;white-space:nowrap">❤️ ${idea.likes||0}</span>
+          ${idea.author ? `<span style="font-size:10px;color:#4b5563">@${esc(idea.author)}</span>` : ''}
+        </div>
       </div>
       <div class="idea-card-body">${esc(idea.description)}</div>
       <div class="idea-card-tags">${(idea.tags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}</div>
       <div class="idea-card-actions">
-        <button class="idea-action-btn" onclick="saveExploreIdea(${JSON.stringify(idea).replace(/"/g,'&quot;')})">💾 Save to Library</button>
+        <button class="idea-action-btn" onclick="likeExploreIdea('${idea.id}',this)">❤️ Like</button>
+        <button class="idea-action-btn" onclick="saveExploreIdea(${JSON.stringify(idea).replace(/"/g,'&quot;')})">💾 Save</button>
         <button class="idea-action-btn" onclick="shareIdea('${esc(idea.title)}')">🔗 Share</button>
       </div>
     </div>`).join('');
+}
+
+async function likeExploreIdea(id, btn) {
+  if (!id || id.startsWith('seed_')) return;
+  btn.disabled = true;
+  const data = await db.read(`explore/${id}`);
+  if (data) {
+    await db.patch(`explore/${id}`, { likes: (data.likes||0) + 1 });
+    btn.textContent = `❤️ ${(data.likes||0) + 1}`;
+  }
 }
 
 function saveExploreIdea(idea) {
