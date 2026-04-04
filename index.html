@@ -307,6 +307,21 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 .mobile-nav-inner{display:flex;justify-content:space-around}
 .mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 8px;background:none;border:none;color:#6B7280;font-size:10px;font-weight:500;cursor:pointer;font-family:inherit;transition:color .15s}
 .mob-nav-btn.active,.mob-nav-btn:hover{color:var(--brand-light)}
+/* IDEAS / LIBRARY / EXPLORE */
+.idea-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
+.idea-card:hover{border-color:rgba(124,58,237,.4)}
+.idea-card-title{font-size:15px;font-weight:700;color:#fff}
+.idea-card-body{font-size:13px;color:#9CA3AF;line-height:1.6}
+.idea-card-tags{display:flex;gap:6px;flex-wrap:wrap}
+.idea-tag{font-size:11px;padding:3px 10px;border-radius:999px;background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.2);cursor:pointer;font-family:inherit}
+.idea-card-actions{display:flex;gap:8px;margin-top:4px}
+.idea-action-btn{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:10px;border:1px solid var(--border);background:transparent;color:#6B7280;font-size:12px;cursor:pointer;font-family:inherit;transition:all .2s}
+.idea-action-btn:hover{border-color:var(--brand);color:#fff}
+.idea-action-btn.active{background:rgba(124,58,237,.15);border-color:var(--brand);color:#a78bfa}
+.lib-tab-btn{padding:7px 14px;border-radius:10px;border:1px solid var(--border);background:transparent;color:#6B7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.lib-tab-btn.active{background:rgba(124,58,237,.15);border-color:var(--brand);color:#a78bfa}
+.explore-cat-btn{padding:6px 14px;border-radius:999px;border:1px solid var(--border);background:transparent;color:#6B7280;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
+.explore-cat-btn.active{background:rgba(124,58,237,.15);border-color:var(--brand);color:#a78bfa}
 /* CALL OVERLAY */
 .call-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:20px}
 .incoming-toast{display:none;position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;z-index:201;min-width:260px;box-shadow:0 20px 60px rgba(0,0,0,.5)}
@@ -475,10 +490,20 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       Zidea
     </div>
     <nav class="sidebar-nav">
-      <div class="sidebar-label">Menu</div>
+      <div class="sidebar-label">Main</div>
       <button class="nav-item" id="nav-discover" onclick="showPage('dashboard')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Discover
       </button>
+      <button class="nav-item" id="nav-ideas" onclick="showPage('ideas')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Generate Ideas
+      </button>
+      <button class="nav-item" id="nav-library" onclick="showPage('library')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library
+      </button>
+      <button class="nav-item" id="nav-explore" onclick="showPage('explore')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Explore 🔥
+      </button>
+      <div class="sidebar-label" style="margin-top:8px">Social</div>
       <button class="nav-item" id="nav-chat" onclick="showPage('chat')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages
       </button>
@@ -487,6 +512,16 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
       </button>
       <button class="nav-item" id="nav-zidai" onclick="showPage('zidai')">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>ZiD AI
+      </button>
+      <div class="sidebar-label" style="margin-top:8px">Account</div>
+      <button class="nav-item" id="nav-profile" onclick="showPage('profile')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+      </button>
+      <button class="nav-item" id="nav-settings" onclick="showPage('settings')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+      </button>
+      <button class="nav-item" id="nav-help" onclick="showPage('help')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Help
       </button>
     </nav>
     <div class="sidebar-footer">
@@ -747,14 +782,251 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   </div>
 </div>
 
+<!-- ── GENERATE IDEAS ─────────────────────────────────────────────────── -->
+<div id="page-ideas" class="page" style="flex-direction:row;min-height:100vh">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav"><div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item active">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="ideas-username">@username</div>
+      <button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-content">
+    <div><div class="page-title">💡 Generate Ideas</div><div class="page-subtitle">Describe what you need and let AI spark something great</div></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div>
+          <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Category</label>
+          <select id="idea-category" class="input-field" style="cursor:pointer">
+            <option value="business">🏢 Business</option>
+            <option value="app">📱 App / Tech</option>
+            <option value="content">🎬 Content / Media</option>
+            <option value="school">🎓 School / Education</option>
+            <option value="startup">🚀 Startup</option>
+            <option value="creative">🎨 Creative</option>
+            <option value="social">🌍 Social Impact</option>
+            <option value="weird">🤪 Weird / Fun</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Difficulty</label>
+          <select id="idea-difficulty" class="input-field" style="cursor:pointer">
+            <option value="beginner">🟢 Beginner</option>
+            <option value="intermediate">🟡 Intermediate</option>
+            <option value="advanced">🔴 Advanced</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Target Audience</label>
+        <input class="input-field" id="idea-audience" placeholder="e.g. teenagers, small businesses, students..." />
+      </div>
+      <div>
+        <label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Describe your idea or topic (optional)</label>
+        <textarea class="input-field" id="idea-prompt" rows="3" placeholder="e.g. I want to build something around fitness and social media..." style="resize:vertical"></textarea>
+      </div>
+      <button class="btn-primary" onclick="generateIdeas()" id="gen-btn" style="align-self:flex-start;padding:11px 28px">✨ Generate Ideas</button>
+    </div>
+    <div id="ideas-output" style="display:flex;flex-direction:column;gap:12px"></div>
+  </div>
+</div>
+
+<!-- ── LIBRARY ─────────────────────────────────────────────────────────── -->
+<div id="page-library" class="page" style="flex-direction:row;min-height:100vh">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav"><div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item active">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="library-username">@username</div>
+      <button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-content">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div><div class="page-title">📚 My Library</div><div class="page-subtitle">Your saved and starred ideas</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="lib-tab-btn active" id="lib-tab-saved" onclick="switchLibTab('saved')">💾 Saved</button>
+        <button class="lib-tab-btn" id="lib-tab-starred" onclick="switchLibTab('starred')">⭐ Starred</button>
+        <button class="lib-tab-btn" id="lib-tab-history" onclick="switchLibTab('history')">🕐 History</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="lib-tag-filter"></div>
+    <div id="library-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+</div>
+
+<!-- ── EXPLORE ────────────────────────────────────────────────────────── -->
+<div id="page-explore" class="page" style="flex-direction:row;min-height:100vh">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav"><div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item active">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="explore-username">@username</div>
+      <button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-content">
+    <div><div class="page-title">🔥 Explore</div><div class="page-subtitle">Trending ideas from the community</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px">
+      <button class="explore-cat-btn active" onclick="filterExplore('all')">All</button>
+      <button class="explore-cat-btn" onclick="filterExplore('startup')">🚀 Startup</button>
+      <button class="explore-cat-btn" onclick="filterExplore('app')">📱 App</button>
+      <button class="explore-cat-btn" onclick="filterExplore('content')">🎬 Content</button>
+      <button class="explore-cat-btn" onclick="filterExplore('weird')">🤪 Weird</button>
+      <button class="explore-cat-btn" onclick="filterExplore('ai')">🤖 AI</button>
+    </div>
+    <div id="explore-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  </div>
+</div>
+
+<!-- ── PROFILE ────────────────────────────────────────────────────────── -->
+<div id="page-profile" class="page" style="flex-direction:row;min-height:100vh">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav"><div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item active">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="profile-username-sidebar">@username</div>
+      <button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-content" style="max-width:600px">
+    <div><div class="page-title">👤 Profile</div></div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px">
+      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#c026d3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff" id="profile-avatar">?</div>
+      <div style="text-align:center">
+        <div style="font-size:20px;font-weight:800;color:#fff" id="profile-name">@username</div>
+        <div style="font-size:13px;color:#6B7280;margin-top:4px" id="profile-email"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;margin-top:8px">
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:24px;font-weight:800;color:var(--brand)" id="profile-ideas-count">0</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px">Ideas Generated</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:24px;font-weight:800;color:#f97316" id="profile-saved-count">0</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px">Saved</div>
+        </div>
+        <div class="card" style="text-align:center;padding:16px">
+          <div style="font-size:24px;font-weight:800;color:#fbbf24" id="profile-starred-count">0</div>
+          <div style="font-size:12px;color:#6B7280;margin-top:4px">Starred</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:0">
+      <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:12px">Recent Ideas</div>
+      <div id="profile-recent-ideas" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SETTINGS ───────────────────────────────────────────────────────── -->
+<div id="page-settings" class="page" style="flex-direction:row;min-height:100vh">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav"><div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item active">⚙️ Settings</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="settings-username">@username</div>
+      <button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-content" style="max-width:560px">
+    <div><div class="page-title">⚙️ Settings</div></div>
+    <div class="card" style="display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+        <div><div style="color:#fff;font-size:14px;font-weight:600">Dark Mode</div><div style="color:#6B7280;font-size:12px;margin-top:2px">Toggle light/dark theme</div></div>
+        <button id="theme-toggle" onclick="toggleTheme()" style="width:44px;height:24px;border-radius:12px;background:var(--brand);border:none;cursor:pointer;position:relative;transition:background .2s">
+          <span id="theme-knob" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s"></span>
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+        <div><div style="color:#fff;font-size:14px;font-weight:600">Clear Idea History</div><div style="color:#6B7280;font-size:12px;margin-top:2px">Remove all generated ideas from history</div></div>
+        <button class="btn-ghost" style="font-size:12px;padding:7px 14px;color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="clearIdeaHistory()">Clear</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+        <div><div style="color:#fff;font-size:14px;font-weight:600">Clear Saved Ideas</div><div style="color:#6B7280;font-size:12px;margin-top:2px">Delete all saved ideas from your library</div></div>
+        <button class="btn-ghost" style="font-size:12px;padding:7px 14px;color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="clearSavedIdeas()">Clear</button>
+      </div>
+      <div style="padding:14px 0">
+        <div style="color:#fff;font-size:14px;font-weight:600;margin-bottom:4px">Account</div>
+        <div style="color:#6B7280;font-size:12px" id="settings-account-info"></div>
+      </div>
+    </div>
+    <button class="btn-ghost" style="width:100%;color:#ef4444;border-color:rgba(239,68,68,.3);margin-top:8px" onclick="handleLogout()">Sign Out</button>
+  </div>
+</div>
+
+<!-- ── HELP ───────────────────────────────────────────────────────────── -->
+<div id="page-help" class="page" style="flex-direction:row;min-height:100vh">
+  <aside class="sidebar">
+    <div class="logo" style="font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav"><div class="sidebar-label">Menu</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item active">❓ Help</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="help-username">@username</div>
+      <button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button>
+    </div>
+  </aside>
+  <div class="main-content" style="max-width:640px">
+    <div><div class="page-title">❓ Help & How It Works</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card"><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">🚀 What is Zidea?</div><p style="color:#9CA3AF;font-size:14px;line-height:1.7">Zidea is your all-in-one platform to generate, save, and share ideas — powered by AI. Connect with friends, challenge them to games, and build your idea library.</p></div>
+      <div class="card"><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">💡 How to Generate Ideas</div><ol style="color:#9CA3AF;font-size:14px;line-height:2;padding-left:18px"><li>Go to <strong style="color:#a78bfa">Generate Ideas</strong> in the menu</li><li>Pick a category, difficulty, and audience</li><li>Optionally describe your topic</li><li>Hit <strong style="color:#a78bfa">✨ Generate Ideas</strong></li><li>Save or star ideas you like</li></ol></div>
+      <div class="card"><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">📚 Library & Favourites</div><p style="color:#9CA3AF;font-size:14px;line-height:1.7">Save ideas to your Library. Star your favourites. Tag them to stay organised. Access everything from the Library tab.</p></div>
+      <div class="card"><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">🔥 Explore</div><p style="color:#9CA3AF;font-size:14px;line-height:1.7">Browse trending ideas from the community. Filter by category. Get inspired by what others are building.</p></div>
+      <div class="card"><div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">💬 Chat & Arcade</div><p style="color:#9CA3AF;font-size:14px;line-height:1.7">Message friends directly, make voice calls, and challenge them to Chess, Among Us, Tic-Tac-Toe and more in the Arcade.</p></div>
+    </div>
+  </div>
+</div>
+
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
   <div class="mobile-nav-inner">
-    <button class="mob-nav-btn active" id="mob-discover" onclick="showPage('dashboard')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Discover</button>
+    <button class="mob-nav-btn active" id="mob-discover" onclick="showPage('dashboard')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Home</button>
+    <button class="mob-nav-btn" id="mob-ideas" onclick="showPage('ideas')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Ideas</button>
     <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
     <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
     <button class="mob-nav-btn" id="mob-zidai" onclick="showPage('zidai')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>ZiD AI</button>
-    <button class="mob-nav-btn" id="mob-signout" onclick="handleLogout()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out</button>
   </div>
 </nav>
 
@@ -804,6 +1076,33 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 <script>
 // ── Firebase ──────────────────────────────────────────────────────────────
 const FB = 'https://zidea-9da13-default-rtdb.firebaseio.com';
+
+// Test Firebase connectivity and warn if rules are blocking writes
+async function testFirebaseAccess() {
+  try {
+    const r = await fetch(`${FB}/_test.json`, {
+      method: 'PUT',
+      body: JSON.stringify({ ok: true }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!r.ok) {
+      const txt = await r.text();
+      if (txt.includes('Permission denied') || txt.includes('PERMISSION_DENIED')) {
+        showFirebaseError();
+      }
+    } else {
+      // Clean up test node
+      fetch(`${FB}/_test.json`, { method: 'DELETE' });
+    }
+  } catch(_) {}
+}
+
+function showFirebaseError() {
+  const banner = document.createElement('div');
+  banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:12px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';
+  banner.innerHTML = '⚠ Firebase rules are blocking messages. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> → Realtime Database → Rules and set <code style="background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px">{ "rules": { ".read": true, ".write": true } }</code>';
+  document.body.prepend(banner);
+}
 const db = {
   patch(p, d) {
     return fetch(`${FB}/${p}.json`, {
@@ -909,8 +1208,14 @@ function showPage(name) {
   const el = document.getElementById('page-' + name);
   if (!el) return;
   el.classList.add('active');
-  ['discover','chat','arcade','zidai'].forEach(k => {
+  // Mobile nav active state
+  ['discover','ideas','chat','arcade','zidai'].forEach(k => {
     const b = document.getElementById('mob-' + k);
+    if (b) b.classList.toggle('active', (k==='discover'&&name==='dashboard')||(k===name));
+  });
+  // Sidebar nav active state (template-based)
+  ['discover','ideas','library','explore','chat','arcade','zidai','profile','settings','help'].forEach(k => {
+    const b = document.getElementById('nav-' + k);
     if (b) b.classList.toggle('active', (k==='discover'&&name==='dashboard')||(k===name));
   });
   if (name === 'dashboard') {
@@ -920,12 +1225,10 @@ function showPage(name) {
   }
   if (name === 'chat') {
     document.getElementById('chat-username').textContent = '@'+(currentUser?.username||'');
-    // Show skeleton immediately — no layout jump
     const ci = document.getElementById('convo-items');
     if (ci && !Object.keys(chatCache).length) ci.innerHTML = skeletonConvos(5);
     loadAllConvos().then(() => {
       renderConvos(activeChatUser);
-      // Auto-open last conversation if none is open
       if (!activeChatUser && !activeGroupId) {
         const users = getAllUsers();
         const chatted = Object.keys(chatCache);
@@ -940,6 +1243,28 @@ function showPage(name) {
     loadMyGroups().then(() => { if (activeConvoTab === 'groups') renderGroupList(); });
   }
   if (name === 'zidai') { if (!document.querySelector('.zidai-msg')) initZidAi(); }
+  if (name === 'ideas') {
+    const u = document.getElementById('ideas-username'); if (u) u.textContent = '@'+(currentUser?.username||'');
+  }
+  if (name === 'library') {
+    const u = document.getElementById('library-username'); if (u) u.textContent = '@'+(currentUser?.username||'');
+    renderLibrary();
+  }
+  if (name === 'explore') {
+    const u = document.getElementById('explore-username'); if (u) u.textContent = '@'+(currentUser?.username||'');
+    renderExplore();
+  }
+  if (name === 'profile') {
+    const u = document.getElementById('profile-username-sidebar'); if (u) u.textContent = '@'+(currentUser?.username||'');
+    renderProfile();
+  }
+  if (name === 'settings') {
+    const u = document.getElementById('settings-username'); if (u) u.textContent = '@'+(currentUser?.username||'');
+    renderSettings();
+  }
+  if (name === 'help') {
+    const u = document.getElementById('help-username'); if (u) u.textContent = '@'+(currentUser?.username||'');
+  }
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────
@@ -982,11 +1307,15 @@ function loginSuccess(user) {
   startFirebase();
   showPage('dashboard');
   setTimeout(listenIncoming, 1000);
+  // Verify Firebase write access — if rules block writes, chats won't work
+  db.write(`_ping/${user.username}`, { ts: Date.now() }).catch(() => {
+    console.warn('Firebase write test failed — check database rules');
+  });
 }
 
 function setLoggedInUI() {
   const n = '@' + currentUser.username;
-  ['dash-username','arcade-username','chat-username','zidai-username'].forEach(id => {
+  ['dash-username','arcade-username','chat-username','zidai-username','ideas-username','library-username','explore-username','profile-username-sidebar','settings-username','help-username','sidebar-username'].forEach(id => {
     const el = document.getElementById(id); if (el) el.textContent = n;
   });
 }
@@ -1511,13 +1840,23 @@ function openConvo(username) {
   let seeded = false;
 
   function mergeMessages(d) {
-    if (!d) return;
-    const vals = typeof d === 'object' ? Object.values(d) : [];
+    if (!d || typeof d !== 'object') return;
+    // Firebase patch can send either { ts: msgObj } or { messages: { ts: msgObj } }
+    let entries = Object.values(d);
+    // If values are not message objects (missing .from), try one level deeper
+    if (entries.length && entries[0] && typeof entries[0] === 'object' && !entries[0].from) {
+      entries = Object.values(entries[0]);
+    }
     let changed = false;
-    vals.forEach(m => {
+    entries.forEach(m => {
       if (!m || !m.ts || !m.from) return;
-      if (!chatCache[username].find(x => x.ts === m.ts && x.from === m.from)) {
+      const existing = chatCache[username].find(x => x.ts === m.ts && x.from === m.from);
+      if (!existing) {
         chatCache[username].push(m);
+        changed = true;
+      } else if (existing._pending && !m._pending) {
+        // Update optimistic entry with confirmed server data
+        Object.assign(existing, m);
         changed = true;
       }
     });
@@ -3257,11 +3596,270 @@ function zidAiKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendZ
 function clearZidAi() { zidHistory=[]; document.getElementById('zidai-messages').innerHTML=''; initZidAi(); }
 function initZidAi() { zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!"); }
 
+// ── Ideas / Library / Explore / Profile / Settings ────────────────────────
+const ZIDAI_KEY_IDEAS = 'AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
+
+// Storage helpers for ideas
+function loadIdeas() { return load('zidea_ideas') || { saved:[], starred:[], history:[] }; }
+function saveIdeas(d) { save('zidea_ideas', d); }
+
+async function generateIdeas() {
+  const cat = document.getElementById('idea-category')?.value || 'business';
+  const diff = document.getElementById('idea-difficulty')?.value || 'beginner';
+  const audience = document.getElementById('idea-audience')?.value.trim() || 'general audience';
+  const prompt = document.getElementById('idea-prompt')?.value.trim();
+  const btn = document.getElementById('gen-btn');
+  const out = document.getElementById('ideas-output');
+  if (!out) return;
+
+  btn.classList.add('btn-loading');
+  out.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#6B7280;padding:20px 0"><div class="spinner"></div> Generating ideas...</div>';
+
+  const userPrompt = `Generate 5 creative ${cat} ideas for ${audience} at ${diff} level.${prompt ? ' Context: ' + prompt : ''}
+Return a JSON array of 5 objects: [{title, description, tags:[]}]. Tags should be 2-3 short words. Be specific and actionable.`;
+
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY_IDEAS}`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ contents:[{role:'user',parts:[{text:userPrompt}]}], generationConfig:{temperature:0.9,maxOutputTokens:1024} })
+    });
+    const data = await res.json();
+    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+    const jsonMatch = raw.match(/\[[\s\S]*\]/);
+    const ideas = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+
+    // Save to history
+    const store = loadIdeas();
+    const ts = Date.now();
+    ideas.forEach((idea, i) => {
+      store.history.unshift({ ...idea, id: ts + i, ts, category: cat });
+    });
+    store.history = store.history.slice(0, 100); // keep last 100
+    saveIdeas(store);
+
+    out.innerHTML = ideas.map((idea, i) => renderIdeaCard(idea, ts + i, 'generate')).join('');
+  } catch(err) {
+    out.innerHTML = `<div class="card" style="color:#ef4444">⚠ Failed to generate ideas. Check your connection.</div>`;
+  }
+  btn.classList.remove('btn-loading');
+}
+
+function renderIdeaCard(idea, id, context) {
+  const store = loadIdeas();
+  const isSaved = store.saved.some(x => x.id === id);
+  const isStarred = store.starred.some(x => x.id === id);
+  const tags = (idea.tags || []).map(t => `<span class="idea-tag" onclick="filterByTag('${esc(t)}')">${esc(t)}</span>`).join('');
+  return `<div class="idea-card" id="idea-${id}">
+    <div class="idea-card-title">${esc(idea.title || '')}</div>
+    <div class="idea-card-body">${esc(idea.description || '')}</div>
+    ${tags ? `<div class="idea-card-tags">${tags}</div>` : ''}
+    <div class="idea-card-actions">
+      <button class="idea-action-btn${isSaved?' active':''}" onclick="toggleSaveIdea(${id},'${context}')" id="save-btn-${id}">
+        💾 ${isSaved ? 'Saved' : 'Save'}
+      </button>
+      <button class="idea-action-btn${isStarred?' active':''}" onclick="toggleStarIdea(${id},'${context}')" id="star-btn-${id}">
+        ⭐ ${isStarred ? 'Starred' : 'Star'}
+      </button>
+      <button class="idea-action-btn" onclick="shareIdea('${esc(idea.title||'')}')">🔗 Share</button>
+    </div>
+  </div>`;
+}
+
+function toggleSaveIdea(id, context) {
+  const store = loadIdeas();
+  const source = context === 'generate'
+    ? (store.history.find(x => x.id === id))
+    : (store.history.find(x => x.id === id) || store.starred.find(x => x.id === id));
+  if (!source) return;
+  const idx = store.saved.findIndex(x => x.id === id);
+  if (idx >= 0) { store.saved.splice(idx, 1); }
+  else { store.saved.unshift({ ...source, savedAt: Date.now() }); }
+  saveIdeas(store);
+  // Update button
+  const btn = document.getElementById('save-btn-' + id);
+  if (btn) { const saved = store.saved.some(x => x.id === id); btn.textContent = saved ? '💾 Saved' : '💾 Save'; btn.classList.toggle('active', saved); }
+}
+
+function toggleStarIdea(id, context) {
+  const store = loadIdeas();
+  const source = store.history.find(x => x.id === id) || store.saved.find(x => x.id === id);
+  if (!source) return;
+  const idx = store.starred.findIndex(x => x.id === id);
+  if (idx >= 0) { store.starred.splice(idx, 1); }
+  else { store.starred.unshift({ ...source, starredAt: Date.now() }); }
+  saveIdeas(store);
+  const btn = document.getElementById('star-btn-' + id);
+  if (btn) { const starred = store.starred.some(x => x.id === id); btn.textContent = starred ? '⭐ Starred' : '⭐ Star'; btn.classList.toggle('active', starred); }
+}
+
+function shareIdea(title) {
+  if (navigator.share) { navigator.share({ title: 'Idea from Zidea', text: title, url: location.href }); }
+  else { navigator.clipboard?.writeText(title); alert('Idea copied to clipboard!'); }
+}
+
+// ── Library ───────────────────────────────────────────────────────────────
+let libTab = 'saved';
+let libTagFilter = null;
+
+function switchLibTab(tab) {
+  libTab = tab;
+  ['saved','starred','history'].forEach(t => {
+    document.getElementById('lib-tab-' + t)?.classList.toggle('active', t === tab);
+  });
+  renderLibrary();
+}
+
+function filterByTag(tag) {
+  libTagFilter = tag;
+  showPage('library');
+  renderLibrary();
+}
+
+function renderLibrary() {
+  const store = loadIdeas();
+  const list = document.getElementById('library-list'); if (!list) return;
+  let ideas = store[libTab] || [];
+  if (libTagFilter) ideas = ideas.filter(x => (x.tags||[]).includes(libTagFilter));
+
+  // Tag filter bar
+  const allTags = [...new Set((store.saved.concat(store.starred).concat(store.history)).flatMap(x => x.tags||[]))];
+  const tagBar = document.getElementById('lib-tag-filter');
+  if (tagBar) tagBar.innerHTML = (libTagFilter ? [`<button class="idea-tag" style="background:rgba(124,58,237,.3)" onclick="libTagFilter=null;renderLibrary()">✕ ${esc(libTagFilter)}</button>`] : []).concat(
+    allTags.slice(0,12).map(t => `<button class="idea-tag" onclick="filterByTag('${esc(t)}')">${esc(t)}</button>`)
+  ).join('');
+
+  if (!ideas.length) {
+    list.innerHTML = `<div style="text-align:center;padding:40px;color:#4b5563">
+      ${libTab==='saved'?'No saved ideas yet. Generate some and hit 💾 Save!':libTab==='starred'?'No starred ideas yet. Hit ⭐ on any idea!':'No history yet. Generate your first idea!'}
+    </div>`;
+    return;
+  }
+  list.innerHTML = ideas.map(idea => `
+    <div class="idea-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div class="idea-card-title">${esc(idea.title||'')}</div>
+        <button onclick="deleteIdeaFromLib(${idea.id},'${libTab}')" style="background:none;border:none;color:#4b5563;cursor:pointer;font-size:16px;flex-shrink:0" title="Delete">🗑</button>
+      </div>
+      <div class="idea-card-body">${esc(idea.description||'')}</div>
+      <div class="idea-card-tags">${(idea.tags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}</div>
+      <div class="idea-card-actions">
+        <button class="idea-action-btn" onclick="toggleSaveIdea(${idea.id},'lib');renderLibrary()">💾 ${store.saved.some(x=>x.id===idea.id)?'Saved':'Save'}</button>
+        <button class="idea-action-btn" onclick="toggleStarIdea(${idea.id},'lib');renderLibrary()">⭐ ${store.starred.some(x=>x.id===idea.id)?'Starred':'Star'}</button>
+      </div>
+    </div>`).join('');
+}
+
+function deleteIdeaFromLib(id, tab) {
+  const store = loadIdeas();
+  store[tab] = store[tab].filter(x => x.id !== id);
+  saveIdeas(store);
+  renderLibrary();
+}
+
+// ── Explore ───────────────────────────────────────────────────────────────
+let exploreCat = 'all';
+const EXPLORE_SEED = [
+  {title:'AI-powered meal planner',description:'An app that plans weekly meals based on your fridge contents using AI.',tags:['ai','food','app'],category:'app',likes:142},
+  {title:'Micro-SaaS for freelancers',description:'A simple invoicing + time tracking tool built for solo freelancers.',tags:['startup','saas','business'],category:'startup',likes:98},
+  {title:'Anonymous feedback platform',description:'Let teams give honest feedback without fear. Anonymous, structured, actionable.',tags:['startup','hr','business'],category:'startup',likes:87},
+  {title:'Daily weird fact newsletter',description:'Send one bizarre but true fact every morning. Monetise with sponsorships.',tags:['content','weird','newsletter'],category:'weird',likes:203},
+  {title:'AI study buddy',description:'An AI that quizzes you on your notes and explains concepts in simple terms.',tags:['ai','education','app'],category:'ai',likes:176},
+  {title:'Local skills exchange',description:'A platform where neighbours trade skills — cooking lessons for garden help.',tags:['social','community','startup'],category:'startup',likes:65},
+  {title:'Reverse job board',description:'Candidates post what they want. Companies apply to them.',tags:['startup','jobs','weird'],category:'weird',likes:312},
+  {title:'Mood-based music generator',description:'AI generates a unique song based on how you feel right now.',tags:['ai','music','app'],category:'ai',likes:241},
+  {title:'Micro-documentary series',description:'60-second documentaries about overlooked local heroes. Post on TikTok/YouTube.',tags:['content','video','social'],category:'content',likes:189},
+  {title:'Gamified language learning for kids',description:'Kids learn a new language by playing mini-games with cartoon characters.',tags:['education','app','kids'],category:'app',likes:134},
+];
+
+function filterExplore(cat) {
+  exploreCat = cat;
+  document.querySelectorAll('.explore-cat-btn').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase().includes(cat)||cat==='all'&&b.textContent==='All'));
+  renderExplore();
+}
+
+function renderExplore() {
+  const list = document.getElementById('explore-list'); if (!list) return;
+  const ideas = exploreCat === 'all' ? EXPLORE_SEED : EXPLORE_SEED.filter(x => x.category === exploreCat || (x.tags||[]).includes(exploreCat));
+  list.innerHTML = ideas.map(idea => `
+    <div class="idea-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px">
+        <div class="idea-card-title">${esc(idea.title)}</div>
+        <span style="font-size:12px;color:#6B7280;white-space:nowrap">❤️ ${idea.likes}</span>
+      </div>
+      <div class="idea-card-body">${esc(idea.description)}</div>
+      <div class="idea-card-tags">${(idea.tags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}</div>
+      <div class="idea-card-actions">
+        <button class="idea-action-btn" onclick="saveExploreIdea(${JSON.stringify(idea).replace(/"/g,'&quot;')})">💾 Save to Library</button>
+        <button class="idea-action-btn" onclick="shareIdea('${esc(idea.title)}')">🔗 Share</button>
+      </div>
+    </div>`).join('');
+}
+
+function saveExploreIdea(idea) {
+  const store = loadIdeas();
+  const id = Date.now();
+  if (!store.saved.some(x => x.title === idea.title)) {
+    store.saved.unshift({ ...idea, id, savedAt: Date.now() });
+    saveIdeas(store);
+    alert('Saved to your Library! 📚');
+  } else { alert('Already in your Library!'); }
+}
+
+// ── Profile ───────────────────────────────────────────────────────────────
+function renderProfile() {
+  if (!currentUser) return;
+  const store = loadIdeas();
+  const el = id => document.getElementById(id);
+  const init = currentUser.username.slice(0,2).toUpperCase();
+  if (el('profile-avatar')) el('profile-avatar').textContent = init;
+  if (el('profile-name')) el('profile-name').textContent = '@' + currentUser.username;
+  if (el('profile-email')) el('profile-email').textContent = currentUser.email || '';
+  if (el('profile-ideas-count')) el('profile-ideas-count').textContent = store.history.length;
+  if (el('profile-saved-count')) el('profile-saved-count').textContent = store.saved.length;
+  if (el('profile-starred-count')) el('profile-starred-count').textContent = store.starred.length;
+  const recent = document.getElementById('profile-recent-ideas');
+  if (recent) {
+    const items = store.history.slice(0, 5);
+    recent.innerHTML = items.length ? items.map(x => `
+      <div style="padding:10px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+        <span style="color:#e2e8f0;font-size:13px">${esc(x.title||'')}</span>
+        <span style="font-size:11px;color:#4b5563">${x.category||''}</span>
+      </div>`).join('') : '<p style="color:#4b5563;font-size:13px">No ideas generated yet.</p>';
+  }
+}
+
+// ── Settings ──────────────────────────────────────────────────────────────
+let isDarkMode = true;
+function toggleTheme() {
+  isDarkMode = !isDarkMode;
+  document.body.style.background = isDarkMode ? '#0F0F13' : '#f8f9fa';
+  document.body.style.color = isDarkMode ? '#E5E7EB' : '#111';
+  const knob = document.getElementById('theme-knob');
+  const toggle = document.getElementById('theme-toggle');
+  if (knob) knob.style.left = isDarkMode ? '3px' : '23px';
+  if (toggle) toggle.style.background = isDarkMode ? 'var(--brand)' : '#d1d5db';
+}
+function clearIdeaHistory() {
+  if (!confirm('Clear all idea history?')) return;
+  const store = loadIdeas(); store.history = []; saveIdeas(store);
+  alert('History cleared.');
+}
+function clearSavedIdeas() {
+  if (!confirm('Delete all saved ideas?')) return;
+  const store = loadIdeas(); store.saved = []; store.starred = []; saveIdeas(store);
+  alert('Library cleared.');
+}
+function renderSettings() {
+  const el = document.getElementById('settings-account-info');
+  if (el && currentUser) el.textContent = `Logged in as @${currentUser.username} · ${currentUser.email||''}`;
+}
+
 // ── Init ──────────────────────────────────────────────────────────────────
 (function init() {
   const s = load('zidea_session');
   if (s) { currentUser = s; setLoggedInUI(); startFirebase(); showPage('dashboard'); setTimeout(listenIncoming, 1000); }
   updateStats();
+  testFirebaseAccess();
 })();
 </script>
 </body>
