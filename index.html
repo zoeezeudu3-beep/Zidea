@@ -27,9 +27,11 @@ a{text-decoration:none;color:inherit}
 .error-msg.show{display:block}
 /* PAGES */
 .page{display:none;opacity:0}
-.page.active{display:flex;flex-direction:column;opacity:1;transition:opacity .18s ease}
+.page.active{display:flex;opacity:1;transition:opacity .18s ease}
 /* LANDING */
-#page-landing{min-height:100vh}
+#page-landing{min-height:100vh;flex-direction:column}
+/* All sidebar pages */
+#page-dashboard,#page-arcade,#page-chat,#page-zidai,#page-ideas,#page-library,#page-explore,#page-profile,#page-settings,#page-help{flex-direction:row;min-height:100vh}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)}
 .logo{font-size:20px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
 .hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px 40px;gap:18px}
@@ -56,8 +58,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 .auth-footer{text-align:center;color:#6B7280;font-size:14px}
 .auth-footer a{color:var(--brand-light);cursor:pointer}
 /* DASHBOARD */
-#page-dashboard{flex-direction:row;min-height:100vh}
-.sidebar{width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px;gap:20px;flex-shrink:0}
+.sidebar{width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px;gap:20px;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
 .sidebar-nav{display:flex;flex-direction:column;gap:4px;flex:1}
 .sidebar-label{font-size:10px;color:#4B5563;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:500;color:#9CA3AF;cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit;width:100%;text-align:left}
@@ -65,7 +66,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 .nav-item.active{background:rgba(124,58,237,.1);color:#fff;border:1px solid rgba(124,58,237,.2)}
 .sidebar-footer{border-top:1px solid var(--border);padding-top:14px;display:flex;flex-direction:column;gap:8px}
 .sidebar-user{font-size:13px;color:#9CA3AF}
-.main-content{flex:1;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.main-content{flex:1;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0;overflow-y:auto;height:100vh}
 .page-title{font-size:20px;font-weight:700;color:#fff}
 .page-subtitle{font-size:13px;color:#6B7280;margin-top:2px}
 /* ONLINE PANEL */
@@ -951,10 +952,17 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   <div class="main-content" style="max-width:600px">
     <div><div class="page-title">👤 Profile</div></div>
     <div class="card" style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:32px">
-      <div style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#c026d3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:#fff" id="profile-avatar">?</div>
+      <div style="position:relative;cursor:pointer" onclick="document.getElementById('avatar-upload').click()" title="Change profile picture">
+        <div style="width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#c026d3);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#fff;overflow:hidden;border:3px solid rgba(124,58,237,.4);box-shadow:0 0 0 4px rgba(124,58,237,.15)" id="profile-avatar">?</div>
+        <div style="position:absolute;bottom:2px;right:2px;width:26px;height:26px;border-radius:50%;background:var(--brand);display:flex;align-items:center;justify-content:center;border:2px solid var(--surface)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </div>
+        <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)"/>
+      </div>
       <div style="text-align:center">
         <div style="font-size:20px;font-weight:800;color:#fff" id="profile-name">@username</div>
         <div style="font-size:13px;color:#6B7280;margin-top:4px" id="profile-email"></div>
+        <button onclick="removeAvatar()" id="remove-avatar-btn" style="display:none;margin-top:8px;background:none;border:none;color:#ef4444;font-size:12px;cursor:pointer;font-family:inherit">Remove photo</button>
       </div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;margin-top:8px">
         <div class="card" style="text-align:center;padding:16px">
@@ -3841,7 +3849,20 @@ function renderProfile() {
   const store = loadIdeas();
   const el = id => document.getElementById(id);
   const init = currentUser.username.slice(0,2).toUpperCase();
-  if (el('profile-avatar')) el('profile-avatar').textContent = init;
+
+  // Load avatar
+  const avatarEl = el('profile-avatar');
+  const savedAvatar = load('zidea_avatar_' + currentUser.username);
+  if (avatarEl) {
+    if (savedAvatar) {
+      avatarEl.innerHTML = `<img src="${savedAvatar}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    } else {
+      avatarEl.textContent = init;
+    }
+  }
+  const removeBtn = el('remove-avatar-btn');
+  if (removeBtn) removeBtn.style.display = savedAvatar ? 'inline-block' : 'none';
+
   if (el('profile-name')) el('profile-name').textContent = '@' + currentUser.username;
   if (el('profile-email')) el('profile-email').textContent = currentUser.email || '';
   if (el('profile-ideas-count')) el('profile-ideas-count').textContent = store.history.length;
@@ -3856,6 +3877,24 @@ function renderProfile() {
         <span style="font-size:11px;color:#4b5563">${x.category||''}</span>
       </div>`).join('') : '<p style="color:#4b5563;font-size:13px">No ideas generated yet.</p>';
   }
+}
+
+function handleAvatarUpload(event) {
+  const file = event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { alert('Image too large. Max 5MB.'); return; }
+  const reader = new FileReader();
+  reader.onload = () => {
+    save('zidea_avatar_' + currentUser.username, reader.result);
+    renderProfile();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAvatar() {
+  localStorage.removeItem('zidea_avatar_' + currentUser.username);
+  renderProfile();
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────
