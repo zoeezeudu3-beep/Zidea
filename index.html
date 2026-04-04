@@ -76,6 +76,10 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
   background:var(--surface);
   z-index:40;
 }
+/* Prevent in-page <aside> from taking flex space — fixed sidebar handles layout */
+.page > aside.sidebar{
+  width:0;padding:0;border:none;overflow:hidden;
+}
 .sidebar-nav{display:flex;flex-direction:column;gap:4px;flex:1}
 .sidebar-label{font-size:10px;color:#4B5563;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;font-size:14px;font-weight:500;color:#9CA3AF;cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit;width:100%;text-align:left}
@@ -283,7 +287,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 .convo-tabs{display:flex;gap:0;border-bottom:1px solid rgba(124,58,237,.15)}
 .convo-tab{flex:1;padding:10px 0;font-size:12px;font-weight:700;color:#4b5563;background:none;border:none;cursor:pointer;transition:all .2s;font-family:inherit;border-bottom:2px solid transparent}
 .convo-tab.active{color:#a78bfa;border-bottom-color:#a78bfa}
-.zidai-layout{flex:1;display:flex;flex-direction:column;height:100vh;min-width:0}
+.zidai-layout{flex:1;display:flex;flex-direction:column;height:100vh;min-width:0;margin-left:220px}
 .zidai-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
 .zidai-avatar-icon{width:36px;height:36px;border-radius:10px;background:rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .zidai-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
@@ -1405,6 +1409,8 @@ function handleSignup(e) {
   err.classList.remove('show');
   accounts[email] = { username, password: pw, wins: 0, losses: 0 };
   save('zidea_accounts', accounts);
+  // Save account to Firebase so user can log in from any device
+  db.write(`accounts/${username}`, { email, username, createdAt: Date.now() }).catch(()=>{});
   loginSuccess({ email, username });
 }
 
@@ -1415,7 +1421,11 @@ function loginSuccess(user) {
   startFirebase();
   showPage('dashboard');
   setTimeout(listenIncoming, 1000);
-  // Verify Firebase write access — if rules block writes, chats won't work
+  // Sync ideas and avatar from Firebase (restores data on new device)
+  setTimeout(() => {
+    syncIdeasFromFirebase();
+    syncAvatarFromFirebase();
+  }, 1500);
   db.write(`_ping/${user.username}`, { ts: Date.now() }).catch(() => {
     console.warn('Firebase write test failed — check database rules');
   });
@@ -3707,9 +3717,54 @@ function initZidAi() { zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'
 // ── Ideas / Library / Explore / Profile / Settings ────────────────────────
 const ZIDAI_KEY_IDEAS = 'AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
 
-// Storage helpers for ideas
+// Storage helpers for ideas — synced to Firebase + localStorage cache
 function loadIdeas() { return load('zidea_ideas') || { saved:[], starred:[], history:[] }; }
-function saveIdeas(d) { save('zidea_ideas', d); }
+function saveIdeas(d) {
+  save('zidea_ideas', d);
+  // Sync to Firebase in background (non-blocking)
+  if (currentUser) {
+    db.write(`userdata/${currentUser.username}/ideas`, {
+      saved: d.saved.slice(0,50),
+      starred: d.starred.slice(0,50),
+      history: d.history.slice(0,100)
+    }).catch(()=>{});
+  }
+}
+
+async function syncIdeasFromFirebase() {
+  if (!currentUser) return;
+  try {
+    const remote = await db.read(`userdata/${currentUser.username}/ideas`);
+    if (!remote) return;
+    const local = loadIdeas();
+    // Merge: keep all local + any remote items not already local
+    const merge = (localArr, remoteArr) => {
+      const ids = new Set(localArr.map(x => x.id));
+      return [...localArr, ...(remoteArr||[]).filter(x => !ids.has(x.id))];
+    };
+    const merged = {
+      saved: merge(local.saved, remote.saved),
+      starred: merge(local.starred, remote.starred),
+      history: merge(local.history, remote.history).sort((a,b)=>b.ts-a.ts).slice(0,100)
+    };
+    save('zidea_ideas', merged);
+  } catch(_) {}
+}
+
+async function syncAvatarFromFirebase() {
+  if (!currentUser) return;
+  const localAvatar = load('zidea_avatar_' + currentUser.username);
+  if (localAvatar) {
+    // Push local avatar to Firebase if not there
+    db.write(`userdata/${currentUser.username}/avatar`, { data: localAvatar }).catch(()=>{});
+  } else {
+    // Pull from Firebase
+    try {
+      const remote = await db.read(`userdata/${currentUser.username}/avatar`);
+      if (remote?.data) save('zidea_avatar_' + currentUser.username, remote.data);
+    } catch(_) {}
+  }
+}
 
 async function generateIdeas() {
   const cat = document.getElementById('idea-category')?.value || 'business';
@@ -4293,6 +4348,8 @@ function handleAvatarUpload(event) {
   const reader = new FileReader();
   reader.onload = () => {
     save('zidea_avatar_' + currentUser.username, reader.result);
+    // Sync to Firebase
+    db.write(`userdata/${currentUser.username}/avatar`, { data: reader.result }).catch(()=>{});
     renderProfile();
   };
   reader.readAsDataURL(file);
@@ -4300,6 +4357,7 @@ function handleAvatarUpload(event) {
 
 function removeAvatar() {
   localStorage.removeItem('zidea_avatar_' + currentUser.username);
+  if (currentUser) db.del(`userdata/${currentUser.username}/avatar`).catch(()=>{});
   renderProfile();
 }
 
@@ -4332,7 +4390,18 @@ function renderSettings() {
 // ── Init ──────────────────────────────────────────────────────────────────
 (function init() {
   const s = load('zidea_session');
-  if (s) { currentUser = s; setLoggedInUI(); startFirebase(); showPage('dashboard'); setTimeout(listenIncoming, 1000); }
+  if (s) {
+    currentUser = s;
+    setLoggedInUI();
+    startFirebase();
+    showPage('dashboard');
+    setTimeout(listenIncoming, 1000);
+    // Restore data from Firebase on page load
+    setTimeout(() => {
+      syncIdeasFromFirebase();
+      syncAvatarFromFirebase();
+    }, 1500);
+  }
   updateStats();
   testFirebaseAccess();
 })();
