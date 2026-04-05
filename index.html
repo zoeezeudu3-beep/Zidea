@@ -1120,12 +1120,15 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <button class="mob-nav-btn active" id="mob-discover" onclick="showPage('dashboard')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Home</button>
-    <button class="mob-nav-btn" id="mob-ideas" onclick="showPage('ideas')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Ideas</button>
-    <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
-    <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
-    <button class="mob-nav-btn" id="mob-zidai" onclick="showPage('zidai')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>ZiD AI</button>
+  <div class="mobile-nav-inner" style="overflow-x:auto;justify-content:flex-start;gap:0;padding:0 4px">
+    <button class="mob-nav-btn active" id="mob-discover" onclick="showPage('dashboard')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Home</button>
+    <button class="mob-nav-btn" id="mob-ideas" onclick="showPage('ideas')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Ideas</button>
+    <button class="mob-nav-btn" id="mob-explore" onclick="showPage('explore')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Explore</button>
+    <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
+    <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
+    <button class="mob-nav-btn" id="mob-zidai" onclick="showPage('zidai')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>ZiD AI</button>
+    <button class="mob-nav-btn" id="mob-library" onclick="showPage('library')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</button>
+    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
   </div>
 </nav>
 
@@ -1308,7 +1311,7 @@ function showPage(name) {
   if (!el) return;
   el.classList.add('active');
   // Mobile nav active state
-  ['discover','ideas','chat','arcade','zidai'].forEach(k => {
+  ['discover','ideas','explore','chat','arcade','zidai','library','profile'].forEach(k => {
     const b = document.getElementById('mob-' + k);
     if (b) b.classList.toggle('active', (k==='discover'&&name==='dashboard')||(k===name));
   });
@@ -1586,10 +1589,17 @@ function renderOnline() {
 
 function updateStats() {
   db.read('users').then(data => {
-    if (!data) return;
+    if (!data) {
+      const su = document.getElementById('stat-users'); if (su) su.textContent = '100+';
+      const so = document.getElementById('stat-online'); if (so) so.textContent = '0';
+      return;
+    }
     const users = Object.values(data);
-    const su = document.getElementById('stat-users'); if (su) su.textContent = users.length + '+';
-    const so = document.getElementById('stat-online'); if (so) so.textContent = users.filter(u => isOnline(u)).length || '—';
+    const su = document.getElementById('stat-users'); if (su) su.textContent = Math.max(users.length, 1) + '+';
+    const so = document.getElementById('stat-online'); if (so) so.textContent = users.filter(u => isOnline(u)).length || '0';
+  }).catch(() => {
+    const su = document.getElementById('stat-users'); if (su) su.textContent = '100+';
+    const so = document.getElementById('stat-online'); if (so) so.textContent = '0';
   });
 }
 </script>
@@ -4211,16 +4221,26 @@ function deleteIdeaFromLib(id, tab) {
 // ── Explore ───────────────────────────────────────────────────────────────
 let exploreCat = 'all';
 const EXPLORE_SEED = [
-  {title:'AI-powered meal planner',description:'An app that plans weekly meals based on your fridge contents using AI.',tags:['ai','food','app'],category:'app',likes:142},
-  {title:'Micro-SaaS for freelancers',description:'A simple invoicing + time tracking tool built for solo freelancers.',tags:['startup','saas','business'],category:'startup',likes:98},
-  {title:'Anonymous feedback platform',description:'Let teams give honest feedback without fear. Anonymous, structured, actionable.',tags:['startup','hr','business'],category:'startup',likes:87},
-  {title:'Daily weird fact newsletter',description:'Send one bizarre but true fact every morning. Monetise with sponsorships.',tags:['content','weird','newsletter'],category:'weird',likes:203},
-  {title:'AI study buddy',description:'An AI that quizzes you on your notes and explains concepts in simple terms.',tags:['ai','education','app'],category:'ai',likes:176},
-  {title:'Local skills exchange',description:'A platform where neighbours trade skills — cooking lessons for garden help.',tags:['social','community','startup'],category:'startup',likes:65},
-  {title:'Reverse job board',description:'Candidates post what they want. Companies apply to them.',tags:['startup','jobs','weird'],category:'weird',likes:312},
-  {title:'Mood-based music generator',description:'AI generates a unique song based on how you feel right now.',tags:['ai','music','app'],category:'ai',likes:241},
-  {title:'Micro-documentary series',description:'60-second documentaries about overlooked local heroes. Post on TikTok/YouTube.',tags:['content','video','social'],category:'content',likes:189},
-  {title:'Gamified language learning for kids',description:'Kids learn a new language by playing mini-games with cartoon characters.',tags:['education','app','kids'],category:'app',likes:134},
+  {title:'AI-powered meal planner',description:'An app that plans weekly meals based on your fridge contents using AI. Reduces food waste and saves money.',tags:['ai','food','app'],category:'app',likes:142},
+  {title:'Micro-SaaS for freelancers',description:'A simple invoicing + time tracking tool built for solo freelancers. One-click invoices, automatic reminders.',tags:['startup','saas','business'],category:'startup',likes:98},
+  {title:'Anonymous feedback platform',description:'Let teams give honest feedback without fear. Anonymous, structured, and actionable — better than surveys.',tags:['startup','hr','business'],category:'startup',likes:87},
+  {title:'Daily weird fact newsletter',description:'Send one bizarre but true fact every morning. Monetise with sponsorships. 5 minutes to build, addictive to read.',tags:['content','weird','newsletter'],category:'weird',likes:203},
+  {title:'AI study buddy',description:'An AI that quizzes you on your notes and explains concepts in simple terms. Works with any subject.',tags:['ai','education','app'],category:'ai',likes:176},
+  {title:'Local skills exchange',description:'A platform where neighbours trade skills — cooking lessons for garden help. No money needed.',tags:['social','community','startup'],category:'startup',likes:65},
+  {title:'Reverse job board',description:'Candidates post what they want. Companies apply to them. Flips the power dynamic in hiring.',tags:['startup','jobs','weird'],category:'weird',likes:312},
+  {title:'Mood-based music generator',description:'AI generates a unique song based on how you feel right now. No two songs are the same.',tags:['ai','music','app'],category:'ai',likes:241},
+  {title:'Micro-documentary series',description:'60-second documentaries about overlooked local heroes. Post on TikTok/YouTube. Sponsors love it.',tags:['content','video','social'],category:'content',likes:189},
+  {title:'Gamified language learning for kids',description:'Kids learn a new language by playing mini-games with cartoon characters. Parents pay monthly.',tags:['education','app','kids'],category:'app',likes:134},
+  {title:'Personal finance tracker for Gen Z',description:'A budgeting app that speaks Gen Z — memes, streaks, and roasts when you overspend. Viral potential.',tags:['finance','app','genz'],category:'finance',likes:278},
+  {title:'Remote team water cooler',description:'A Slack bot that randomly pairs remote teammates for 15-min virtual coffee chats. Kills loneliness.',tags:['startup','remote','hr'],category:'startup',likes:156},
+  {title:'AI logo generator for small businesses',description:'Type your business name and niche, get 10 professional logos in 10 seconds. $5 per download.',tags:['ai','design','business'],category:'business',likes:445},
+  {title:'Subscription box for indie games',description:'Monthly box with 3 indie game codes + exclusive merch. Supports small developers.',tags:['gaming','subscription','content'],category:'content',likes:167},
+  {title:'Mental health check-in app',description:'A 2-minute daily mood journal with AI insights. Detects patterns and suggests small actions.',tags:['health','ai','app'],category:'health',likes:389},
+  {title:'Hyperlocal event discovery',description:'Find events happening within 2km of you right now. No algorithm, just what\'s nearby.',tags:['social','local','app'],category:'app',likes:112},
+  {title:'AI resume optimizer',description:'Paste a job description, upload your CV — AI rewrites it to match. Increases interview rate by 3x.',tags:['ai','career','startup'],category:'ai',likes:521},
+  {title:'Peer-to-peer tutoring marketplace',description:'Students teach students. Earn credits by teaching what you know, spend them learning what you don\'t.',tags:['education','startup','social'],category:'startup',likes:93},
+  {title:'Crypto portfolio explainer',description:'Connect your wallet, get a plain-English explanation of what you own and why it\'s moving.',tags:['finance','crypto','app'],category:'finance',likes:201},
+  {title:'One-sentence daily journal',description:'Just one sentence per day. AI builds a story of your year. Beautiful year-end recap.',tags:['app','health','weird'],category:'weird',likes:334},
 ];
 
 function filterExplore(cat) {
@@ -4381,15 +4401,17 @@ function renderSettings() {
     currentUser = s;
     setLoggedInUI();
     startFirebase();
+    // Already logged in — skip landing page, go straight to dashboard
     showPage('dashboard');
     setTimeout(listenIncoming, 1000);
-    // Restore data from Firebase on page load
     setTimeout(() => {
       syncIdeasFromFirebase();
       syncAvatarFromFirebase();
     }, 1500);
+  } else {
+    // Not logged in — show landing page and update stats
+    updateStats();
   }
-  updateStats();
   testFirebaseAccess();
 })();
 </script>
