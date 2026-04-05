@@ -361,7 +361,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px}
 <body>
 
 <!-- LANDING -->
-<div id="page-landing" class="page active">
+<div id="page-landing" class="page">
   <nav class="nav">
     <div class="logo">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
@@ -1945,7 +1945,17 @@ function openConvo(username) {
     }
   }
   chatCache[username] = chatCache[username] || [];
-  if (chatCache[username].length) renderMsgs();
+
+  // Load from localStorage backup immediately (shows messages before SSE)
+  const localKey = 'chat_' + [currentUser.username, username].sort().join('__');
+  const localMsgs = load(localKey) || [];
+  if (localMsgs.length && !chatCache[username].length) {
+    chatCache[username] = localMsgs;
+    markRead(username);
+    renderMsgs();
+  } else if (chatCache[username].length) {
+    renderMsgs();
+  }
 
   const key = [currentUser.username, username].sort().join('__');
 
@@ -1978,6 +1988,9 @@ function openConvo(username) {
     if (changed) {
       chatCache[username].sort((a, b) => a.ts - b.ts);
       markRead(username);
+      // Persist to localStorage so messages survive page refresh
+      const localKey = 'chat_' + [currentUser.username, username].sort().join('__');
+      save(localKey, chatCache[username].slice(-200));
       renderMsgs();
       renderConvos(username);
     }
@@ -2628,9 +2641,8 @@ function sendMsg() {
 
   const ts = Date.now();
   const time = new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const msg = { from: currentUser.username, text, time, ts, read: true, _pending: true };
+  const msg = { from: currentUser.username, text, time, ts, read: true };
 
-  // Optimistic update — clear input immediately for good UX
   input.value = '';
   input.style.height = 'auto';
 
@@ -2639,6 +2651,13 @@ function sendMsg() {
   renderMsgs();
   renderConvos(activeChatUser);
 
+  // Save to localStorage as backup so messages persist locally
+  const localKey = 'chat_' + [currentUser.username, activeChatUser].sort().join('__');
+  const localMsgs = load(localKey) || [];
+  localMsgs.push(msg);
+  save(localKey, localMsgs.slice(-200));
+
+  // Save to Firebase
   const key = [currentUser.username, activeChatUser].sort().join('__');
   db.patch('chats/' + key + '/messages', { [ts]: { from: msg.from, text: msg.text, time: msg.time, ts: msg.ts, read: msg.read } })
     .then(() => { msg._pending = false; renderMsgs(); })
@@ -4401,7 +4420,6 @@ function renderSettings() {
     currentUser = s;
     setLoggedInUI();
     startFirebase();
-    // Already logged in — skip landing page, go straight to dashboard
     showPage('dashboard');
     setTimeout(listenIncoming, 1000);
     setTimeout(() => {
@@ -4409,7 +4427,7 @@ function renderSettings() {
       syncAvatarFromFirebase();
     }, 1500);
   } else {
-    // Not logged in — show landing page and update stats
+    showPage('landing');
     updateStats();
   }
   testFirebaseAccess();
