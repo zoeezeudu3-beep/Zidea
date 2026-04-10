@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
 <title>Zidea — Connect, Call, Play</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -4270,20 +4273,30 @@ function filterExplore(cat) {
 
 async function renderExplore() {
   const list = document.getElementById('explore-list'); if (!list) return;
-  list.innerHTML = '<div style="display:flex;align-items:center;gap:10px;color:#6B7280;padding:20px 0"><div class="spinner"></div> Loading ideas...</div>';
 
-  // Load from Firebase, fall back to seed data
-  let ideas = [];
+  // Show seed data immediately — no spinner wait
+  const seedIdeas = EXPLORE_SEED.map((x, i) => ({ ...x, id: 'seed_' + i, author: 'Zidea', ts: 0 }));
+  let ideas = [...seedIdeas];
+
+  // Render seed immediately
+  renderExploreList(ideas);
+
+  // Then try to load community ideas from Firebase in background
   try {
     const data = await db.read('explore');
     if (data) {
-      ideas = Object.values(data).sort((a, b) => (b.likes||0) - (a.likes||0) || b.ts - a.ts);
+      const community = Object.values(data).sort((a, b) => (b.likes||0) - (a.likes||0) || b.ts - a.ts);
+      if (community.length) {
+        // Merge community ideas on top of seed
+        ideas = [...community, ...seedIdeas];
+        renderExploreList(ideas);
+      }
     }
   } catch(_) {}
+}
 
-  // Merge with seed data (seed shown if no community ideas yet)
-  if (!ideas.length) ideas = EXPLORE_SEED.map((x, i) => ({ ...x, id: 'seed_' + i, author: 'Zidea', ts: 0 }));
-
+function renderExploreList(ideas) {
+  const list = document.getElementById('explore-list'); if (!list) return;
   const filtered = exploreCat === 'all' ? ideas : ideas.filter(x => x.category === exploreCat || (x.tags||[]).includes(exploreCat));
 
   if (!filtered.length) {
