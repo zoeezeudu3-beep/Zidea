@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"/>
 <title>Zidea — Connect, Call, Play</title>
+<meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
@@ -37,6 +38,9 @@ a{text-decoration:none;color:inherit}
 .input-wrap .input-field{padding-left:36px}
 .error-msg{color:#F87171;font-size:13px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);border-radius:12px;padding:12px 16px;display:none}
 .error-msg.show{display:block}
+.toast-wrap{position:fixed;top:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:500}
+.toast{background:rgba(15,15,30,.95);border:1px solid rgba(124,58,237,.4);color:#e2e8f0;padding:10px 12px;border-radius:12px;font-size:12px;min-width:220px;box-shadow:0 10px 32px rgba(0,0,0,.45)}
+.mob-avatar-chip{width:18px;height:18px;border-radius:50%;background:rgba(124,58,237,.22);border:1px solid rgba(124,58,237,.35);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#d8b4fe;margin-right:4px}
 </style>
 </head>
 <body>
@@ -379,7 +383,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
     <p style="color:#9CA3AF;font-size:14px;margin-bottom:24px">Join free. No credit card. No download.</p>
     <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="showPage('signup')">Create your account</button>
   </div>
-  <footer>&copy; 2026 Zidea. All rights reserved.</footer>
+  <footer>&copy; 2026 Zidea. All rights reserved. · <a href="#" onclick="showToast('Privacy policy coming soon.');return false;">Privacy Policy</a> · <a href="#" onclick="showToast('Terms of service coming soon.');return false;">Terms of Service</a> · <a href="#" onclick="showToast('Contact: hello@zidea.app');return false;">Contact</a></footer>
 </div>
 
 <!-- LOGIN -->
@@ -392,8 +396,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="input-field" type="password" id="login-password" placeholder="Password" required/></div>
       <button type="submit" class="btn-primary" style="width:100%">Log In</button>
     </form>
-    <div class="divider">or</div>
-    <button class="google-btn" onclick="handleGoogleLogin()"><svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Continue with Google</button>
+    <div class="divider">Use email + password</div>
     <p class="auth-footer">No account? <a onclick="showPage('signup')">Sign up</a></p>
   </div>
 </div>
@@ -701,7 +704,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
         <textarea class="input-field" id="idea-prompt" rows="2" placeholder="e.g. I want to build something around fitness..." style="resize:vertical"></textarea></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap">
         <button class="btn-primary" onclick="generateIdeas()" id="gen-btn" style="padding:11px 28px">✨ Generate Ideas</button>
-        <button class="btn-ghost" onclick="generateIdeas()" style="font-size:13px;padding:11px 18px">🔄 Regenerate</button>
+        <button class="btn-ghost" id="regen-btn" onclick="generateIdeas()" style="font-size:13px;padding:11px 18px;display:none">🔄 Regenerate</button>
       </div>
     </div>
     <div id="ideas-output" style="display:flex;flex-direction:column;gap:12px"></div>
@@ -900,7 +903,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
       <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">🚀 What is Zidea?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Zidea is your all-in-one platform to generate, save, and share ideas — powered by AI. Connect with friends, challenge them to games, and build your idea library.</p></div>
       <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">💡 How to Generate Ideas</div><ol style="color:#9CA3AF;font-size:13px;line-height:2;padding-left:18px"><li>Go to <strong style="color:#a78bfa">Generate Ideas</strong></li><li>Pick category, difficulty, budget, time</li><li>Hit <strong style="color:#a78bfa">✨ Generate Ideas</strong></li><li>Save, star, improve, or share ideas</li></ol></div>
       <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">💬 Chat & Calls</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Message friends directly, make voice calls, send voice messages and files. Create groups for group chats and group calls.</p></div>
-      <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">🎮 Arcade</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Play Chess (5 difficulty levels), Tic-Tac-Toe, Among Us, and Rock Paper Scissors — vs AI or friends.</p></div>
+      <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">🎮 Arcade</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Play Chess (5 difficulty levels), Tic-Tac-Toe, Among Us, and Rock Paper Scissors — vs AI or friends.</p><p style="color:#6B7280;font-size:12px;line-height:1.7;margin-top:8px">Chess: select a difficulty and move pieces by tapping. Tic-Tac-Toe: first to 3 in a row wins. Among Us: move with keyboard, call meetings, vote. RPS: best of five rounds.</p></div>
     </div>
   </div>
 </div>
@@ -915,7 +918,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
     <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
     <button class="mob-nav-btn" id="mob-zidai" onclick="showPage('zidai')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>ZiD AI</button>
     <button class="mob-nav-btn" id="mob-library" onclick="showPage('library')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</button>
-    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><span class="mob-avatar-chip" id="mob-avatar-chip">U</span>Profile</button>
   </div>
 </nav>
 
@@ -943,7 +946,7 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
 </div>
 
 <!-- GOOGLE MODAL -->
-<div class="modal-overlay" id="google-modal" onclick="if(event.target===this)closeGoogleModal()">
+<div class="modal-overlay" id="google-modal" style="display:none" onclick="if(event.target===this)closeGoogleModal()">
   <div class="modal-box">
     <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Enter your email and password</p></div>
     <div id="google-error" class="error-msg"></div>
@@ -973,6 +976,47 @@ const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const load=k=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}};
 // State
 let currentUser=null,fbUsers={},fbSSE=null,fbStarted=false,incomingSSE=null,searchQuery='';
+const PAGE_META={
+  landing:{title:'Zidea - Connect, Call, Play',desc:'Connect with friends, generate ideas, chat, call, and play games on Zidea.'},
+  login:{title:'Sign In - Zidea',desc:'Sign in to your Zidea account.'},
+  signup:{title:'Sign Up - Zidea',desc:'Create your Zidea account and start exploring ideas.'},
+  dashboard:{title:'Home - Zidea',desc:'Discover people and start chats and calls.'},
+  ideas:{title:'Generate Ideas - Zidea',desc:'Generate startup and project ideas tailored to your preferences.'},
+  library:{title:'Library - Zidea',desc:'Browse your saved, starred, and history ideas.'},
+  explore:{title:'Explore - Zidea',desc:'Explore community ideas by category.'},
+  chat:{title:'Messages - Zidea',desc:'Chat and call friends in real time.'},
+  arcade:{title:'Arcade - Zidea',desc:'Play chess, tic-tac-toe, rock paper scissors, and among us style mode.'},
+  zidai:{title:'ZiD AI - Zidea',desc:'Ask ZiD AI and get instant responses.'},
+  profile:{title:'Profile - Zidea',desc:'View and manage your Zidea profile and stats.'},
+  settings:{title:'Settings - Zidea',desc:'Manage preferences and account settings.'},
+  help:{title:'Help - Zidea',desc:'Learn how to use Zidea features.'}
+};
+function getUserInitials(name){
+  const parts=String(name||'U').trim().split(/[\s._-]+/).filter(Boolean);
+  if(parts.length===1)return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0]+parts[1][0]).toUpperCase();
+}
+function userColor(name){
+  const colors=['#7C3AED','#ec4899','#0ea5e9','#16a34a','#f97316','#eab308'];
+  let h=0;for(const ch of String(name||''))h=(h*31+ch.charCodeAt(0))>>>0;
+  return colors[h%colors.length];
+}
+function showToast(message){
+  let wrap=document.getElementById('toast-wrap');
+  if(!wrap){wrap=document.createElement('div');wrap.id='toast-wrap';wrap.className='toast-wrap';document.body.appendChild(wrap);}
+  const t=document.createElement('div');t.className='toast';t.textContent=message;wrap.appendChild(t);
+  setTimeout(()=>{t.remove();},2600);
+}
+function applyTheme(){
+  const theme=load(currentUser?`zidea_theme_${currentUser.username}`:'zidea_theme')||'dark';
+  document.documentElement.style.filter=theme==='light'?'invert(1) hue-rotate(180deg)':'';
+}
+function setPageMeta(name){
+  const m=PAGE_META[name]||PAGE_META.landing;
+  document.title=m.title;
+  const desc=document.getElementById('meta-description');
+  if(desc)desc.setAttribute('content',m.desc);
+}
 // Routing
 function showPage(name){
   if(name==='signin')name='login';
@@ -980,6 +1024,7 @@ function showPage(name){
   const el=document.getElementById('page-'+name);
   if(!el)return;
   el.classList.add('active');
+  setPageMeta(name);
   ['discover','ideas','explore','chat','arcade','zidai','library','profile'].forEach(k=>{
     const b=document.getElementById('mob-'+k);
     if(b)b.classList.toggle('active',(k==='discover'&&name==='dashboard')||(k===name));
@@ -988,9 +1033,9 @@ function showPage(name){
   if(name==='chat'){document.getElementById('chat-username').textContent='@'+(currentUser?.username||'');const ci=document.getElementById('convo-items');if(ci&&!Object.keys(chatCache).length)ci.innerHTML=skeletonConvos(5);loadAllConvos().then(()=>{renderConvos(activeChatUser);if(!activeChatUser&&!activeGroupId){const chatted=Object.keys(chatCache);if(chatted.length)openConvo(chatted[0]);}});loadMyGroups().then(()=>{if(activeConvoTab==='groups')renderGroupList();});}
   if(name==='zidai'){if(!document.querySelector('.zidai-msg'))initZidAi();}
   if(name==='ideas'){const u=document.getElementById('ideas-username');if(u)u.textContent='@'+(currentUser?.username||'');}
-  if(name==='library'){const u=document.getElementById('library-username');if(u)u.textContent='@'+(currentUser?.username||'');renderLibrary();}
-  if(name==='explore'){const u=document.getElementById('explore-username');if(u)u.textContent='@'+(currentUser?.username||'');renderExplore();}
-  if(name==='profile'){const u=document.getElementById('profile-username-sidebar');if(u)u.textContent='@'+(currentUser?.username||'');renderProfile();}
+  if(name==='library'){const u=document.getElementById('library-username');if(u)u.textContent='@'+(currentUser?.username||'');const list=document.getElementById('library-list');if(list)list.innerHTML=skeletonUserCards(2);renderLibrary();}
+  if(name==='explore'){const u=document.getElementById('explore-username');if(u)u.textContent='@'+(currentUser?.username||'');const list=document.getElementById('explore-list');if(list)list.innerHTML=skeletonUserCards(2);renderExplore();}
+  if(name==='profile'){const u=document.getElementById('profile-username-sidebar');if(u)u.textContent='@'+(currentUser?.username||'');const recent=document.getElementById('profile-recent-ideas');if(recent)recent.innerHTML=skeletonUserCards(2);renderProfile();}
   if(name==='settings'){const u=document.getElementById('settings-username');if(u)u.textContent='@'+(currentUser?.username||'');renderSettings();}
   if(name==='help'){const u=document.getElementById('help-username');if(u)u.textContent='@'+(currentUser?.username||'');}
 }
@@ -1027,28 +1072,30 @@ function handleSignup(e){
 function loginSuccess(user){
   currentUser=user;save('zidea_session',user);setLoggedInUI();startFirebase();showPage('dashboard');setTimeout(listenIncoming,1000);
   setTimeout(()=>{syncIdeasFromFirebase();syncAvatarFromFirebase();},1500);
+  showToast('Signed in successfully.');
 }
 function setLoggedInUI(){
   const n='@'+currentUser.username;
   ['dash-username','arcade-username','chat-username','zidai-username','ideas-username','library-username','explore-username','profile-username-sidebar','settings-username','help-username'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n;});
+  const chip=document.getElementById('mob-avatar-chip');
+  if(chip){chip.textContent=getUserInitials(currentUser.username);}
+  applyTheme();
 }
 function handleLogout(){
   if(activeCallUser)endCall();
   if(incomingSSE){incomingSSE.close();incomingSSE=null;}
   if(fbSSE){fbSSE.close();fbSSE=null;}
   if(currentUser&&fbStarted)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});
-  fbStarted=false;currentUser=null;localStorage.removeItem('zidea_session');showPage('landing');
+  fbStarted=false;currentUser=null;localStorage.removeItem('zidea_session');showPage('landing');showToast('Signed out.');
 }
 // Google mock
 let gStep='email',gEmail='';
 const GOOGLE_ACCS={'nova@gmail.com':'nova1234','pixel@gmail.com':'pixel999','demo@gmail.com':'demo123'};
-function handleGoogleLogin(){gStep='email';gEmail='';document.getElementById('google-email').value='';document.getElementById('google-password').value='';document.getElementById('google-step1').style.display='block';document.getElementById('google-step2').style.display='none';document.getElementById('google-btn').textContent='Next';document.getElementById('google-error').classList.remove('show');document.getElementById('google-modal').classList.add('show');}
+function handleGoogleLogin(){showToast('Google sign-in is disabled. Use email + password.');}
 function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
 function handleGoogleSubmit(e){
   e.preventDefault();
-  const err=document.getElementById('google-error');err.classList.remove('show');
-  if(gStep==='email'){const email=document.getElementById('google-email').value.trim().toLowerCase();const accounts=load('zidea_accounts')||{};if(!GOOGLE_ACCS[email]&&!accounts[email]){err.textContent='No account with that email.';err.classList.add('show');return;}gEmail=email;gStep='password';document.getElementById('google-step1').style.display='none';document.getElementById('google-step2').style.display='block';document.getElementById('google-btn').textContent='Sign In';}
-  else{const pw=document.getElementById('google-password').value;const accounts=load('zidea_accounts')||{};const stored=GOOGLE_ACCS[gEmail]||accounts[gEmail]?.password;if(stored!==pw){err.textContent='Wrong password.';err.classList.add('show');return;}closeGoogleModal();const username=accounts[gEmail]?.username||gEmail.split('@')[0].replace(/[^a-z0-9_]/gi,'_');loginSuccess({email:gEmail,username});}
+  showToast('Google sign-in is disabled in this build.');
 }
 </script>
 
@@ -1059,8 +1106,8 @@ function startFirebase(){
   db.write('users/'+currentUser.username,{username:currentUser.username,lastSeen:Date.now(),online:true});
   db.read('users').then(data=>{if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser.username)fbUsers[k]=u;});renderUsers();renderOnline();updateStats();});
   const sse=new EventSource(`${FB}/users.json`);fbSSE=sse;
-  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]=u;});renderUsers();renderOnline();}catch(_){}});
-  sse.addEventListener('patch',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]={...(fbUsers[k]||{}),...u};});renderUsers();renderOnline();}catch(_){}});
+  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]=u;});renderUsers();renderOnline();updateStats();}catch(_){}});
+  sse.addEventListener('patch',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]={...(fbUsers[k]||{}),...u};});renderUsers();renderOnline();updateStats();}catch(_){}});
   sse.onerror=()=>{sse.close();fbSSE=null;setTimeout(startFirebase,5000);};
   window.addEventListener('beforeunload',()=>{if(currentUser)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});});
 }
@@ -1068,6 +1115,7 @@ function isOnline(u){if(!u)return false;return u.online===true&&Date.now()-(u.la
 function touchPresence(){if(!currentUser||!fbStarted)return;db.patch('users/'+currentUser.username,{lastSeen:Date.now(),online:true});}
 setInterval(touchPresence,15000);
 setInterval(()=>{renderOnline();renderUsers();},10000);
+setInterval(updateStats,12000);
 function getAllUsers(){const fb=Object.values(fbUsers);if(fb.length)return fb;const accounts=load('zidea_accounts')||{};return Object.entries(accounts).filter(([e])=>e!==currentUser?.email).map(([,a])=>({username:a.username,wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0}));}
 function filterUsers(){searchQuery=document.getElementById('search-input').value;const list=document.getElementById('user-list');if(searchQuery&&!Object.keys(fbUsers).length&&list)list.innerHTML=skeletonUserCards(3);renderUsers();}
 function renderUsers(){
@@ -1078,7 +1126,7 @@ function renderUsers(){
   list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#22C55E':'#6B7280'}">${isOnline(u)?'● Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
 }
 function renderOnline(){const el=document.getElementById('online-list');if(!el)return;const online=getAllUsers().filter(u=>isOnline(u));if(!online.length){el.innerHTML='<div class="online-empty">No one online yet</div>';return;}el.innerHTML=online.map(u=>`<div class="online-user-row"><div class="online-avatar">${u.username.slice(0,2).toUpperCase()}</div><div><div class="online-user-name">@${u.username}</div></div></div>`).join('');}
-function updateStats(){db.read('users').then(data=>{const su=document.getElementById('stat-users');const so=document.getElementById('stat-online');if(!data){if(su)su.textContent='100+';if(so)so.textContent='0';return;}const users=Object.values(data);if(su)su.textContent=Math.max(users.length,1)+'+';if(so)so.textContent=users.filter(u=>isOnline(u)).length||'0';}).catch(()=>{const su=document.getElementById('stat-users');const so=document.getElementById('stat-online');if(su)su.textContent='100+';if(so)so.textContent='0';});}
+function updateStats(){db.read('users').then(data=>{const su=document.getElementById('stat-users');const so=document.getElementById('stat-online');if(!data){if(su)su.textContent='-';if(so)so.textContent='-';return;}const users=Object.values(data).filter(Boolean);if(su)su.textContent=String(users.length);if(so)so.textContent=String(users.filter(u=>isOnline(u)).length);}).catch(()=>{const su=document.getElementById('stat-users');const so=document.getElementById('stat-online');if(su)su.textContent='-';if(so)so.textContent='-';});}
 // Skeletons
 function skeletonConvos(n=5){return Array(n).fill(0).map(()=>`<div class="skeleton-convo"><div class="skeleton skeleton-circle" style="width:42px;height:42px;flex-shrink:0"></div><div style="flex:1;min-width:0"><div class="skeleton" style="height:13px;width:70%;margin-bottom:7px;border-radius:6px"></div><div class="skeleton" style="height:11px;width:50%;border-radius:6px"></div></div></div>`).join('');}
 function skeletonUserCards(n=3){return Array(n).fill(0).map(()=>`<div class="skeleton-card"><div class="skeleton skeleton-circle" style="width:44px;height:44px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:13px;width:60%;margin-bottom:8px;border-radius:6px"></div><div class="skeleton" style="height:11px;width:40%;border-radius:6px"></div></div><div style="display:flex;gap:8px"><div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div><div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div></div></div>`).join('');}
@@ -1088,7 +1136,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 <script>
 // ── Voice Calls (WebRTC) ──────────────────────────────────────────────────
-let rtcPeer=null,localStream=null,activeCallUser=null,callMuted=false,callTimer=null,callSecs=0,incomingUser=null,sigSSE=null;
+let rtcPeer=null,localStream=null,activeCallUser=null,callMuted=false,callTimer=null,callSecs=0,incomingUser=null,sigSSE=null,callConnectTimeout=null;
 const RTC_CONFIG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
 function callChan(a,b){return[a,b].sort().join('__');}
 function sigPath(chan){return`webrtc/${chan}`;}
@@ -1096,15 +1144,17 @@ async function toggleCall(username){if(activeCallUser){endCall();return;}await s
 async function startCall(username){
   if(!currentUser)return;activeCallUser=username;
   const overlay=document.getElementById('call-overlay');overlay.style.display='flex';
-  document.getElementById('call-name').textContent='@'+username;document.getElementById('call-avatar').textContent=username.slice(0,2).toUpperCase();document.getElementById('call-status').textContent='Connecting...';document.getElementById('call-timer').textContent='00:00';
+  document.getElementById('call-name').textContent='@'+username;document.getElementById('call-avatar').textContent=getUserInitials(username);document.getElementById('call-status').textContent='Connecting...';document.getElementById('call-timer').textContent='00:00';
   const chan=callChan(currentUser.username,username);
   await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,ts:Date.now()});
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;return;}
+  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;showToast('Microphone unavailable.');return;}
   rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='In call with @'+username;};
+  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
+  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';showToast('Call connection failed.');setTimeout(endCall,900);}};
   rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
   const offer=await rtcPeer.createOffer();await rtcPeer.setLocalDescription(offer);await db.write(sigPath(chan)+'/offer',{sdp:offer.sdp,type:offer.type,from:currentUser.username});
-  listenSignals(chan,false);startCallTimer();renderUsers();
+  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='No answer';showToast('No answer. Call ended.');endCall();}},30000);
+  listenSignals(chan,false);renderUsers();
 }
 function listenSignals(chan,isCallee){
   if(sigSSE){sigSSE.close();sigSSE=null;}const me=currentUser.username;
@@ -1115,6 +1165,7 @@ function listenSignals(chan,isCallee){
 async function endCall(){
   if(!activeCallUser)return;const u=activeCallUser;activeCallUser=null;callMuted=false;
   if(currentUser){db.del('calls/'+currentUser.username+'/incoming');db.del('calls/'+u+'/incoming');const chan=callChan(currentUser.username,u);db.del(sigPath(chan));}
+  if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}
   if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
   const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
 }
@@ -1124,16 +1175,18 @@ function stopCallTimer(){if(callTimer){clearInterval(callTimer);callTimer=null;}
 function listenIncoming(){
   if(!currentUser||incomingSSE)return;
   const sse=new EventSource(`${FB}/calls/${currentUser.username}/incoming.json`);incomingSSE=sse;
-  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data||!data.from||data.from===currentUser?.username||activeCallUser)return;incomingUser=data.from;document.getElementById('incoming-name').textContent='@'+data.from;document.getElementById('incoming-avatar').textContent=data.from.slice(0,2).toUpperCase();document.getElementById('incoming-toast').style.display='block';setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);}catch(_){}});
+  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data||!data.from||data.from===currentUser?.username||activeCallUser)return;incomingUser=data.from;document.getElementById('incoming-name').textContent='@'+data.from;document.getElementById('incoming-avatar').textContent=getUserInitials(data.from);document.getElementById('incoming-toast').style.display='block';setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);}catch(_){}});
 }
 async function acceptCall(){
   if(!incomingUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser;incomingUser=null;activeCallUser=caller;
-  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';document.getElementById('call-name').textContent='@'+caller;document.getElementById('call-avatar').textContent=caller.slice(0,2).toUpperCase();document.getElementById('call-status').textContent='Connecting...';document.getElementById('call-timer').textContent='00:00';
+  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';document.getElementById('call-name').textContent='@'+caller;document.getElementById('call-avatar').textContent=getUserInitials(caller);document.getElementById('call-status').textContent='Connecting...';document.getElementById('call-timer').textContent='00:00';
   try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;return;}
   rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='In call with @'+caller;};
+  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
+  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';setTimeout(endCall,900);}};
   rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);const chan=callChan(currentUser.username,caller);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  const chan=callChan(currentUser.username,caller);listenSignals(chan,true);startCallTimer();renderUsers();
+  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
+  const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
 }
 function declineCall(){incomingUser=null;document.getElementById('incoming-toast').style.display='none';if(currentUser)db.del('calls/'+currentUser.username+'/incoming');}
 </script>
@@ -1298,7 +1351,7 @@ function filterConvos(q){const items=document.querySelectorAll('.convo-item');it
 // ── Groups ────────────────────────────────────────────────────────────────
 let activeGroupId=null,groupSSE=null;
 const groupCache={};let myGroups={};
-let gcallPeers={},gcallStream=null,gcallTimer=null,gcallSecs=0,gcallMuted=false,gcallGroupId=null,gcallSigSSE=null;
+let gcallPeers={},gcallStream=null,gcallTimer=null,gcallSecs=0,gcallMuted=false,gcallGroupId=null,gcallSigSSE=null,gcallConnected=false;
 function openCreateGroup(){
   const list=document.getElementById('group-member-list');document.getElementById('group-name-input').value='';document.getElementById('group-modal-overlay').classList.add('show');
   list.innerHTML='<div style="padding:16px;text-align:center;color:#4b5563;font-size:13px">Loading users...</div>';
@@ -1364,13 +1417,17 @@ async function startGroupCall(groupId){
   await db.write(`groupcalls/${groupId}/members/${currentUser.username}`,{joined:true,ts:Date.now()});
   document.getElementById('gcall-group-name').textContent='📞 '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
   const grid=document.getElementById('gcall-grid');if(grid)grid.innerHTML=group.members.map(u=>`<div class="gcall-tile" id="gcall-tile-${u}"><div class="gcall-avatar">${u.slice(0,2).toUpperCase()}</div><div class="gcall-name">@${esc(u)}${u===currentUser.username?' (you)':''}</div><div class="gcall-speaking"></div></div>`).join('');
-  document.getElementById('gcall-overlay').classList.add('show');gcallSecs=0;gcallTimer=setInterval(()=>{gcallSecs++;const m=String(Math.floor(gcallSecs/60)).padStart(2,'0');const s=String(gcallSecs%60).padStart(2,'0');const el=document.getElementById('gcall-timer-display');if(el)el.textContent=m+':'+s;},1000);
+  document.getElementById('gcall-overlay').classList.add('show');gcallSecs=0;gcallConnected=false;
   listenGroupCallSignals(groupId);const existing=await db.read(`groupcalls/${groupId}/members`);if(existing){const others=Object.keys(existing).filter(u=>u!==currentUser.username);for(const u of others)await gcallConnectTo(groupId,u,true);}
+}
+function gcallStartTimer(){
+  if(gcallTimer)return;
+  gcallTimer=setInterval(()=>{gcallSecs++;const m=String(Math.floor(gcallSecs/60)).padStart(2,'0');const s=String(gcallSecs%60).padStart(2,'0');const el=document.getElementById('gcall-timer-display');if(el)el.textContent=m+':'+s;},1000);
 }
 async function gcallConnectTo(groupId,remoteUser,isInitiator){
   if(gcallPeers[remoteUser])return;const pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});gcallPeers[remoteUser]=pc;
   if(gcallStream)gcallStream.getTracks().forEach(t=>pc.addTrack(t,gcallStream));
-  pc.ontrack=e=>{let audio=document.getElementById('gcall-audio-'+remoteUser);if(!audio){audio=document.createElement('audio');audio.id='gcall-audio-'+remoteUser;audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];};
+  pc.ontrack=e=>{let audio=document.getElementById('gcall-audio-'+remoteUser);if(!audio){audio=document.createElement('audio');audio.id='gcall-audio-'+remoteUser;audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];if(!gcallConnected){gcallConnected=true;gcallStartTimer();}};
   pc.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/ice`,{[key]:JSON.stringify(e.candidate)});}};
   if(isInitiator){const offer=await pc.createOffer();await pc.setLocalDescription(offer);await db.write(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/offer`,{sdp:offer.sdp,type:offer.type});}
 }
@@ -1386,7 +1443,7 @@ async function handleGcallData(groupId,data){
   if(data.signals){for(const[fromUser,toMap]of Object.entries(data.signals)){if(fromUser===me)continue;const sig=toMap[me];if(!sig)continue;const pc=gcallPeers[fromUser];if(sig.offer&&(!pc||!pc.remoteDescription)){let peer=pc;if(!peer){await gcallConnectTo(groupId,fromUser,false);peer=gcallPeers[fromUser];}if(!peer||peer.remoteDescription)continue;await peer.setRemoteDescription(new RTCSessionDescription({type:sig.offer.type,sdp:sig.offer.sdp}));const answer=await peer.createAnswer();await peer.setLocalDescription(answer);await db.write(`groupcalls/${groupId}/signals/${me}/${fromUser}/answer`,{sdp:answer.sdp,type:answer.type});}if(sig.answer&&pc&&!pc.remoteDescription){await pc.setRemoteDescription(new RTCSessionDescription({type:sig.answer.type,sdp:sig.answer.sdp}));}if(sig.ice&&pc&&pc.remoteDescription){for(const key of Object.keys(sig.ice)){try{await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(sig.ice[key])));}catch(_){}}}}}
 }
 function gcallToggleMute(){gcallMuted=!gcallMuted;if(gcallStream)gcallStream.getAudioTracks().forEach(t=>t.enabled=!gcallMuted);document.getElementById('gcall-mute-btn').textContent=gcallMuted?'🔇':'🎤';}
-async function endGroupCall(){if(gcallGroupId&&currentUser)await db.del(`groupcalls/${gcallGroupId}/members/${currentUser.username}`);if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}Object.values(gcallPeers).forEach(pc=>pc.close());gcallPeers={};if(gcallStream){gcallStream.getTracks().forEach(t=>t.stop());gcallStream=null;}document.querySelectorAll('[id^="gcall-audio-"]').forEach(a=>a.remove());if(gcallTimer){clearInterval(gcallTimer);gcallTimer=null;}gcallGroupId=null;document.getElementById('gcall-overlay').classList.remove('show');}
+async function endGroupCall(){if(gcallGroupId&&currentUser)await db.del(`groupcalls/${gcallGroupId}/members/${currentUser.username}`);if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}Object.values(gcallPeers).forEach(pc=>pc.close());gcallPeers={};if(gcallStream){gcallStream.getTracks().forEach(t=>t.stop());gcallStream=null;}document.querySelectorAll('[id^="gcall-audio-"]').forEach(a=>a.remove());if(gcallTimer){clearInterval(gcallTimer);gcallTimer=null;}gcallConnected=false;gcallSecs=0;gcallGroupId=null;document.getElementById('gcall-overlay').classList.remove('show');}
 </script>
 
 <script>
@@ -1431,7 +1488,7 @@ function pushIdeaUnique(list,idea){const id=ideaUid(idea);if(list.some(x=>ideaUi
 function createIdeaCardHTML(idea,ctx='ideas'){
   const id=ideaUid(idea),saved=getSavedIdeas().some(x=>ideaUid(x)===id),starred=getStarredIdeas().some(x=>ideaUid(x)===id);
   const canCall=!!idea.author&&idea.author!==currentUser?.username;
-  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div></div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">💾 ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">⭐ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">👁 Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">📤 Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">📞 Call @${esc(idea.author)}</button>`:''}</div></div>`;
+  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">💾 ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">⭐ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">👁 Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">📤 Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">📞 Call @${esc(idea.author)}</button>`:''}</div></div>`;
 }
 function getCurrentGeneratedIdeas(){return load(ideaStoreKey('generated_now'))||[];}
 function setCurrentGeneratedIdeas(v){save(ideaStoreKey('generated_now'),v);}
@@ -1456,13 +1513,15 @@ function generateIdeas(){
     title:pick(seeds),
     category:cat,
     author:currentUser?.username||'you',
-    description:`${pick(variants)}. Monetization: ${pick(['subscription','freemium upsells','commission model','one-time templates'])}.`
+    description:`${pick(variants)}. Monetization: ${pick(['subscription','freemium upsells','commission model','one-time templates'])}.`,
+    score:{impact:6+Math.floor(Math.random()*5),feasibility:6+Math.floor(Math.random()*5),profit:6+Math.floor(Math.random()*5)}
   }));
   setCurrentGeneratedIdeas(ideas);
   const history=ideas.reduce((acc,idea)=>pushIdeaUnique(acc,{...idea,ts:Date.now()}),getIdeaHistory()).slice(0,80);
   setIdeaHistory(history);
   const out=document.getElementById('ideas-output');
   if(out)out.innerHTML=ideas.map(i=>createIdeaCardHTML(i,'ideas')).join('');
+  const regen=document.getElementById('regen-btn');if(regen)regen.style.display='inline-flex';
   if(btn)btn.classList.remove('btn-loading');
   syncIdeasToFirebase();
 }
@@ -1488,6 +1547,7 @@ function toggleSaveIdea(id,ctx){
   let saved=getSavedIdeas();const exists=saved.some(x=>ideaUid(x)===id);
   saved=exists?saved.filter(x=>ideaUid(x)!==id):pushIdeaUnique(saved,{...idea,savedAt:Date.now()});
   setSavedIdeas(saved);renderLibrary();if(ctx==='explore')renderExplore();else{const out=document.getElementById('ideas-output');if(out&&getCurrentGeneratedIdeas().length)out.innerHTML=getCurrentGeneratedIdeas().map(i=>createIdeaCardHTML(i,'ideas')).join('');}
+  showToast(exists?'Idea removed from saved.':'Idea saved.');
   syncIdeasToFirebase();
 }
 function toggleStarIdea(id,ctx){
@@ -1495,6 +1555,7 @@ function toggleStarIdea(id,ctx){
   let starred=getStarredIdeas();const exists=starred.some(x=>ideaUid(x)===id);
   starred=exists?starred.filter(x=>ideaUid(x)!==id):pushIdeaUnique(starred,{...idea,starredAt:Date.now()});
   setStarredIdeas(starred);renderLibrary();if(ctx==='explore')renderExplore();else{const out=document.getElementById('ideas-output');if(out&&getCurrentGeneratedIdeas().length)out.innerHTML=getCurrentGeneratedIdeas().map(i=>createIdeaCardHTML(i,'ideas')).join('');}
+  showToast(exists?'Idea unstarred.':'Idea starred.');
   syncIdeasToFirebase();
 }
 function openIdeaDetails(id,ctx){
@@ -1508,8 +1569,8 @@ function closeIdeaModal(){document.getElementById('idea-modal-overlay').classLis
 function shareIdea(id,ctx){
   const idea=getIdeaFromContext(id,ctx);if(!idea)return;
   const text=`${idea.title} — ${idea.description}`;
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>alert('Idea copied to clipboard.')).catch(()=>alert(text));}
-  else alert(text);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>showToast('Idea copied to clipboard.')).catch(()=>showToast('Copy failed.'));}
+  else showToast(text);
 }
 function switchLibTab(tab){libTab=tab;['saved','starred','history'].forEach(t=>{const b=document.getElementById('lib-tab-'+t);if(b)b.classList.toggle('active',t===tab);});renderLibrary();}
 function renderLibrary(){
@@ -1520,7 +1581,7 @@ function renderLibrary(){
   const tags=[...new Set(source.map(i=>i.category).filter(Boolean))];
   const tagWrap=document.getElementById('lib-tag-filter');
   if(tagWrap)tagWrap.innerHTML=tags.map(t=>`<button class="idea-tag" onclick="document.getElementById('lib-search').value='${t}';renderLibrary()">${esc(CAT_LABEL[t]||t)}</button>`).join('');
-  if(!filtered.length){list.innerHTML='<div class="card" style="text-align:center;color:#6B7280">No ideas here yet.</div>';return;}
+  if(!filtered.length){list.innerHTML='<div class="card" style="text-align:center;color:#6B7280"><div style="font-size:28px;margin-bottom:10px">💡</div><div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:6px">No ideas here yet</div><div style="font-size:12px;color:#6B7280">No saved ideas yet - go generate one!</div><button class="btn-primary" style="margin-top:10px;font-size:12px" onclick="showPage(\'ideas\')">Generate Ideas</button></div>';return;}
   list.innerHTML=filtered.map(i=>createIdeaCardHTML(i,'library')).join('');
 }
 function filterExplore(cat){
@@ -1538,7 +1599,7 @@ function renderExplore(){
 }
 function callIdeaAuthor(username){
   if(!currentUser){showPage('login');return;}
-  if(username===currentUser.username){alert('You cannot call yourself.');return;}
+  if(username===currentUser.username){showToast('You cannot call yourself.');return;}
   toggleCall(username);
 }
 function renderProfile(){
@@ -1546,7 +1607,9 @@ function renderProfile(){
   const avatar=load(ideaStoreKey('avatar_data'));
   const avatarEl=document.getElementById('profile-avatar');
   if(avatarEl){
-    avatarEl.innerHTML=avatar?`<img src="${avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`:currentUser.username.slice(0,1).toUpperCase();
+    const initials=getUserInitials(currentUser.username);
+    avatarEl.style.background=`linear-gradient(135deg,${userColor(currentUser.username)},#c026d3)`;
+    avatarEl.innerHTML=avatar?`<img src="${avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`:initials;
   }
   document.getElementById('remove-avatar-btn').style.display=avatar?'inline-block':'none';
   document.getElementById('profile-name').textContent='@'+currentUser.username;
@@ -1569,11 +1632,13 @@ function renderSettings(){
 function toggleTheme(){
   const cur=load(ideaStoreKey('theme'))||'dark',next=cur==='dark'?'light':'dark';
   save(ideaStoreKey('theme'),next);
+  save('zidea_theme',next);
   document.documentElement.style.filter=next==='light'?'invert(1) hue-rotate(180deg)':'';
+  showToast(`Theme changed to ${next}.`);
   renderSettings();
 }
-function clearIdeaHistory(){if(confirm('Clear all generated idea history?')){setIdeaHistory([]);renderLibrary();renderProfile();syncIdeasToFirebase();}}
-function clearSavedIdeas(){if(confirm('Clear all saved and starred ideas?')){setSavedIdeas([]);setStarredIdeas([]);renderLibrary();renderProfile();syncIdeasToFirebase();}}
+function clearIdeaHistory(){if(confirm('Are you sure? This cannot be undone.')){setIdeaHistory([]);renderLibrary();renderProfile();syncIdeasToFirebase();showToast('Idea history cleared.');}}
+function clearSavedIdeas(){if(confirm('Are you sure? This cannot be undone.')){setSavedIdeas([]);setStarredIdeas([]);renderLibrary();renderProfile();syncIdeasToFirebase();showToast('Saved and starred ideas cleared.');}}
 function handleAvatarUpload(event){
   const file=event.target.files?.[0];if(!file)return;
   const reader=new FileReader();
@@ -1612,8 +1677,10 @@ function seedExploreUsers(){
 // Boot
 testFirebaseAccess();
 seedExploreUsers();
+document.getElementById('incoming-toast').style.display='none';
+updateStats();
 if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();showPage('dashboard');setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
-else showPage('landing');
+else{applyTheme();showPage('landing');}
 </script>
 
 <script>
@@ -1659,6 +1726,61 @@ let rpsYou=0,rpsBot=0,rpsRound=0;
 const RPS_EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
 function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win! 🎉';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} — ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} — Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;}
 function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
+// Among Us (lightweight local simulation)
+let auRaf=null,auRole='Crewmate',auPlayers=[],auPos={x:280,y:210},auMeetingOpen=false,auImpostorAlive=true;
+function randomRoom(){return['Cafeteria','Electrical','MedBay','Admin','Navigation'][Math.floor(Math.random()*5)];}
+function resetAmongUs(){
+  auRole=Math.random()<0.35?'Impostor':'Crewmate';
+  auPlayers=['Nova','Pixel','Jamie','Milo','You'].map((name,idx)=>({name,alive:true,x:80+idx*90,y:70+((idx%2)*130)}));
+  auPos={x:280,y:210};auMeetingOpen=false;auImpostorAlive=true;
+  const roleEl=document.getElementById('au-role-display');if(roleEl)roleEl.textContent='Role: '+auRole;
+  const roomEl=document.getElementById('au-room-display');if(roomEl)roomEl.textContent='Room: '+randomRoom();
+  const aliveEl=document.getElementById('au-alive-display');if(aliveEl)aliveEl.textContent='Alive: 5/5';
+  const killBtn=document.getElementById('au-kill-btn');if(killBtn)killBtn.style.display=auRole==='Impostor'?'inline-flex':'none';
+  const votePanel=document.getElementById('au-vote-panel');if(votePanel)votePanel.style.display='none';
+  const endPanel=document.getElementById('au-end-panel');if(endPanel)endPanel.style.display='none';
+  if(auRaf)cancelAnimationFrame(auRaf);
+  const loop=()=>{drawAmongUs();auRaf=requestAnimationFrame(loop);};loop();
+}
+function drawAmongUs(){
+  const cv=document.getElementById('au-canvas');if(!cv)return;const ctx=cv.getContext('2d');
+  ctx.clearRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='#0b1324';ctx.fillRect(0,0,cv.width,cv.height);
+  ctx.fillStyle='rgba(124,58,237,.12)';for(let i=0;i<12;i++){ctx.beginPath();ctx.arc((i*93)%560,(i*57)%420,18,0,Math.PI*2);ctx.fill();}
+  auPlayers.forEach((p,i)=>{if(!p.alive)return;ctx.fillStyle=i===4?'#a78bfa':'#22d3a0';ctx.fillRect(p.x,p.y,28,36);ctx.fillStyle='#e5e7eb';ctx.font='10px Inter';ctx.fillText(p.name,p.x-2,p.y+48);});
+}
+function auKill(){
+  if(auRole!=='Impostor'||auMeetingOpen)return;
+  const victim=auPlayers.find(p=>p.name!=='You'&&p.alive);
+  if(!victim)return;
+  victim.alive=false;
+  const alive=auPlayers.filter(p=>p.alive).length;
+  document.getElementById('au-alive-display').textContent=`Alive: ${alive}/5`;
+  showToast(`You eliminated ${victim.name}.`);
+  if(alive<=2){auEnd('Impostor wins!');}
+}
+function auMeeting(){
+  if(auMeetingOpen)return;
+  auMeetingOpen=true;
+  const panel=document.getElementById('au-vote-panel');if(panel)panel.style.display='flex';
+  const list=document.getElementById('au-vote-list');if(!list)return;
+  const alivePlayers=auPlayers.filter(p=>p.alive&&p.name!=='You');
+  list.innerHTML=alivePlayers.map(p=>`<button class="btn-ghost" style="font-size:12px" onclick="auVote('${p.name}')">Vote ${p.name}</button>`).join('');
+}
+function auVote(name){
+  const target=auPlayers.find(p=>p.name===name&&p.alive);
+  if(target)target.alive=false;
+  document.getElementById('au-vote-panel').style.display='none';auMeetingOpen=false;
+  const alive=auPlayers.filter(p=>p.alive).length;document.getElementById('au-alive-display').textContent=`Alive: ${alive}/5`;
+  if(auRole==='Crewmate'&&name==='Nova')auEnd('Crewmates win! Impostor ejected.');
+  else if(auRole==='Impostor'&&name!=='Nova')auEnd('Impostor survives. Keep sabotaging.');
+  else if(alive<=2)auEnd(auRole==='Impostor'?'Impostor wins!':'Crewmates win!');
+}
+function auSkipVote(){document.getElementById('au-vote-panel').style.display='none';auMeetingOpen=false;showToast('Vote skipped.');}
+function auEnd(text){
+  const panel=document.getElementById('au-end-panel');if(panel)panel.style.display='flex';
+  const txt=document.getElementById('au-end-text');if(txt)txt.textContent=text;
+}
 </script>
 
 <script>
@@ -1680,7 +1802,7 @@ function chessHasLegal(b,col,cr,ep){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b
 function chessCheckResult(b,col,cr,ep){if(chessHasLegal(b,col,cr,ep))return null;return chessInCheck(b,col,cr,ep)?'checkmate':'stalemate';}
 function chessEval(b){let score=0;for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(!p)continue;const sign=p.col==='w'?1:-1;const pstRow=p.col==='w'?r:7-r;const pst=PST[p.t]?.[pstRow]?.[c]||0;score+=sign*(PIECE_VAL[p.t]+pst);}return score;}
 function minimax(b,depth,alpha,beta,maximizing,cr,ep){const col=maximizing?'w':'b';const result=chessCheckResult(b,col,cr,ep);if(result==='checkmate')return maximizing?-100000:100000;if(result==='stalemate')return 0;if(depth===0)return chessEval(b);const moves=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]?.col===col)for(const[tr,tc,flag]of chessMoves(b,r,c,cr,ep))moves.push([r,c,tr,tc,flag]);moves.sort((a,b2)=>{const va=b[a[2]]?.[a[3]]?PIECE_VAL[b[a[2]][a[3]].t]||0:0;const vb=b[b2[2]]?.[b2[3]]?PIECE_VAL[b[b2[2]][b2[3]].t]||0:0;return vb-va;});if(maximizing){let best=-Infinity;for(const[fr,fc,tr,tc,flag]of moves){const res=chessApply(b,fr,fc,tr,tc,flag,cr,ep,'Q');const val=minimax(res.board,depth-1,alpha,beta,false,res.cr,res.ep);best=Math.max(best,val);alpha=Math.max(alpha,val);if(beta<=alpha)break;}return best;}else{let best=Infinity;for(const[fr,fc,tr,tc,flag]of moves){const res=chessApply(b,fr,fc,tr,tc,flag,cr,ep,'Q');const val=minimax(res.board,depth-1,alpha,beta,true,res.cr,res.ep);best=Math.min(best,val);beta=Math.min(beta,val);if(beta<=alpha)break;}return best;}}
-const CHESS_LEVELS={1:{depth:0,random:1.0},2:{depth:1,random:0.5},3:{depth:2,random:0.2},4:{depth:3,random:0.05},5:{depth:4,random:0.0}};
+const CHESS_LEVELS={1:{depth:1,random:0.75},2:{depth:2,random:0.45},3:{depth:3,random:0.2},4:{depth:4,random:0.08},5:{depth:5,random:0.0}};
 function chessBotMove(){
   const cfg=CHESS_LEVELS[chessLevel]||CHESS_LEVELS[1];const all=[];
   for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(chessBoard[r][c]?.col==='b')for(const[tr,tc,flag]of chessMoves(chessBoard,r,c,castleRights,enPassantTarget))all.push([r,c,tr,tc,flag]);
