@@ -29,6 +29,9 @@ a{text-decoration:none;color:inherit}
 .btn-primary:hover{background:var(--brand-dark);transform:translateY(-1px);box-shadow:0 4px 20px rgba(124,58,237,.4)}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;justify-content:center;background:transparent;color:#D1D5DB;font-weight:500;padding:10px 20px;border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s;font-family:inherit;font-size:14px}
 .btn-ghost:hover{border-color:var(--brand);color:#fff}
+button{cursor:pointer}
+button:focus-visible{outline:2px solid rgba(167,139,250,.85);outline-offset:2px}
+button:active{transform:scale(.98)}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
 .input-field{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
 .input-field::placeholder{color:#6B7280}
@@ -72,7 +75,7 @@ a{text-decoration:none;color:inherit}
 footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;position:relative;z-index:1}
 /* Auth */
 .auth-page{min-height:100vh;align-items:center;justify-content:center;padding:20px;background:var(--surface)}
-.auth-box{width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px}
+.auth-box{width:100%;max-width:420px;display:flex;flex-direction:column;gap:16px;position:relative}
 .auth-header{text-align:center}
 .auth-header p{color:#9CA3AF;font-size:14px;margin-top:4px}
 .auth-form{display:flex;flex-direction:column;gap:12px}
@@ -313,6 +316,10 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
 .modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:18px}
+.auth-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:170;align-items:center;justify-content:center;padding:20px}
+.auth-modal.show{display:flex!important;opacity:1}
+.rand-animate{animation:randPulse .45s ease}
+@keyframes randPulse{0%{transform:scale(1)}40%{transform:scale(1.03)}100%{transform:scale(1)}}
 @media(max-width:768px){
   .sidebar{display:none!important}
   .main-content{height:auto;min-height:calc(100vh - 64px)}
@@ -330,9 +337,9 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
   <div class="orb" style="width:250px;height:250px;background:rgba(56,189,248,.07);top:45%;left:55%;animation-duration:11s;animation-delay:-3s"></div>
   <nav class="nav">
     <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
-    <div style="display:flex;gap:8px">
-      <button class="btn-ghost" style="padding:8px 16px" onclick="showPage('login')">Log In</button>
-      <button class="btn-primary" style="padding:8px 16px" onclick="showPage('signup')">Sign Up</button>
+    <div style="display:flex;gap:8px" id="landing-auth-actions">
+      <button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage('login')">Log In</button>
+      <button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage('signup')">Sign Up</button>
     </div>
   </nav>
   <section class="hero">
@@ -387,8 +394,9 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
 </div>
 
 <!-- LOGIN -->
-<div id="page-login" class="page auth-page">
+<div id="page-login" class="page auth-page auth-modal" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-box card">
+    <button type="button" onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#6B7280;font-size:24px;line-height:1">×</button>
     <div class="auth-header"><div class="logo" style="justify-content:center;font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div><p>Welcome back</p></div>
     <div id="login-error" class="error-msg"></div>
     <form class="auth-form" onsubmit="handleLogin(event)">
@@ -402,8 +410,9 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
 </div>
 
 <!-- SIGNUP -->
-<div id="page-signup" class="page auth-page">
+<div id="page-signup" class="page auth-page auth-modal" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-box card">
+    <button type="button" onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#6B7280;font-size:24px;line-height:1">×</button>
     <div class="auth-header"><div class="logo" style="justify-content:center;font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div><p>Create your account</p></div>
     <div id="signup-error" class="error-msg"></div>
     <form class="auth-form" onsubmit="handleSignup(event)">
@@ -1017,18 +1026,49 @@ function setPageMeta(name){
   const desc=document.getElementById('meta-description');
   if(desc)desc.setAttribute('content',m.desc);
 }
-// Routing
-function showPage(name){
+const PRIVATE_PAGES=new Set(['dashboard','arcade','chat','zidai','ideas','library','explore','profile','settings','help']);
+let suppressHashChange=false;
+function updateLandingAuthUI(){
+  const box=document.getElementById('landing-auth-actions');if(!box)return;
+  if(currentUser)box.innerHTML='<button class="btn-primary" style="padding:8px 16px" onclick="showPage(\'dashboard\')">Open Dashboard</button>';
+  else box.innerHTML='<button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage(\'login\')">Log In</button><button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage(\'signup\')">Sign Up</button>';
+}
+function syncSidebarActive(name){
+  document.querySelectorAll('.sidebar .nav-item').forEach(btn=>{
+    const click=btn.getAttribute('onclick')||'';
+    const match=click.match(/showPage\('([^']+)'\)/);
+    btn.classList.toggle('active',!!match&&match[1]===name);
+  });
+}
+function openAuthModal(kind,skipHash=false){
+  const login=document.getElementById('page-login'),signup=document.getElementById('page-signup');
+  login.classList.remove('show');signup.classList.remove('show');
+  if(kind==='signup')signup.classList.add('show');else login.classList.add('show');
+  setPageMeta(kind==='signup'?'signup':'login');
+  if(!skipHash){suppressHashChange=true;window.location.hash=kind;setTimeout(()=>{suppressHashChange=false;},0);}
+}
+function closeAuthModal(skipHash=false){
+  document.getElementById('page-login').classList.remove('show');
+  document.getElementById('page-signup').classList.remove('show');
+  if(!skipHash&&(window.location.hash==='#login'||window.location.hash==='#signup')){suppressHashChange=true;window.location.hash=currentUser?'dashboard':'landing';setTimeout(()=>{suppressHashChange=false;},0);}
+}
+function showPage(name,opts={}){
   if(name==='signin')name='login';
+  if(name==='login'||name==='signup'){openAuthModal(name,opts.skipHash);return;}
+  closeAuthModal(true);
+  if(PRIVATE_PAGES.has(name)&&!currentUser){name='landing';openAuthModal('login',true);showToast('Please sign in to continue.');}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const el=document.getElementById('page-'+name);
   if(!el)return;
   el.classList.add('active');
   setPageMeta(name);
+  updateLandingAuthUI();
+  syncSidebarActive(name);
   ['discover','ideas','explore','chat','arcade','zidai','library','profile'].forEach(k=>{
     const b=document.getElementById('mob-'+k);
     if(b)b.classList.toggle('active',(k==='discover'&&name==='dashboard')||(k===name));
   });
+  if(!opts.skipHash){suppressHashChange=true;window.location.hash=name;setTimeout(()=>{suppressHashChange=false;},0);}
   if(name==='dashboard'){searchQuery='';const si=document.getElementById('search-input');if(si)si.value='';renderUsers();renderOnline();}
   if(name==='chat'){document.getElementById('chat-username').textContent='@'+(currentUser?.username||'');const ci=document.getElementById('convo-items');if(ci&&!Object.keys(chatCache).length)ci.innerHTML=skeletonConvos(5);loadAllConvos().then(()=>{renderConvos(activeChatUser);if(!activeChatUser&&!activeGroupId){const chatted=Object.keys(chatCache);if(chatted.length)openConvo(chatted[0]);}});loadMyGroups().then(()=>{if(activeConvoTab==='groups')renderGroupList();});}
   if(name==='zidai'){if(!document.querySelector('.zidai-msg'))initZidAi();}
@@ -1039,6 +1079,21 @@ function showPage(name){
   if(name==='settings'){const u=document.getElementById('settings-username');if(u)u.textContent='@'+(currentUser?.username||'');renderSettings();}
   if(name==='help'){const u=document.getElementById('help-username');if(u)u.textContent='@'+(currentUser?.username||'');}
 }
+function handleHashRoute(){
+  if(suppressHashChange)return;
+  const route=(window.location.hash||'#landing').replace('#','');
+  if(route==='login'||route==='signup'){openAuthModal(route,true);if(!currentUser)showPage('landing',{skipHash:true});return;}
+  if(route.startsWith('arcade-')){
+    if(!currentUser){showPage('landing',{skipHash:true});openAuthModal('login',true);return;}
+    const game=route.replace('arcade-','');
+    showPage('arcade',{skipHash:true});
+    if(['tictactoe','chess','rps','amongus'].includes(game))startGame(game);
+    return;
+  }
+  showPage(route||'landing',{skipHash:true});
+}
+window.addEventListener('hashchange',handleHashRoute);
+window.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuthModal();});
 // Auth
 function handleLogin(e){
   e.preventDefault();
@@ -1070,7 +1125,7 @@ function handleSignup(e){
   loginSuccess({email,username});
 }
 function loginSuccess(user){
-  currentUser=user;save('zidea_session',user);setLoggedInUI();startFirebase();showPage('dashboard');setTimeout(listenIncoming,1000);
+  currentUser=user;save('zidea_session',user);setLoggedInUI();updateLandingAuthUI();closeAuthModal(true);startFirebase();showPage('dashboard');setTimeout(listenIncoming,1000);
   setTimeout(()=>{syncIdeasFromFirebase();syncAvatarFromFirebase();},1500);
   showToast('Signed in successfully.');
 }
@@ -1081,12 +1136,14 @@ function setLoggedInUI(){
   if(chip){chip.textContent=getUserInitials(currentUser.username);}
   applyTheme();
 }
-function handleLogout(){
+function handleLogout(force=false){
+  if(!force&&!confirm('Sign out of Zidea?'))return;
   if(activeCallUser)endCall();
   if(incomingSSE){incomingSSE.close();incomingSSE=null;}
   if(fbSSE){fbSSE.close();fbSSE=null;}
   if(currentUser&&fbStarted)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});
   fbStarted=false;currentUser=null;localStorage.removeItem('zidea_session');showPage('landing');showToast('Signed out.');
+  updateLandingAuthUI();
 }
 // Google mock
 let gStep='email',gEmail='';
@@ -1535,6 +1592,7 @@ function randomIdea(){
   document.getElementById('idea-budget').value=budget;
   document.getElementById('idea-time').value=t;
   document.getElementById('idea-audience').value=audience;
+  ['idea-category','idea-difficulty','idea-budget','idea-time','idea-audience'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.classList.remove('rand-animate');void el.offsetWidth;el.classList.add('rand-animate');});
   generateIdeas();
 }
 function getIdeaFromContext(id,ctx){
@@ -1679,8 +1737,12 @@ testFirebaseAccess();
 seedExploreUsers();
 document.getElementById('incoming-toast').style.display='none';
 updateStats();
-if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();showPage('dashboard');setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
-else{applyTheme();showPage('landing');}
+if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
+else{applyTheme();}
+updateLandingAuthUI();
+const pathSeg=window.location.pathname.split('/').filter(Boolean).pop();
+if(!window.location.hash&&pathSeg&&pathSeg!=='index.html'){window.location.hash=pathSeg;}
+if(window.location.hash)handleHashRoute();else showPage(currentUser?'dashboard':'landing');
 </script>
 
 <script>
@@ -1710,8 +1772,17 @@ function startGame(type){
   if(type==='chess'){document.getElementById('game-chess').style.display='flex';resetChess();}
   if(type==='rps'){document.getElementById('game-rps').style.display='flex';resetRPS();}
   if(type==='amongus'){document.getElementById('game-amongus').style.display='flex';resetAmongUs();}
+  suppressHashChange=true;window.location.hash='arcade-'+type;setTimeout(()=>{suppressHashChange=false;},0);
 }
-function exitGame(){['game-ttt','game-chess','game-rps','game-amongus'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});document.getElementById('game-picker').style.display='flex';if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}}
+function exitGame(){
+  resetTTT();resetRPS();resetChess();
+  if(auRaf){cancelAnimationFrame(auRaf);auRaf=null;}
+  const vp=document.getElementById('au-vote-panel');if(vp)vp.style.display='none';
+  const ep=document.getElementById('au-end-panel');if(ep)ep.style.display='none';
+  ['game-ttt','game-chess','game-rps','game-amongus'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
+  document.getElementById('game-picker').style.display='flex';
+  suppressHashChange=true;window.location.hash='arcade';setTimeout(()=>{suppressHashChange=false;},0);
+}
 // TTT
 let tttBoard=Array(9).fill(null),tttX=true,tttOver=false;
 const WINS=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
@@ -1720,12 +1791,12 @@ function tttBotMove(b){for(const m of['O','X']){for(const[a,c,d]of WINS){const l
 function renderTTT(){document.getElementById('ttt-grid').innerHTML=tttBoard.map((c,i)=>`<button class="ttt-cell${c==='X'?' x':c==='O'?' o':''}" onclick="tttClick(${i})"${(c||tttOver)?'disabled':''}>${c||''}</button>`).join('');}
 function tttClick(i){if(tttBoard[i]||tttOver)return;tttBoard[i]=tttX?'X':'O';tttX=!tttX;renderTTT();const w=tttWinner(tttBoard);if(w){tttEnd(w);return;}if(gameMode==='bot'&&!tttX){document.getElementById('ttt-status').textContent='Bot thinking...';setTimeout(()=>{const idx=tttBotMove(tttBoard);if(idx!==undefined){tttBoard[idx]='O';tttX=true;renderTTT();const w2=tttWinner(tttBoard);if(w2)tttEnd(w2);else document.getElementById('ttt-status').textContent='Your turn (X)';}},400);}else{document.getElementById('ttt-status').textContent=tttX?'Your turn (X)':"Player 2's turn (O)";}}
 function tttEnd(r){tttOver=true;renderTTT();document.getElementById('ttt-status').style.display='none';document.getElementById('ttt-result').style.display='flex';document.getElementById('ttt-result-text').textContent=r==='draw'?"It's a draw!":r==='X'?'You win! 🎉':gameMode==='bot'?'Bot wins!':'Player 2 wins!';}
-function resetTTT(){tttBoard=Array(9).fill(null);tttX=true;tttOver=false;document.getElementById('ttt-status').style.display='block';document.getElementById('ttt-status').textContent='Your turn (X)';document.getElementById('ttt-result').style.display='none';renderTTT();}
+function resetTTT(){tttBoard=Array(9).fill(null);tttX=true;tttOver=false;document.getElementById('ttt-status').style.display='block';document.getElementById('ttt-status').textContent='Your turn (X)';document.getElementById('ttt-result-text').textContent='';document.getElementById('ttt-result').style.display='none';renderTTT();}
 // RPS
 let rpsYou=0,rpsBot=0,rpsRound=0;
 const RPS_EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
 function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win! 🎉';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} — ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} — Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;}
-function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
+function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
 // Among Us (lightweight local simulation)
 let auRaf=null,auRole='Crewmate',auPlayers=[],auPos={x:280,y:210},auMeetingOpen=false,auImpostorAlive=true;
 function randomRoom(){return['Cafeteria','Electrical','MedBay','Admin','Navigation'][Math.floor(Math.random()*5)];}
@@ -1840,5 +1911,5 @@ function renderChess(){
   el.innerHTML=html;
 }
 function chessEndGame(msg){chessOver=true;const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s)s.style.display='none';const res=document.getElementById('chess-result');if(res)res.style.display='flex';const txt=document.getElementById('chess-result-text');if(txt)txt.textContent=msg;}
-function resetChess(){chessInit();chessSelected=null;chessTurn='w';chessOver=false;chessHighlights=[];pendingPromotion=null;const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s){s.style.display='block';s.textContent='Your turn (White)';}const res=document.getElementById('chess-result');if(res)res.style.display='none';renderChess();}
+function resetChess(){chessInit();chessSelected=null;chessTurn='w';chessOver=false;chessHighlights=[];pendingPromotion=null;positionHistory=[];const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s){s.style.display='block';s.textContent='Your turn (White)';}const res=document.getElementById('chess-result');if(res)res.style.display='none';const txt=document.getElementById('chess-result-text');if(txt)txt.textContent='';renderChess();}
 </script>
