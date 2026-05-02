@@ -8,6 +8,8 @@
 <meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script>try{if(JSON.parse(localStorage.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
+<style>html.has-session #page-landing{display:none!important}</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--brand:#7C3AED;--brand-dark:#5B21B6;--brand-light:#A78BFA;--surface:#0a0a12;--card:#1A1A24;--border:#2A2A3A}
@@ -62,7 +64,7 @@ button:active{transform:scale(.98)}
 #page-landing .nav,#page-landing section,#page-landing>div,#page-landing footer{position:relative;z-index:1}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid rgba(124,58,237,.15);background:rgba(10,10,18,.85);backdrop-filter:blur(20px)}
 .logo{font-size:20px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
-.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 20px 40px;gap:20px}
+.hero{height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:14px}
 .hero h1{font-size:clamp(32px,7vw,64px);font-weight:800;color:#fff;line-height:1.1}
 .hero h1 em{font-style:normal;background:linear-gradient(135deg,#7C3AED,#c026d3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero p{color:#9CA3AF;font-size:16px;max-width:500px;line-height:1.7}
@@ -100,8 +102,8 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
 </style>
 <style>
 /* Dashboard */
-.dashboard-grid{display:grid;grid-template-columns:1fr 260px;gap:16px;align-items:start}
-.online-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.dashboard-grid{display:grid;grid-template-columns:1fr;gap:16px;align-items:start}
+.online-panel{display:none}
 .online-panel-title{font-size:13px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
 .online-dot-green{width:8px;height:8px;border-radius:50%;background:#22C55E;display:inline-block}
 .online-user-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)}
@@ -332,9 +334,11 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
 
 <!-- LANDING -->
 <div id="page-landing" class="page">
-  <div class="orb" style="width:500px;height:500px;background:rgba(124,58,237,.12);top:-150px;left:-150px;animation-duration:14s"></div>
-  <div class="orb" style="width:350px;height:350px;background:rgba(192,38,211,.1);bottom:5%;right:-80px;animation-duration:18s;animation-delay:-6s"></div>
-  <div class="orb" style="width:250px;height:250px;background:rgba(56,189,248,.07);top:45%;left:55%;animation-duration:11s;animation-delay:-3s"></div>
+  <div style="position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden">
+    <div class="orb" style="width:500px;height:500px;background:rgba(124,58,237,.12);top:-150px;left:-150px;animation-duration:14s"></div>
+    <div class="orb" style="width:350px;height:350px;background:rgba(192,38,211,.1);bottom:5%;right:-80px;animation-duration:18s;animation-delay:-6s"></div>
+    <div class="orb" style="width:250px;height:250px;background:rgba(56,189,248,.07);top:45%;left:55%;animation-duration:11s;animation-delay:-3s"></div>
+  </div>
   <nav class="nav">
     <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <div style="display:flex;gap:8px" id="landing-auth-actions">
@@ -362,35 +366,24 @@ footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;positi
   <div style="max-width:800px;margin:0 auto 40px;padding:0 20px;position:relative;z-index:1">
     <h2 style="text-align:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:28px">How it works</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center">
-        <div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div>
-        <h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3>
-        <p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center">
-        <div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">🔍<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div>
-        <h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3>
-        <p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center">
-        <div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div>
-        <h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat & play</h3>
-        <p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p>
-      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">🔍<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
     </div>
   </div>
   <div class="features">
     <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Find Friends</h3><p>Search anyone by @username and connect instantly.</p></div>
     <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><h3>Voice Calls</h3><p>Real-time voice calls powered by WebRTC.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>Zidea Arcade</h3><p>Chess, Among Us, Tic-Tac-Toe — vs friends or AI.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Generate Ideas</h3><p>AI-powered idea generator with breakdown & scoring.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>Zidea Arcade</h3><p>Chess, Among Us, Tic-Tac-Toe &mdash; vs friends or AI.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Generate Ideas</h3><p>AI-powered idea generator with breakdown &amp; scoring.</p></div>
   </div>
   <div style="text-align:center;padding:0 20px 60px;position:relative;z-index:1">
     <h2 style="font-size:clamp(20px,5vw,32px);font-weight:800;color:#fff;margin-bottom:12px">Ready to connect?</h2>
     <p style="color:#9CA3AF;font-size:14px;margin-bottom:24px">Join free. No credit card. No download.</p>
     <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="showPage('signup')">Create your account</button>
   </div>
-  <footer>&copy; 2026 Zidea. All rights reserved. · <a href="#" onclick="showToast('Privacy policy coming soon.');return false;">Privacy Policy</a> · <a href="#" onclick="showToast('Terms of service coming soon.');return false;">Terms of Service</a> · <a href="#" onclick="showToast('Contact: hello@zidea.app');return false;">Contact</a></footer>
+  <footer>&copy; 2026 Zidea. All rights reserved. &middot; <a href="#" onclick="showToast('Privacy policy coming soon.');return false;">Privacy Policy</a> &middot; <a href="#" onclick="showToast('Terms of service coming soon.');return false;">Terms of Service</a> &middot; <a href="#" onclick="showToast('Contact: hello@zidea.app');return false;">Contact</a></footer>
+
 </div>
 
 <!-- LOGIN -->
