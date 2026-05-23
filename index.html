@@ -1257,7 +1257,7 @@ async function loadGoogleConfig(){
     }
   }catch(_){}
   // Static local previews can also set the client ID directly via window vars.
-  googleClientId = googleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
+  googleClientId = googleClientId || window.g_id_onload?.client_id || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
   return googleClientId;
 }
 async function initGoogleAuth(){
@@ -1325,7 +1325,7 @@ async function handleCredentialResponse(response){
     loginSuccess({email: data.user.email, username: data.user.username, avatar: data.user.avatar || ''});
   } catch (error) {
     const msg = String(error?.message || 'Google sign-in failed. Please try again.');
-    console.error('Google auth failed', error);
+    console.error('Google auth failed', error, {response: error?.response});
     showToast(msg);
   }
 }
