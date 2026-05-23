@@ -9,6 +9,20 @@
 <meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script>
+  window.zideaGoogleCredentialCallback = function(response) {
+    if (typeof window.handleCredentialResponse === 'function') {
+      return window.handleCredentialResponse(response);
+    }
+    window.pendingGoogleCredentialResponse = response;
+  };
+  window.g_id_onload = {
+    client_id: '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com',
+    callback: window.zideaGoogleCredentialCallback,
+    auto_select: false,
+    cancel_on_tap_outside: true
+  };
+</script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>try{const s=window.localStorage;if(s&&JSON.parse(s.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
 <style>html.has-session #page-landing{display:none!important}</style>
@@ -881,7 +895,7 @@ body.app-active #page-landing footer{display:none}
 <!-- GOOGLE MODAL -->
 <div class="modal-overlay" id="google-modal" onclick="if(event.target===this)closeGoogleModal()">
   <div class="modal-box">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Google OAuth is connected. Use the button on the login or signup form to sign in with Google.</p></div>
+    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Google OAuth is not connected yet. Use email and password for now.</p></div>
     <div id="google-error" class="error-msg"></div>
     <form style="display:flex;flex-direction:column;gap:12px" onsubmit="handleGoogleSubmit(event)">
       <div id="google-step1"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="google-email" placeholder="your@gmail.com"/></div></div>
@@ -1237,7 +1251,7 @@ async function loadGoogleConfig(){
     }
   }catch(_){}
   // Static local previews can also set the client ID directly via window vars.
-  googleClientId = googleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '';
+  googleClientId = googleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
   return googleClientId;
 }
 async function initGoogleAuth(){
@@ -1253,9 +1267,10 @@ async function initGoogleAuth(){
   if(!googleReady){
     google.accounts.id.initialize({
       client_id: clientId,
-      callback: handleGoogleCredential,
+      callback: handleCredentialResponse,
       ux_mode: 'popup',
-      auto_select: false
+      auto_select: false,
+      cancel_on_tap_outside: true
     });
     googleReady=true;
   }
@@ -1278,7 +1293,7 @@ async function handleGoogleLogin(){
     showToast('Google sign-in failed. Please try again.');
   }
 }
-async function handleGoogleCredential(response){
+async function handleCredentialResponse(response){
   const idToken = response?.credential;
   if(!idToken){
     showToast('Google sign-in failed. Please try again.');
