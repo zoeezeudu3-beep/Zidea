@@ -881,7 +881,7 @@ body.app-active #page-landing footer{display:none}
 <!-- GOOGLE MODAL -->
 <div class="modal-overlay" id="google-modal" onclick="if(event.target===this)closeGoogleModal()">
   <div class="modal-box">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Google OAuth is not connected yet. Use email and password for now.</p></div>
+    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Google OAuth is connected. Use the button on the login or signup form to sign in with Google.</p></div>
     <div id="google-error" class="error-msg"></div>
     <form style="display:flex;flex-direction:column;gap:12px" onsubmit="handleGoogleSubmit(event)">
       <div id="google-step1"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="google-email" placeholder="your@gmail.com"/></div></div>
@@ -1228,25 +1228,34 @@ async function handleForgotPassword(){
   showToast('Password reset instructions have been sent if this email is registered.');
 }
 async function loadGoogleConfig(){
-  if(googleClientId)return googleClientId;
+  if(googleClientId) return googleClientId;
   try{
-    const res=await fetch('/api/config');
-    if(res.ok){const data=await res.json();googleClientId=data.googleClientId||'';}
+    const res = await fetch('/api/config');
+    if(res.ok){
+      const data = await res.json();
+      googleClientId = data.googleClientId || '';
+    }
   }catch(_){}
-  // Static local previews can set this manually before loading the page.
-  googleClientId=googleClientId||window.NEXT_PUBLIC_GOOGLE_CLIENT_ID||window.VITE_GOOGLE_CLIENT_ID||'';
+  // Static local previews can also set the client ID directly via window vars.
+  googleClientId = googleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '';
   return googleClientId;
 }
 async function initGoogleAuth(){
-  const clientId=await loadGoogleConfig();
-  if(!clientId){showToast('Google sign-in is not configured yet.');return false;}
-  if(!window.google?.accounts?.id){showToast('Google sign-in is still loading. Try again in a moment.');return false;}
+  const clientId = await loadGoogleConfig();
+  if(!clientId){
+    showToast('Google sign-in is not configured yet.');
+    return false;
+  }
+  if(!window.google?.accounts?.id){
+    showToast('Google sign-in is still loading. Try again in a moment.');
+    return false;
+  }
   if(!googleReady){
     google.accounts.id.initialize({
-      client_id:clientId,
-      callback:handleGoogleCredential,
-      ux_mode:'popup',
-      auto_select:false
+      client_id: clientId,
+      callback: handleGoogleCredential,
+      ux_mode: 'popup',
+      auto_select: false
     });
     googleReady=true;
   }
@@ -1255,23 +1264,50 @@ async function initGoogleAuth(){
 async function handleGoogleLogin(){
   const ready=await initGoogleAuth();
   if(!ready)return;
-  try{google.accounts.id.prompt(notification=>{if(notification.isNotDisplayed?.()||notification.isSkippedMoment?.())google.accounts.id.renderButton(document.body.appendChild(Object.assign(document.createElement('div'),{style:'position:fixed;left:-9999px'})),{theme:'outline',size:'large'});});}
-  catch(_){showToast('Google sign-in failed. Please try again.');}
+  try {
+    google.accounts.id.prompt(notification => {
+      if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
+        google.accounts.id.renderButton(
+          document.body.appendChild(Object.assign(document.createElement('div'), {style:'position:fixed;left:-9999px'})),
+          {theme:'outline', size:'large'}
+        );
+      }
+    });
+  } catch (error) {
+    console.error('Google sign-in failed', error);
+    showToast('Google sign-in failed. Please try again.');
+  }
 }
 async function handleGoogleCredential(response){
-  const idToken=response?.credential;
-  if(!idToken){showToast('Google sign-in failed. Please try again.');return;}
+  const idToken = response?.credential;
+  if(!idToken){
+    showToast('Google sign-in failed. Please try again.');
+    return;
+  }
   try{
-    const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken})});
-    const data=await res.json().catch(()=>({}));
-    if(!res.ok||!data.success)throw new Error(data.message||'Authentication failed. Try again.');
-    if(data.token)save('zidea_google_session_token',data.token);
-    if(data.user?.avatar)save(`zidea_avatar_data_${data.user.username}`,data.user.avatar);
-    saveAccount(normalizeEmail(data.user.email),{email:data.user.email,username:data.user.username,password:'',google_id:data.user.google_id||'',avatar:data.user.avatar||'',wins:0,losses:0});
-    loginSuccess({email:data.user.email,username:data.user.username,avatar:data.user.avatar||''});
-  }catch(error){
-    const msg=String(error?.message||'');
-    showToast(msg.includes('registered')?msg:msg.includes('fetch')?'Connection error. Check your internet and retry.':'Google sign-in failed. Please try again.');
+    const res = await fetch('/api/auth/google', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({idToken})
+    });
+    const data = await res.json().catch(() => ({}));
+    if(!res.ok || !data.success) throw new Error(data.message || 'Authentication failed. Try again.');
+    if(data.token) save('zidea_google_session_token', data.token);
+    if(data.user?.avatar) save(`zidea_avatar_data_${data.user.username}`, data.user.avatar);
+    saveAccount(normalizeEmail(data.user.email), {
+      email: data.user.email,
+      username: data.user.username,
+      password: '',
+      google_id: data.user.google_id || '',
+      avatar: data.user.avatar || '',
+      wins: data.user.wins || 0,
+      losses: data.user.losses || 0
+    });
+    loginSuccess({email: data.user.email, username: data.user.username, avatar: data.user.avatar || ''});
+  } catch (error) {
+    const msg = String(error?.message || '');
+    console.error('Google auth failed', error);
+    showToast(msg.includes('registered') ? msg : msg.includes('fetch') ? 'Connection error. Check your internet and retry.' : 'Google sign-in failed. Please try again.');
   }
 }
 let gStep='email',gEmail='';
