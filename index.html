@@ -10,24 +10,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script>
-  window.zideaGoogleCredentialCallback = function(response) {
-    if (typeof window.handleCredentialResponse === 'function') {
-      return window.handleCredentialResponse(response);
-    }
-    window.pendingGoogleCredentialResponse = response;
-  };
-  window.processPendingGoogleCredentialResponse = function() {
-    if (window.pendingGoogleCredentialResponse && typeof window.handleCredentialResponse === 'function') {
-      window.handleCredentialResponse(window.pendingGoogleCredentialResponse);
-      window.pendingGoogleCredentialResponse = null;
-    }
-  };
-  window.g_id_onload = {
-    client_id: '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com',
-    callback: window.zideaGoogleCredentialCallback,
-    auto_select: false,
-    cancel_on_tap_outside: true
-  };
+  window.zideaGoogleClientId = '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
 </script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>try{const s=window.localStorage;if(s&&JSON.parse(s.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
@@ -75,7 +58,7 @@ button:active{transform:scale(.98)}
 </head>
 <body>
 <style>
-/* PAGES â€” landing visible by default before JS */
+/* PAGES — landing visible by default before JS */
 .page{display:none;opacity:0}
 .page.active{display:flex;opacity:1;transition:opacity .2s ease}
 #page-landing{display:flex;opacity:1;flex-direction:column;min-height:100vh}
@@ -443,12 +426,12 @@ body.app-active #page-landing footer{display:none}
   <section class="hero">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.4);color:var(--brand-light);font-size:12px;padding:6px 16px;border-radius:999px;animation:fadeInUp .6s ease">
       <span style="width:7px;height:7px;border-radius:50%;background:#22d3a0;box-shadow:0 0 8px #22d3a0;display:inline-block"></span>
-      Live now â€” join free
+      Live now — join free
     </div>
     <h1 style="animation:fadeInUp .7s ease .1s both">Connect. Call. <em>Play.</em></h1>
-    <p style="animation:fadeInUp .7s ease .2s both">Find friends by username, jump into voice calls, challenge them to games, and chat with AI â€” all in one place.</p>
+    <p style="animation:fadeInUp .7s ease .2s both">Find friends by username, jump into voice calls, challenge them to games, and chat with AI — all in one place.</p>
     <div class="hero-actions" style="animation:fadeInUp .7s ease .3s both">
-      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(124,58,237,.4)" onclick="showPage('signup')">Get Started Free â†’</button>
+      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(124,58,237,.4)" onclick="showPage('signup')">Get Started Free →</button>
       <button class="btn-ghost" style="padding:14px 32px;font-size:15px" onclick="showPage('login')">Log In</button>
     </div>
     <div style="display:flex;gap:40px;margin-top:16px;flex-wrap:wrap;justify-content:center;animation:fadeInUp .7s ease .4s both">
@@ -461,9 +444,9 @@ body.app-active #page-landing footer{display:none}
   <div style="max-width:800px;margin:0 auto 40px;padding:0 20px;position:relative;z-index:1">
     <h2 style="text-align:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:28px">How it works</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">ðŸ‘¤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">ðŸ”<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">ðŸ“ž<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">🔍<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
     </div>
   </div>
   <div class="features">
@@ -523,18 +506,18 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item active" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item active" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="dash-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
@@ -550,23 +533,23 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item active" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item active" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="arcade-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
   <div class="main-content">
-    <div><div class="page-title">ðŸŽ® Arcade</div><div class="page-subtitle">Play quick games solo or while you are on a call</div></div>
+    <div><div class="page-title">🎮 Arcade</div><div class="page-subtitle">Play quick games solo or while you are on a call</div></div>
     <div id="game-picker" style="display:flex;flex-direction:column;gap:16px">
       <div class="arcade-grid" id="arcade-game-grid"></div>
       <div class="card arcade-panel">
@@ -589,8 +572,8 @@ body.app-active #page-landing footer{display:none}
     </div>
     <div id="game-ttt" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="ttt-status" style="color:#fff;font-weight:800">Your turn</div><div id="ttt-grid" class="ttt-grid"></div><div id="ttt-result" style="display:none;flex-direction:column;align-items:center;gap:8px"><div id="ttt-result-text" style="color:#fff;font-weight:800"></div><button class="btn-primary" onclick="resetTTT()">Play again</button></div></div>
     <div id="game-chess" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="chess-status" style="color:#fff;font-weight:800">Your turn (White)</div><div id="chess-board" class="chess-board"></div><button class="btn-ghost" onclick="resetChess()">Reset chess</button></div>
-    <div id="game-rps" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="rpsPlay('rock')">âœŠ Rock</button><button class="btn-primary" onclick="rpsPlay('paper')">âœ‹ Paper</button><button class="btn-primary" onclick="rpsPlay('scissors')">âœŒï¸ Scissors</button></div><div id="rps-result" style="color:#fff;font-weight:800">Pick a move</div><div id="rps-score" style="color:#9CA3AF">You: 0 â€” Bot: 0</div><button class="btn-ghost" onclick="resetRPS()">Reset</button></div>
-    <div id="game-amongus" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><canvas id="amongus-canvas" width="640" height="360" style="width:100%;max-width:720px;border-radius:16px;background:#080811"></canvas><div id="au-status" style="color:#9CA3AF;font-size:13px">Move with arrow keys or WASD.</div><button class="btn-ghost" onclick="auMeeting()">ðŸš¨ Meeting</button><div id="au-vote-panel" style="display:none;flex-direction:column;gap:8px"></div></div>
+    <div id="game-rps" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="rpsPlay('rock')">✊ Rock</button><button class="btn-primary" onclick="rpsPlay('paper')">✋ Paper</button><button class="btn-primary" onclick="rpsPlay('scissors')">✌️ Scissors</button></div><div id="rps-result" style="color:#fff;font-weight:800">Pick a move</div><div id="rps-score" style="color:#9CA3AF">You: 0 — Bot: 0</div><button class="btn-ghost" onclick="resetRPS()">Reset</button></div>
+    <div id="game-amongus" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><canvas id="amongus-canvas" width="640" height="360" style="width:100%;max-width:720px;border-radius:16px;background:#080811"></canvas><div id="au-status" style="color:#9CA3AF;font-size:13px">Move with arrow keys or WASD.</div><button class="btn-ghost" onclick="auMeeting()">🚨 Meeting</button><div id="au-vote-panel" style="display:none;flex-direction:column;gap:8px"></div></div>
   </div>
 </div>
 
@@ -599,18 +582,18 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item active" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item active" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="chat-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
@@ -622,22 +605,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item active" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item active" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="zidai-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">ðŸ¤– ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">âž¤</button></div></div>
+  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">➤</button></div></div>
 </div>
 
 <!-- GENERATE IDEAS -->
@@ -645,22 +628,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item active" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item active" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="ideas-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">ðŸ’¡ Generate Ideas</div><div class="page-subtitle">Profile your idea and match with real Zidea users</div></div>
+  <div class="main-content"><div><div class="page-title">💡 Generate Ideas</div><div class="page-subtitle">Profile your idea and match with real Zidea users</div></div>
     <div class="card matchmaker-form" id="idea-matchmaker">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:16px;font-weight:800;color:#fff">Collaboration Matcher</div><div style="font-size:12px;color:#6B7280;margin-top:4px">Submit your idea, answer quick prompts, then see your top near matches.</div></div><button class="btn-ghost" style="font-size:12px;padding:7px 12px" onclick="renderMatchAdmin()">View all submissions</button></div>
       <div class="match-progress"><span id="match-progress-bar"></span></div>
@@ -683,22 +666,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item active" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item active" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="library-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div class="page-title">ðŸ“š My Library</div><div class="page-subtitle">Ideas you have created on Zidea</div></div><div style="display:flex;gap:8px"><button class="lib-tab-btn active" id="lib-tab-created" onclick="switchLibTab('created')">Created</button><button class="lib-tab-btn" id="lib-tab-saved" onclick="switchLibTab('saved')">Saved</button><button class="lib-tab-btn" id="lib-tab-starred" onclick="switchLibTab('starred')">Starred</button></div></div><div class="input-wrap" style="max-width:360px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="lib-search" placeholder="Search ideas..." oninput="renderLibrary()"/></div><div style="display:flex;gap:6px;flex-wrap:wrap" id="lib-tag-filter"></div><div id="library-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
+  <div class="main-content"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div class="page-title">📚 My Library</div><div class="page-subtitle">Ideas you have created on Zidea</div></div><div style="display:flex;gap:8px"><button class="lib-tab-btn active" id="lib-tab-created" onclick="switchLibTab('created')">Created</button><button class="lib-tab-btn" id="lib-tab-saved" onclick="switchLibTab('saved')">Saved</button><button class="lib-tab-btn" id="lib-tab-starred" onclick="switchLibTab('starred')">Starred</button></div></div><div class="input-wrap" style="max-width:360px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="lib-search" placeholder="Search ideas..." oninput="renderLibrary()"/></div><div style="display:flex;gap:6px;flex-wrap:wrap" id="lib-tag-filter"></div><div id="library-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
 </div>
 
 <!-- EXPLORE -->
@@ -706,22 +689,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item active" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item active" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="explore-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">ðŸ”¥ Explore</div><div class="page-subtitle">Trending ideas from the community</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="explore-cat-btn active" onclick="filterExplore('all')">All</button><button class="explore-cat-btn" onclick="filterExplore('startup')">ðŸš€ Startup</button><button class="explore-cat-btn" onclick="filterExplore('app')">ðŸ“± App</button><button class="explore-cat-btn" onclick="filterExplore('finance')">ðŸ’° Finance</button><button class="explore-cat-btn" onclick="filterExplore('health')">ðŸ¥ Health</button></div><div id="explore-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
+  <div class="main-content"><div><div class="page-title">🔥 Explore</div><div class="page-subtitle">Trending ideas from the community</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="explore-cat-btn active" onclick="filterExplore('all')">All</button><button class="explore-cat-btn" onclick="filterExplore('startup')">🚀 Startup</button><button class="explore-cat-btn" onclick="filterExplore('app')">📱 App</button><button class="explore-cat-btn" onclick="filterExplore('finance')">💰 Finance</button><button class="explore-cat-btn" onclick="filterExplore('health')">🏥 Health</button></div><div id="explore-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
 </div>
 
 <!-- PROFILE -->
@@ -729,22 +712,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item active" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item active" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="profile-username-sidebar">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">ðŸ‘¤ Profile</div></div><div class="card" style="display:flex;align-items:center;gap:16px"><div id="profile-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;overflow:hidden"></div><div><div id="profile-name" style="color:#fff;font-size:18px;font-weight:800"></div><div id="profile-email" style="color:#9CA3AF;font-size:13px;margin-top:4px"></div><label class="btn-ghost" style="display:inline-flex;margin-top:10px;font-size:12px"><input type="file" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)"/>Upload avatar</label><button id="remove-avatar-btn" class="btn-ghost" style="font-size:12px;margin-left:8px" onclick="removeAvatar()">Remove</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"><div class="card" style="text-align:center"><div id="profile-ideas-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Ideas</div></div><div class="card" style="text-align:center"><div id="profile-saved-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Saved</div></div><div class="card" style="text-align:center"><div id="profile-starred-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Starred</div></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Game stats</div><div id="profile-game-stats"></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Recent ideas</div><div id="profile-recent-ideas"></div></div></div>
+  <div class="main-content"><div><div class="page-title">👤 Profile</div></div><div class="card" style="display:flex;align-items:center;gap:16px"><div id="profile-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;overflow:hidden"></div><div><div id="profile-name" style="color:#fff;font-size:18px;font-weight:800"></div><div id="profile-email" style="color:#9CA3AF;font-size:13px;margin-top:4px"></div><label class="btn-ghost" style="display:inline-flex;margin-top:10px;font-size:12px"><input type="file" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)"/>Upload avatar</label><button id="remove-avatar-btn" class="btn-ghost" style="font-size:12px;margin-left:8px" onclick="removeAvatar()">Remove</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"><div class="card" style="text-align:center"><div id="profile-ideas-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Ideas</div></div><div class="card" style="text-align:center"><div id="profile-saved-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Saved</div></div><div class="card" style="text-align:center"><div id="profile-starred-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Starred</div></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Game stats</div><div id="profile-game-stats"></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Recent ideas</div><div id="profile-recent-ideas"></div></div></div>
 </div>
 
 <!-- SETTINGS -->
@@ -752,22 +735,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item active" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item active" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="settings-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">âš™ï¸ Settings</div></div><div class="card"><div style="color:#fff;font-weight:800;margin-bottom:8px">Account</div><div id="settings-account-info" style="color:#9CA3AF;font-size:13px"></div></div><div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="color:#fff;font-weight:700">Theme</div><div style="color:#6B7280;font-size:12px">Toggle light/dark filter</div></div><button id="theme-toggle" onclick="toggleTheme()" style="width:46px;height:26px;border-radius:999px;border:none;position:relative;cursor:pointer"><span id="theme-knob" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></span></button></div><div class="card"><button class="btn-ghost" style="color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="clearSavedIdeas()">Clear saved ideas</button></div></div>
+  <div class="main-content"><div><div class="page-title">⚙️ Settings</div></div><div class="card"><div style="color:#fff;font-weight:800;margin-bottom:8px">Account</div><div id="settings-account-info" style="color:#9CA3AF;font-size:13px"></div></div><div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="color:#fff;font-weight:700">Theme</div><div style="color:#6B7280;font-size:12px">Toggle light/dark filter</div></div><button id="theme-toggle" onclick="toggleTheme()" style="width:46px;height:26px;border-radius:999px;border:none;position:relative;cursor:pointer"><span id="theme-knob" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></span></button></div><div class="card"><button class="btn-ghost" style="color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="clearSavedIdeas()">Clear saved ideas</button></div></div>
 </div>
 
 <!-- HELP -->
@@ -775,18 +758,18 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
-      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
-      <button class="nav-item active" onclick="showPage('help')">â“ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item active" onclick="showPage('help')">❓ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="help-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
@@ -808,7 +791,7 @@ body.app-active #page-landing footer{display:none}
     <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
     <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
     <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
-    <button class="mob-nav-btn" id="mob-more" onclick="toggleMobileMore()"><span class="mob-more-dot" style="font-size:22px;line-height:14px">⋯</span>More</button>
+    <button class="mob-nav-btn" id="mob-more" onclick="toggleMobileMore()"><span class="mob-more-dot" style="font-size:22px;line-height:14px">?</span>More</button>
   </div>
 </nav>
 <div class="mobile-more-drawer" id="mobile-more-drawer">
@@ -854,7 +837,7 @@ body.app-active #page-landing footer{display:none}
   <div style="text-align:center"><div style="color:#fff;font-size:18px;font-weight:700" id="call-name">@user</div><div style="color:#9CA3AF;font-size:13px;margin-top:4px" id="call-status">Connecting...</div></div>
   <div class="video-call-stage" id="video-call-stage"><div class="video-tile"><video id="remote-video" autoplay playsinline></video><span class="video-label">Remote</span></div><div class="video-tile local"><video id="local-video" autoplay muted playsinline></video><span class="video-label">You</span></div></div>
   <div class="call-game-dock" id="call-game-dock"></div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center"><button onclick="toggleMute()" id="mute-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">ðŸŽ¤</button><button onclick="toggleVideo()" id="video-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">ðŸ“¹</button><button onclick="toggleCallGameDock()" id="call-game-btn" style="height:56px;border-radius:999px;background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.45);color:#fff;font-size:13px;font-weight:800;padding:0 18px;cursor:pointer">ðŸŽ® Play</button><button onclick="endCall()" style="width:64px;height:64px;border-radius:50%;background:#DC2626;border:none;color:#fff;font-size:22px;cursor:pointer">ðŸ“µ</button></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center"><button onclick="toggleMute()" id="mute-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">🎤</button><button onclick="toggleVideo()" id="video-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">📹</button><button onclick="toggleCallGameDock()" id="call-game-btn" style="height:56px;border-radius:999px;background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.45);color:#fff;font-size:13px;font-weight:800;padding:0 18px;cursor:pointer">🎮 Play</button><button onclick="endCall()" style="width:64px;height:64px;border-radius:50%;background:#DC2626;border:none;color:#fff;font-size:22px;cursor:pointer">📵</button></div>
   <div id="call-timer" style="color:#6B7280;font-size:12px;font-family:monospace">00:00</div>
 </div>
 
@@ -889,10 +872,10 @@ body.app-active #page-landing footer{display:none}
       <p style="color:#9CA3AF;font-size:13px;line-height:1.6">Here are the four places worth trying first.</p>
     </div>
     <div class="welcome-grid">
-      <div class="welcome-item"><div class="welcome-icon">💡</div><div><strong>Generate Ideas</strong><span>Profile an idea and find collaborator matches.</span></div></div>
-      <div class="welcome-item"><div class="welcome-icon">💬</div><div><strong>Messages</strong><span>Chat, share files, and start calls.</span></div></div>
-      <div class="welcome-item"><div class="welcome-icon">🎮</div><div><strong>Arcade</strong><span>Play games solo or with friends.</span></div></div>
-      <div class="welcome-item"><div class="welcome-icon">🤖</div><div><strong>ZiD AI</strong><span>Brainstorm and get quick answers.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">??</div><div><strong>Generate Ideas</strong><span>Profile an idea and find collaborator matches.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">??</div><div><strong>Messages</strong><span>Chat, share files, and start calls.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">??</div><div><strong>Arcade</strong><span>Play games solo or with friends.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">??</div><div><strong>ZiD AI</strong><span>Brainstorm and get quick answers.</span></div></div>
     </div>
     <button class="btn-primary" onclick="dismissWelcomeTour()">Got it</button>
   </div>
@@ -923,7 +906,7 @@ const db = {
   async read(p){for(let n=0;n<3;n++){try{const r=await fetch(`${FB}/${p}.json`);if(r.ok)return await r.json();}catch(_){}if(n<2)await new Promise(res=>setTimeout(res,400*(n+1)));}return null;},
   del(p){return fetch(`${FB}/${p}.json`,{method:'DELETE'}).catch(()=>{})}
 };
-async function testFirebaseAccess(){try{const r=await fetch(`${FB}/_test.json`,{method:'PUT',body:JSON.stringify({ok:true}),headers:{'Content-Type':'application/json'}});if(!r.ok){const t=await r.text();if(t.includes('Permission denied')||t.includes('PERMISSION_DENIED')){const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';b.innerHTML='âš  Firebase rules blocking writes. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> â†’ Realtime Database â†’ Rules â†’ set { "rules": { ".read": true, ".write": true } }';document.body.prepend(b);}}else{fetch(`${FB}/_test.json`,{method:'DELETE'});}}catch(_){}}
+async function testFirebaseAccess(){try{const r=await fetch(`${FB}/_test.json`,{method:'PUT',body:JSON.stringify({ok:true}),headers:{'Content-Type':'application/json'}});if(!r.ok){const t=await r.text();if(t.includes('Permission denied')||t.includes('PERMISSION_DENIED')){const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';b.innerHTML='⚠ Firebase rules blocking writes. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> → Realtime Database → Rules → set { "rules": { ".read": true, ".write": true } }';document.body.prepend(b);}}else{fetch(`${FB}/_test.json`,{method:'DELETE'});}}catch(_){}}
 // Storage
 const memoryStore={};
 function getLocalStorage(){
@@ -1257,7 +1240,7 @@ async function loadGoogleConfig(){
     }
   }catch(_){}
   // Static local previews can also set the client ID directly via window vars.
-  googleClientId = googleClientId || window.g_id_onload?.client_id || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
+  googleClientId = googleClientId || window.zideaGoogleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
   return googleClientId;
 }
 async function initGoogleAuth(){
@@ -1286,10 +1269,20 @@ async function handleGoogleLogin(){
   const ready=await initGoogleAuth();
   if(!ready)return;
   try {
+    google.accounts.id.cancel();
     google.accounts.id.prompt(notification => {
       console.log('Google prompt notification', notification);
       if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
         showToast('Google prompt was blocked or did not appear. Please allow popups and try again.');
+        let fallback=document.getElementById('google-fallback-button');
+        if(!fallback){
+          fallback=document.createElement('div');
+          fallback.id='google-fallback-button';
+          fallback.style.position='fixed';
+          fallback.style.left='-9999px';
+          document.body.appendChild(fallback);
+        }
+        google.accounts.id.renderButton(fallback,{theme:'outline',size:'large'});
       }
     });
   } catch (error) {
@@ -1329,10 +1322,6 @@ async function handleCredentialResponse(response){
     showToast(msg);
   }
 }
-if (window.pendingGoogleCredentialResponse && typeof window.handleCredentialResponse === 'function') {
-  window.handleCredentialResponse(window.pendingGoogleCredentialResponse);
-  window.pendingGoogleCredentialResponse = null;
-}
 let gStep='email',gEmail='';
 function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
 function handleGoogleSubmit(e){
@@ -1365,7 +1354,7 @@ function renderUsers(){
   if(!searchQuery){list.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center"><div style="width:64px;height:64px;border-radius:20px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div><p style="color:#e2e8f0;font-size:15px;font-weight:700;margin-bottom:6px">Find someone</p><p style="color:#4b5563;font-size:13px;line-height:1.6">Search by @username to find people</p></div></div>`;return;}
   const users=getAllUsers().filter(u=>u.username.toLowerCase().includes(searchQuery.toLowerCase()));
   if(!users.length){list.innerHTML=`<p style="color:#4b5563;font-size:14px;text-align:center;padding:40px 20px">No users found for "<strong style="color:#a78bfa">${esc(searchQuery)}</strong>"</p>`;return;}
-  list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#22C55E':'#6B7280'}">${isOnline(u)?'â— Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
+  list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#22C55E':'#6B7280'}">${isOnline(u)?'● Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
 }
 function renderOnline(){const el=document.getElementById('online-list');if(!el)return;const online=getAllUsers().filter(u=>isOnline(u));if(!online.length){el.innerHTML='<div class="online-empty">No one online yet</div>';return;}el.innerHTML=online.map(u=>`<div class="online-user-row"><div class="online-avatar">${u.username.slice(0,2).toUpperCase()}</div><div><div class="online-user-name">@${u.username}</div></div></div>`).join('');}
 function updateLandingOnlineStat(count){
@@ -1433,7 +1422,7 @@ async function endCall(){
   if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
   const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
 }
-function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'ðŸ”‡':'ðŸŽ¤';}
+function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'🔇':'🎤';}
 function startCallTimer(){callSecs=0;callTimer=setInterval(()=>{callSecs++;const m=String(Math.floor(callSecs/60)).padStart(2,'0');const s=String(callSecs%60).padStart(2,'0');const el=document.getElementById('call-timer');if(el)el.textContent=m+':'+s;},1000);}
 function stopCallTimer(){if(callTimer){clearInterval(callTimer);callTimer=null;}callSecs=0;}
 function listenIncoming(){
@@ -1505,8 +1494,8 @@ async function acceptCall(){
   callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
   const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
 }
-function toggleVideo(){const track=localStream?.getVideoTracks?.()[0];if(!track){showToast('Start a video call to use camera.');return;}track.enabled=!track.enabled;document.getElementById('video-btn').textContent=track.enabled?'ðŸ“¹':'ðŸš«';}
-function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'ðŸ”‡':'ðŸŽ¤';}
+function toggleVideo(){const track=localStream?.getVideoTracks?.()[0];if(!track){showToast('Start a video call to use camera.');return;}track.enabled=!track.enabled;document.getElementById('video-btn').textContent=track.enabled?'📹':'🚫';}
+function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'🔇':'🎤';}
 async function endCall(){
   if(!activeCallUser)return;const u=activeCallUser;activeCallUser=null;callMuted=false;
   if(currentUser){db.del('calls/'+currentUser.username+'/incoming');db.del('calls/'+u+'/incoming');const chan=callChan(currentUser.username,u);db.del(sigPath(chan));}
@@ -1516,10 +1505,10 @@ async function endCall(){
 }
 function toggleCallGameDock(){
   const dock=document.getElementById('call-game-dock');if(!dock)return;
-  if(!dock.innerHTML)dock.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px"><div style="color:#fff;font-weight:800">Play during call</div><button class="idea-action-btn" onclick="toggleCallGameDock()">Close</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button class="btn-primary" onclick="renderCallMiniGame('ttt')">â­• Tic-Tac-Toe</button><button class="btn-primary" onclick="renderCallMiniGame('rps')">âœŠ RPS</button></div><div id="call-mini-game"></div>`;
+  if(!dock.innerHTML)dock.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px"><div style="color:#fff;font-weight:800">Play during call</div><button class="idea-action-btn" onclick="toggleCallGameDock()">Close</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button class="btn-primary" onclick="renderCallMiniGame('ttt')">⭕ Tic-Tac-Toe</button><button class="btn-primary" onclick="renderCallMiniGame('rps')">✊ RPS</button></div><div id="call-mini-game"></div>`;
   dock.classList.toggle('show');if(dock.classList.contains('show')&&!document.getElementById('call-mini-game').innerHTML)renderCallMiniGame('ttt');
 }
-function renderCallMiniGame(type){const root=document.getElementById('call-mini-game');if(!root)return;if(type==='rps'){root.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked rock'">âœŠ Rock</button><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked paper'">âœ‹ Paper</button><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked scissors'">âœŒï¸ Scissors</button></div><div style="color:#9CA3AF;margin-top:10px">Pick a move.</div>`;return;}root.innerHTML=`<div class="ttt-grid">${Array.from({length:9},(_,i)=>`<button onclick="this.textContent=this.textContent?'':'X';this.disabled=true" style="aspect-ratio:1;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:#fff;font-size:26px;font-weight:900"></button>`).join('')}</div>`;}
+function renderCallMiniGame(type){const root=document.getElementById('call-mini-game');if(!root)return;if(type==='rps'){root.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked rock'">✊ Rock</button><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked paper'">✋ Paper</button><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked scissors'">✌️ Scissors</button></div><div style="color:#9CA3AF;margin-top:10px">Pick a move.</div>`;return;}root.innerHTML=`<div class="ttt-grid">${Array.from({length:9},(_,i)=>`<button onclick="this.textContent=this.textContent?'':'X';this.disabled=true" style="aspect-ratio:1;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:#fff;font-size:26px;font-weight:900"></button>`).join('')}</div>`;}
 </script>
 
 <script>
@@ -1536,12 +1525,12 @@ function renderConvos(active){
   const el=document.getElementById('convo-items');if(!el)return;
   const users=getAllUsers();const chatted=Object.keys(chatCache).filter(u=>!users.find(x=>x.username===u));
   const allUsers=[...users,...chatted.map(u=>({username:u,wins:0,losses:0,lastSeen:0}))];
-  if(!allUsers.length){el.innerHTML=emptyStateHTML('💬','No messages yet','Find someone by @username and start a conversation.','Find People',"showPage('dashboard')");return;}
+  if(!allUsers.length){el.innerHTML=emptyStateHTML('??','No messages yet','Find someone by @username and start a conversation.','Find People',"showPage('dashboard')");return;}
   allUsers.sort((a,b)=>{const ma=chatCache[a.username]||[],mb=chatCache[b.username]||[];return(mb[mb.length-1]?.ts||0)-(ma[ma.length-1]?.ts||0);});
   el.innerHTML=allUsers.map(u=>{
     const msgs=chatCache[u.username]||[];const last=msgs[msgs.length-1];const online=isOnline(u);
     const unread=msgs.filter(m=>m.from!==currentUser?.username&&!m.read).length;
-    const preview=last?(last.type&&last.type!=='text'?'ðŸ“Ž '+(last.name||last.type.replace('_ref','')):(last.from===currentUser?.username?'You: ':'')+esc(last.text||'')):'Say hello!';
+    const preview=last?(last.type&&last.type!=='text'?'📎 '+(last.name||last.type.replace('_ref','')):(last.from===currentUser?.username?'You: ':'')+esc(last.text||'')):'Say hello!';
     return`<div class="convo-item${active===u.username?' active':''}" onclick="openConvo('${u.username}')"><div class="convo-avatar">${getUserInitials(u.username)}${online?'<div class="online-dot"></div>':''}</div><div class="convo-meta"><div class="convo-name">@${u.username}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${relativeTime(last.ts)}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;
   }).join('');
 }
@@ -1555,10 +1544,10 @@ function openConvo(username){
   const user=getAllUsers().find(u=>u.username===username);const online=user&&isOnline(user);
   document.getElementById('chat-window').innerHTML=`
     <div class="chat-header">
-      <button class="icon-btn chat-back" onclick="closeMobileChat()" title="Back">←</button>
+      <button class="icon-btn chat-back" onclick="closeMobileChat()" title="Back">?</button>
       <div class="convo-avatar" style="width:40px;height:40px;font-size:13px;flex-shrink:0">${getUserInitials(username)}${online?'<div class="online-dot"></div>':''}</div>
       <div class="chat-header-info"><div class="chat-header-name">@${username}</div><div class="chat-header-status${online?'':' offline'}">${online?'Online now':'Offline'}</div></div>
-      <div class="chat-header-actions"><button class="icon-btn" onclick="openChallengeModal('chess','${username}')" title="Challenge friend">♟</button><button class="icon-btn" onclick="toggleCall('${username}')" title="Voice call">ðŸ“ž</button><button class="icon-btn" onclick="toggleVideoCall('${username}')" title="Video call">ðŸ“¹</button></div>
+      <div class="chat-header-actions"><button class="icon-btn" onclick="openChallengeModal('chess','${username}')" title="Challenge friend">?</button><button class="icon-btn" onclick="toggleCall('${username}')" title="Voice call">📞</button><button class="icon-btn" onclick="toggleVideoCall('${username}')" title="Video call">📹</button></div>
     </div>
     <div class="chat-messages" id="chat-msgs"></div>
     <div class="chat-input-bar" style="position:relative">
@@ -1612,7 +1601,7 @@ function renderBubble(m){
   if(m.type==='audio_ref')return`<div class="bubble"><div class="voice-msg-wrap"><div class="voice-msg-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice</div><audio class="bubble-audio" id="audio_${m.ts}" controls onplay="loadAudioRef(this,'${m.ref}','${m.ts}')"></audio></div></div>`;
   if(m.type==='image_ref')return`<div class="bubble" style="padding:6px"><img class="bubble-img" src="" data-ref="${m.ref}" data-ts="${m.ts}" alt="${esc(m.name||'image')}" style="min-width:80px;min-height:60px;background:rgba(255,255,255,.05);border-radius:10px" loading="lazy"/></div>`;
   if(m.type==='file'||m.type==='file_ref'){const ext=(m.name||'').split('.').pop().toUpperCase().slice(0,4)||'FILE';const href=m.type==='file'?m.url||'#':'#';const onclick=m.type==='file_ref'?`onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u){const a=document.createElement('a');a.href=u;a.download='${esc(m.name||'file')}';a.click();}});return false"`:'';return`<div class="bubble" style="padding:6px 10px"><a class="bubble-file" href="${href}" ${onclick} target="_blank" download="${esc(m.name||'file')}"><div class="bubble-file-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#f1f5f9">${esc(m.name||'file')}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${ext}</div></div></a></div>`;}
-  return`<div class="bubble">${esc(m.text||'')}${m._failed?`<span style="font-size:10px;color:#ef4444;margin-left:6px;cursor:pointer" onclick="retryMsg(${m.ts})">âš  Retry</span>`:''}</div>`;
+  return`<div class="bubble">${esc(m.text||'')}${m._failed?`<span style="font-size:10px;color:#ef4444;margin-left:6px;cursor:pointer" onclick="retryMsg(${m.ts})">⚠ Retry</span>`:''}</div>`;
 }
 const audioRefCache={};
 async function loadAudioRef(audioEl,ref,ts){if(audioRefCache[ts]){audioEl.src=audioRefCache[ts];return;}audioEl.src='';const data=await db.read('chatmedia/'+ref);if(!data)return;let full='';for(let i=0;i<data.total;i++)full+=data[`chunk_${i}`]||'';audioRefCache[ts]=full;audioEl.src=full;audioEl.play().catch(()=>{});}
@@ -1709,7 +1698,7 @@ function renderGroupList(){
   const el=document.getElementById('convo-items');if(!el)return;const groups=Object.values(myGroups);
   if(!groups.length){el.innerHTML=`<div style="padding:24px 16px;text-align:center;color:#374151;font-size:13px">No groups yet.<br><span style="color:#7C3AED;cursor:pointer" onclick="openCreateGroup()">+ Create one</span></div>`;return;}
   groups.sort((a,b)=>{const ma=groupCache[a.id]||[],mb=groupCache[b.id]||[];return(mb[mb.length-1]?.ts||b.ts)-(ma[ma.length-1]?.ts||a.ts);});
-  el.innerHTML=groups.map(g=>{const msgs=groupCache[g.id]||[];const last=msgs[msgs.length-1];const unread=msgs.filter(m=>m.from!==currentUser.username&&!m.read).length;const preview=last?(last.type?'ðŸ“Ž '+(last.name||'file'):(last.from===currentUser.username?'You: ':last.from+': ')+esc(last.text||'')):'No messages yet';return`<div class="convo-item${activeGroupId===g.id?' active':''}" onclick="openGroupConvo('${g.id}')"><div class="convo-avatar" style="background:linear-gradient(135deg,#f97316,#ec4899)">${g.name.slice(0,2).toUpperCase()}</div><div class="convo-meta"><div class="convo-name">${esc(g.name)}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;}).join('');
+  el.innerHTML=groups.map(g=>{const msgs=groupCache[g.id]||[];const last=msgs[msgs.length-1];const unread=msgs.filter(m=>m.from!==currentUser.username&&!m.read).length;const preview=last?(last.type?'📎 '+(last.name||'file'):(last.from===currentUser.username?'You: ':last.from+': ')+esc(last.text||'')):'No messages yet';return`<div class="convo-item${activeGroupId===g.id?' active':''}" onclick="openGroupConvo('${g.id}')"><div class="convo-avatar" style="background:linear-gradient(135deg,#f97316,#ec4899)">${g.name.slice(0,2).toUpperCase()}</div><div class="convo-meta"><div class="convo-name">${esc(g.name)}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;}).join('');
 }
 function openGroupConvo(groupId){
   activeGroupId=groupId;activeChatUser=null;if(chatSSE){chatSSE.close();chatSSE=null;}if(groupSSE){groupSSE.close();groupSSE=null;}
@@ -1753,7 +1742,7 @@ async function startGroupCall(groupId){
   const group=myGroups[groupId];if(!group)return;gcallGroupId=groupId;gcallPeers={};gcallMuted=false;
   try{gcallStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){alert('Mic error: '+err.message);return;}
   await db.write(`groupcalls/${groupId}/members/${currentUser.username}`,{joined:true,ts:Date.now()});
-  document.getElementById('gcall-group-name').textContent='ðŸ“ž '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
+  document.getElementById('gcall-group-name').textContent='📞 '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
   const grid=document.getElementById('gcall-grid');if(grid)grid.innerHTML=group.members.map(u=>`<div class="gcall-tile" id="gcall-tile-${u}"><div class="gcall-avatar">${u.slice(0,2).toUpperCase()}</div><div class="gcall-name">@${esc(u)}${u===currentUser.username?' (you)':''}</div><div class="gcall-speaking"></div></div>`).join('');
   document.getElementById('gcall-overlay').classList.add('show');gcallSecs=0;gcallConnected=false;
   listenGroupCallSignals(groupId);const existing=await db.read(`groupcalls/${groupId}/members`);if(existing){const others=Object.keys(existing).filter(u=>u!==currentUser.username);for(const u of others)await gcallConnectTo(groupId,u,true);}
@@ -1780,7 +1769,7 @@ async function handleGcallData(groupId,data){
   if(data.members){for(const u of Object.keys(data.members)){if(u!==me&&!gcallPeers[u])await gcallConnectTo(groupId,u,false);}}
   if(data.signals){for(const[fromUser,toMap]of Object.entries(data.signals)){if(fromUser===me)continue;const sig=toMap[me];if(!sig)continue;const pc=gcallPeers[fromUser];if(sig.offer&&(!pc||!pc.remoteDescription)){let peer=pc;if(!peer){await gcallConnectTo(groupId,fromUser,false);peer=gcallPeers[fromUser];}if(!peer||peer.remoteDescription)continue;await peer.setRemoteDescription(new RTCSessionDescription({type:sig.offer.type,sdp:sig.offer.sdp}));const answer=await peer.createAnswer();await peer.setLocalDescription(answer);await db.write(`groupcalls/${groupId}/signals/${me}/${fromUser}/answer`,{sdp:answer.sdp,type:answer.type});}if(sig.answer&&pc&&!pc.remoteDescription){await pc.setRemoteDescription(new RTCSessionDescription({type:sig.answer.type,sdp:sig.answer.sdp}));}if(sig.ice&&pc&&pc.remoteDescription){for(const key of Object.keys(sig.ice)){try{await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(sig.ice[key])));}catch(_){}}}}}
 }
-function gcallToggleMute(){gcallMuted=!gcallMuted;if(gcallStream)gcallStream.getAudioTracks().forEach(t=>t.enabled=!gcallMuted);document.getElementById('gcall-mute-btn').textContent=gcallMuted?'ðŸ”‡':'ðŸŽ¤';}
+function gcallToggleMute(){gcallMuted=!gcallMuted;if(gcallStream)gcallStream.getAudioTracks().forEach(t=>t.enabled=!gcallMuted);document.getElementById('gcall-mute-btn').textContent=gcallMuted?'🔇':'🎤';}
 async function endGroupCall(){if(gcallGroupId&&currentUser)await db.del(`groupcalls/${gcallGroupId}/members/${currentUser.username}`);if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}Object.values(gcallPeers).forEach(pc=>pc.close());gcallPeers={};if(gcallStream){gcallStream.getTracks().forEach(t=>t.stop());gcallStream=null;}document.querySelectorAll('[id^="gcall-audio-"]').forEach(a=>a.remove());if(gcallTimer){clearInterval(gcallTimer);gcallTimer=null;}gcallConnected=false;gcallSecs=0;gcallGroupId=null;document.getElementById('gcall-overlay').classList.remove('show');}
 </script>
 
@@ -1952,7 +1941,7 @@ function pushIdeaUnique(list,idea){const id=ideaUid(idea);if(list.some(x=>ideaUi
 function createIdeaCardHTML(idea,ctx='ideas'){
   const id=ideaUid(idea),saved=getSavedIdeas().some(x=>ideaUid(x)===id),starred=getStarredIdeas().some(x=>ideaUid(x)===id);
   const canCall=!!idea.author&&idea.author!==currentUser?.username;
-  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">ðŸ’¾ ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">â­ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">ðŸ‘ Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">ðŸ“¤ Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">ðŸ“ž Call @${esc(idea.author)}</button>`:''}</div></div>`;
+  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">💾 ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">⭐ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">👁 Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">📤 Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">📞 Call @${esc(idea.author)}</button>`:''}</div></div>`;
 }
 function getCurrentGeneratedIdeas(){return load(ideaStoreKey('generated_now'))||[];}
 function setCurrentGeneratedIdeas(v){save(ideaStoreKey('generated_now'),v);}
@@ -2033,7 +2022,7 @@ function openIdeaDetails(id,ctx){
 function closeIdeaModal(){document.getElementById('idea-modal-overlay').classList.remove('show');activeIdeaModal=null;}
 function shareIdea(id,ctx){
   const idea=getIdeaFromContext(id,ctx);if(!idea)return;
-  const text=`${idea.title} â€” ${idea.description}`;
+  const text=`${idea.title} — ${idea.description}`;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>showToast('Idea copied to clipboard.')).catch(()=>showToast('Copy failed.'));}
   else showToast(text);
 }
@@ -2057,7 +2046,7 @@ function renderLibrary(){
   const tags=[...new Set(source.map(i=>i.category||i.industry).filter(Boolean))];
   const tagWrap=document.getElementById('lib-tag-filter');
   if(tagWrap)tagWrap.innerHTML=tags.map(t=>`<button class="idea-tag" onclick="document.getElementById('lib-search').value='${t}';renderLibrary()">${esc(CAT_LABEL[t]||t)}</button>`).join('');
-  if(!filtered.length){list.innerHTML=emptyStateHTML('💡','No ideas yet','Generate your first idea and it will appear in your library.','Generate your first idea',"showPage('ideas')");return;}
+  if(!filtered.length){list.innerHTML=emptyStateHTML('??','No ideas yet','Generate your first idea and it will appear in your library.','Generate your first idea',"showPage('ideas')");return;}
   list.innerHTML=filtered.map(i=>libTab==='created'?createdIdeaCardHTML(i):createIdeaCardHTML(i,'library')).join('');
 }
 function filterExplore(cat){
@@ -2071,7 +2060,7 @@ function filterExplore(cat){
 function renderExplore(){
   const el=document.getElementById('explore-list');if(!el)return;
   const ideas=EXPLORE_MOCK.filter(i=>exploreCategory==='all'||i.category===exploreCategory);
-  if(!ideas.length){el.innerHTML=emptyStateHTML('🔥','No trending ideas here','Try another category or generate a new idea to get the momentum started.','Generate an idea',"showPage('ideas')");return;}
+  if(!ideas.length){el.innerHTML=emptyStateHTML('??','No trending ideas here','Try another category or generate a new idea to get the momentum started.','Generate an idea',"showPage('ideas')");return;}
   el.innerHTML=ideas.map(i=>createIdeaCardHTML(i,'explore')).join('');
 }
 function callIdeaAuthor(username){
@@ -2109,7 +2098,7 @@ function renderSettings(){
   const btn=document.getElementById('theme-toggle'),knob=document.getElementById('theme-knob');
   if(btn&&knob){btn.style.background=theme==='light'?'#94A3B8':'var(--brand)';knob.style.left=theme==='light'?'23px':'3px';}
   const info=document.getElementById('settings-account-info');
-  if(info)info.textContent=`@${currentUser.username} Â· ${currentUser.email||'local account'}`;
+  if(info)info.textContent=`@${currentUser.username} · ${currentUser.email||'local account'}`;
 }
 function toggleTheme(){
   const cur=load(ideaStoreKey('theme'))||'dark',next=cur==='dark'?'light':'dark';
@@ -2176,27 +2165,27 @@ if(window.location.hash)handleHashRoute();else showPage(currentUser?'dashboard':
 const ZIDAI_KEY='AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
 const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise and warm.';
 let zidHistory=[];
-function zidAiMsg(role,text){const el=document.getElementById('zidai-messages');const init=currentUser?.username.slice(0,1).toUpperCase()||'U';const isAi=role==='ai';const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');const div=document.createElement('div');div.className='zidai-msg '+role;div.innerHTML=`<div class="zidai-msg-avatar">${isAi?'ðŸ¤–':init}</div><div class="zidai-bubble">${fmt}</div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
-function zidAiTyping(){const el=document.getElementById('zidai-messages');const div=document.createElement('div');div.className='zidai-msg ai';div.id='zidai-typing';div.innerHTML=`<div class="zidai-msg-avatar">ðŸ¤–</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
+function zidAiMsg(role,text){const el=document.getElementById('zidai-messages');const init=currentUser?.username.slice(0,1).toUpperCase()||'U';const isAi=role==='ai';const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');const div=document.createElement('div');div.className='zidai-msg '+role;div.innerHTML=`<div class="zidai-msg-avatar">${isAi?'🤖':init}</div><div class="zidai-bubble">${fmt}</div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
+function zidAiTyping(){const el=document.getElementById('zidai-messages');const div=document.createElement('div');div.className='zidai-msg ai';div.id='zidai-typing';div.innerHTML=`<div class="zidai-msg-avatar">🤖</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
 async function sendZidAi(){
   const input=document.getElementById('zidai-input');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';document.getElementById('zidai-send').disabled=true;
   zidAiMsg('user',text);zidHistory.push({role:'user',parts:[{text}]});zidAiTyping();
-  try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:ZIDAI_SYS}]},contents:zidHistory,generationConfig:{temperature:0.8,maxOutputTokens:1024}})});const data=await res.json();const t=document.getElementById('zidai-typing');if(t)t.remove();if(data.error){zidAiMsg('ai','âš ï¸ '+data.error.message);}else{const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';zidHistory.push({role:'model',parts:[{text:reply}]});zidAiMsg('ai',reply);}}catch(err){const t=document.getElementById('zidai-typing');if(t)t.remove();zidAiMsg('ai','âš ï¸ Could not reach AI.');}
+  try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:ZIDAI_SYS}]},contents:zidHistory,generationConfig:{temperature:0.8,maxOutputTokens:1024}})});const data=await res.json();const t=document.getElementById('zidai-typing');if(t)t.remove();if(data.error){zidAiMsg('ai','⚠️ '+data.error.message);}else{const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';zidHistory.push({role:'model',parts:[{text:reply}]});zidAiMsg('ai',reply);}}catch(err){const t=document.getElementById('zidai-typing');if(t)t.remove();zidAiMsg('ai','⚠️ Could not reach AI.');}
   document.getElementById('zidai-send').disabled=false;
 }
 function zidAiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendZidAi();}}
 function clearZidAi(){zidHistory=[];document.getElementById('zidai-messages').innerHTML='';initZidAi();}
-function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI âš¡ Ask me anything â€” I'm powered by Gemini!");}
+function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!");}
 // ------ Arcade ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const ARCADE_GAMES=[
-  {id:'chess',icon:'♟️',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},
-  {id:'tictactoe',icon:'❌',name:'Tic-Tac-Toe',desc:'First to 3 in a row wins.'},
-  {id:'rps',icon:'✊',name:'Rock Paper Scissors',desc:'Best of 3. No luck allowed.'},
-  {id:'amongus',icon:'🔴',name:'Among Us Mode',desc:"Find the impostor before it's too late."}
+  {id:'chess',icon:'??',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},
+  {id:'tictactoe',icon:'?',name:'Tic-Tac-Toe',desc:'First to 3 in a row wins.'},
+  {id:'rps',icon:'?',name:'Rock Paper Scissors',desc:'Best of 3. No luck allowed.'},
+  {id:'amongus',icon:'??',name:'Among Us Mode',desc:"Find the impostor before it's too late."}
 ];
 let pendingChallengeGame='chess',gameInviteSSE=null,currentRoom=null,currentResultGame='tictactoe';
 function gameLabel(type){return ARCADE_GAMES.find(g=>g.id===type)?.name||type;}
-function gameIcon(type){return ARCADE_GAMES.find(g=>g.id===type)?.icon||'🎮';}
+function gameIcon(type){return ARCADE_GAMES.find(g=>g.id===type)?.icon||'??';}
 function renderArcadeHome(){
   const grid=document.getElementById('arcade-game-grid');
   if(grid)grid.innerHTML=ARCADE_GAMES.map(g=>`<div class="card arcade-card"><div class="arcade-icon">${g.icon}</div><div><div class="arcade-card-title">${g.name}</div><div class="arcade-card-copy">${g.desc}</div></div><div class="arcade-actions"><button class="btn-primary" style="font-size:12px" onclick="startGame('${g.id}')">Play vs AI</button><button class="btn-ghost" style="font-size:12px" onclick="openChallengeModal('${g.id}')">Challenge Friend</button></div></div>`).join('');
@@ -2262,8 +2251,8 @@ async function renderInvites(data){
   const el=document.getElementById('arcade-invites');if(!el)return;
   const invites=data||await db.read(`gameInvites/${currentUser?.username}`)||{};
   const list=Object.values(invites).filter(i=>i&&i.status==='pending');
-  if(!list.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">No active games — challenge a friend!</div>';return;}
-  el.innerHTML=list.map(i=>`<div class="arcade-row"><div><div style="color:#fff;font-weight:800">${gameIcon(i.type)} Pending ${gameLabel(i.type)} challenge</div><div style="color:#9CA3AF;font-size:12px;margin-top:3px">From @${esc(i.from)} · room ${esc(i.code)}</div></div><div style="display:flex;gap:8px"><button class="btn-primary" style="font-size:12px" onclick="acceptGameInvite('${i.code}','${i.type}')">Accept</button><button class="btn-ghost" style="font-size:12px" onclick="declineGameInvite('${i.code}')">Decline</button></div></div>`).join('');
+  if(!list.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">No active games � challenge a friend!</div>';return;}
+  el.innerHTML=list.map(i=>`<div class="arcade-row"><div><div style="color:#fff;font-weight:800">${gameIcon(i.type)} Pending ${gameLabel(i.type)} challenge</div><div style="color:#9CA3AF;font-size:12px;margin-top:3px">From @${esc(i.from)} � room ${esc(i.code)}</div></div><div style="display:flex;gap:8px"><button class="btn-primary" style="font-size:12px" onclick="acceptGameInvite('${i.code}','${i.type}')">Accept</button><button class="btn-ghost" style="font-size:12px" onclick="declineGameInvite('${i.code}')">Decline</button></div></div>`).join('');
 }
 async function acceptGameInvite(code,type){document.getElementById('join-room-code').value=code;await joinGameRoom();await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'accepted'});startGame(type);}
 async function declineGameInvite(code){await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'declined'});renderInvites();}
@@ -2281,13 +2270,13 @@ function renderRecentResults(){
   const el=document.getElementById('arcade-results');if(!el)return;
   const recent=(load(ideaStoreKey('game_results'))||[]).slice(0,3);
   if(!recent.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">No recent results yet.</div>';return;}
-  el.innerHTML=recent.map(r=>`<div class="arcade-row"><span>${gameIcon(r.type)} You ${r.result==='win'?'beat':r.result==='loss'?'lost to':'drew with'} @${esc(r.opponent)} at ${gameLabel(r.type)} · ${relativeTime(r.ts)}</span></div>`).join('');
+  el.innerHTML=recent.map(r=>`<div class="arcade-row"><span>${gameIcon(r.type)} You ${r.result==='win'?'beat':r.result==='loss'?'lost to':'drew with'} @${esc(r.opponent)} at ${gameLabel(r.type)} � ${relativeTime(r.ts)}</span></div>`).join('');
 }
 function renderLeaderboard(){
   const el=document.getElementById('arcade-leaderboard');if(!el)return;
   const stats=getGameStats(),rows=Object.entries(stats).map(([type,s])=>({type,...s,score:(s.wins||0)*3+(s.draws||0)})).sort((a,b)=>b.score-a.score).slice(0,5);
   if(!rows.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">Play a game to enter the leaderboard.</div>';return;}
-  el.innerHTML=rows.map((r,i)=>`<div class="arcade-row"><span>${i+1}. ${gameIcon(r.type)} @${esc(currentUser?.username||'you')} · ${gameLabel(r.type)}</span><span style="color:#a78bfa;font-weight:800">${r.wins||0}W ${r.losses||0}L ${r.draws||0}D</span></div>`).join('');
+  el.innerHTML=rows.map((r,i)=>`<div class="arcade-row"><span>${i+1}. ${gameIcon(r.type)} @${esc(currentUser?.username||'you')} � ${gameLabel(r.type)}</span><span style="color:#a78bfa;font-weight:800">${r.wins||0}W ${r.losses||0}L ${r.draws||0}D</span></div>`).join('');
 }
 function showGameResult(type,title,summary,result){
   currentResultGame=type;recordGameResult(type,result);
@@ -2331,9 +2320,9 @@ function tttEnd(r){tttOver=true;renderTTT();document.getElementById('ttt-status'
 function resetTTT(){tttBoard=Array(9).fill(null);tttX=true;tttOver=false;document.getElementById('ttt-status').style.display='block';document.getElementById('ttt-status').textContent='Your turn (X)';document.getElementById('ttt-result-text').textContent='';document.getElementById('ttt-result').style.display='none';renderTTT();}
 // RPS
 let rpsYou=0,rpsBot=0,rpsRound=0;
-const RPS_EMOJI={rock:'âœŠ',paper:'âœ‹',scissors:'âœŒï¸'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
-function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win!';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} — ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} — Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;if(rpsRound>=5||rpsYou===3||rpsBot===3){const outcome=rpsYou===rpsBot?'draw':rpsYou>rpsBot?'win':'loss';showGameResult('rps',outcome==='win'?'You won the series':outcome==='loss'?'You lost the series':'Series draw',`Final score: You ${rpsYou}, Bot ${rpsBot}.`,outcome);}}
-function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 â€” Bot: 0';}
+const RPS_EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
+function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win!';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} � ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} � Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;if(rpsRound>=5||rpsYou===3||rpsBot===3){const outcome=rpsYou===rpsBot?'draw':rpsYou>rpsBot?'win':'loss';showGameResult('rps',outcome==='win'?'You won the series':outcome==='loss'?'You lost the series':'Series draw',`Final score: You ${rpsYou}, Bot ${rpsBot}.`,outcome);}}
+function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
 // Among Us (lightweight local simulation)
 let auRaf=null,auRole='Crewmate',auPlayers=[],auPos={x:280,y:210},auMeetingOpen=false,auImpostorAlive=true;
 function randomRoom(){return['Cafeteria','Electrical','MedBay','Admin','Navigation'][Math.floor(Math.random()*5)];}
@@ -2395,11 +2384,11 @@ function auEnd(text){
 // ------ Chess (full rules + minimax) ------------------------------------------------------------------------------------------------------------------------------
 let chessBoard=[],chessSelected=null,chessTurn='w',chessOver=false,chessHighlights=[];
 let castleRights={w:{K:true,Q:true},b:{K:true,Q:true}},enPassantTarget=null,positionHistory=[],pendingPromotion=null;
-const CHESS_UNICODE={K:['â™”','â™š'],Q:['â™•','â™›'],R:['â™–','â™œ'],B:['â™—','â™'],N:['â™˜','â™ž'],P:['â™™','â™Ÿ']};
+const CHESS_UNICODE={K:['♔','♚'],Q:['♕','♛'],R:['♖','♜'],B:['♗','♝'],N:['♘','♞'],P:['♙','♟']};
 const PIECE_VAL={K:20000,Q:900,R:500,B:330,N:320,P:100};
 const PST={P:[[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],N:[[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],B:[[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],R:[[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],Q:[[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],K:[[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]};
 function chessInit(){const order=['R','N','B','Q','K','B','N','R'];chessBoard=Array(8).fill(null).map(()=>Array(8).fill(null));for(let c=0;c<8;c++){chessBoard[0][c]={t:order[c],col:'b'};chessBoard[1][c]={t:'P',col:'b'};chessBoard[6][c]={t:'P',col:'w'};chessBoard[7][c]={t:order[c],col:'w'};}castleRights={w:{K:true,Q:true},b:{K:true,Q:true}};enPassantTarget=null;positionHistory=[];pendingPromotion=null;}
-function chessFEN(b,turn,cr,ep){let s='';for(let r=0;r<8;r++){let e=0;for(let c=0;c<8;c++){const p=b[r][c];if(!p){e++;}else{if(e){s+=e;e=0;}s+=p.col==='w'?p.t:p.t.toLowerCase();}}if(e)s+=e;if(r<7)s+='/';}s+=' '+turn+' '+(cr.w.K?'K':'')+(cr.w.Q?'Q':'')+(cr.b.K?'k':'')+(cr.b.Q?'q':'');s+=' '+(ep?String.fromCharCode(97+ep[1])+(8-ep[0]):'â€“');return s;}
+function chessFEN(b,turn,cr,ep){let s='';for(let r=0;r<8;r++){let e=0;for(let c=0;c<8;c++){const p=b[r][c];if(!p){e++;}else{if(e){s+=e;e=0;}s+=p.col==='w'?p.t:p.t.toLowerCase();}}if(e)s+=e;if(r<7)s+='/';}s+=' '+turn+' '+(cr.w.K?'K':'')+(cr.w.Q?'Q':'')+(cr.b.K?'k':'')+(cr.b.Q?'q':'');s+=' '+(ep?String.fromCharCode(97+ep[1])+(8-ep[0]):'–');return s;}
 function chessRawMoves(b,r,c,cr,ep){const p=b[r][c];if(!p)return[];const{t,col}=p,moves=[];const inB=(r,c)=>r>=0&&r<8&&c>=0&&c<8;const empty=(r,c)=>!b[r][c];const enemy=(r,c)=>b[r][c]&&b[r][c].col!==col;const slide=(dr,dc)=>{let nr=r+dr,nc=c+dc;while(inB(nr,nc)){if(empty(nr,nc)){moves.push([nr,nc,'']);}else{if(enemy(nr,nc))moves.push([nr,nc,'cap']);break;}nr+=dr;nc+=dc;}};if(t==='P'){const d=col==='w'?-1:1,s=col==='w'?6:1;if(inB(r+d,c)&&empty(r+d,c)){moves.push([r+d,c,r+d===0||r+d===7?'promo':'']);if(r===s&&empty(r+d*2,c))moves.push([r+d*2,c,'double']);}for(const dc of[-1,1]){if(inB(r+d,c+dc)){if(enemy(r+d,c+dc))moves.push([r+d,c+dc,r+d===0||r+d===7?'promo':'cap']);if(ep&&ep[0]===r+d&&ep[1]===c+dc)moves.push([r+d,c+dc,'ep']);}}}if(t==='N'){for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc,'']);}}if(t==='K'){for(const[dr,dc]of[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc,'']);}const row=col==='w'?7:0;if(r===row&&c===4){if(cr[col].K&&empty(row,5)&&empty(row,6)&&b[row][7]?.t==='R'&&b[row][7]?.col===col)moves.push([row,6,'castle-K']);if(cr[col].Q&&empty(row,3)&&empty(row,2)&&empty(row,1)&&b[row][0]?.t==='R'&&b[row][0]?.col===col)moves.push([row,2,'castle-Q']);}}if(t==='R'||t==='Q'){slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);}if(t==='B'||t==='Q'){slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);}return moves;}
 function chessApply(b,fr,fc,tr,tc,flag,cr,ep,promo){const next=b.map(row=>[...row]);const p=next[fr][fc];const ncr={w:{...cr.w},b:{...cr.b}};let nep=null;if(flag==='ep')next[fr][tc]=null;next[tr][tc]=p;next[fr][fc]=null;if(flag==='promo'||flag==='promo-cap')next[tr][tc]={t:promo||'Q',col:p.col};if(flag==='double')nep=[fr+(tr-fr)/2,fc];if(flag==='castle-K'){next[tr][5]={t:'R',col:p.col};next[tr][7]=null;}if(flag==='castle-Q'){next[tr][3]={t:'R',col:p.col};next[tr][0]=null;}if(p.t==='K'){ncr[p.col].K=false;ncr[p.col].Q=false;}if(p.t==='R'){if(fc===7)ncr[p.col].K=false;if(fc===0)ncr[p.col].Q=false;}if(tr===7&&tc===7)ncr['w'].K=false;if(tr===7&&tc===0)ncr['w'].Q=false;if(tr===0&&tc===7)ncr['b'].K=false;if(tr===0&&tc===0)ncr['b'].Q=false;return{board:next,cr:ncr,ep:nep};}
 function chessIsAttacked(b,r,c,byCol,cr,ep){for(let pr=0;pr<8;pr++)for(let pc=0;pc<8;pc++){const p=b[pr][pc];if(!p||p.col!==byCol)continue;if(chessRawMoves(b,pr,pc,cr||{w:{K:false,Q:false},b:{K:false,Q:false}},ep||null).some(([mr,mc])=>mr===r&&mc===c))return true;}return false;}
@@ -2419,13 +2408,13 @@ function chessBotMove(){
   else{let best=Infinity,bestMoves=[];for(const[fr,fc,tr,tc,flag]of all){const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');const val=minimax(res.board,cfg.depth-1,-Infinity,Infinity,true,res.cr,res.ep);if(val<best){best=val;bestMoves=[[fr,fc,tr,tc,flag]];}else if(val===best)bestMoves.push([fr,fc,tr,tc,flag]);}chosen=bestMoves[Math.floor(Math.random()*bestMoves.length)];}
   const[fr,fc,tr,tc,flag]=chosen;const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');chessBoard=res.board;castleRights=res.cr;enPassantTarget=res.ep;chessTurn='w';
   const fen=chessFEN(chessBoard,chessTurn,castleRights,enPassantTarget);positionHistory.push(fen);renderChess();
-  if(chessCheckThreefold()){chessEndGame("Draw â€” threefold repetition!");return;}
+  if(chessCheckThreefold()){chessEndGame("Draw — threefold repetition!");return;}
   const result=chessCheckResult(chessBoard,'w',castleRights,enPassantTarget);
-  if(result==='checkmate'){chessEndGame('Black wins by checkmate! â™š');return;}if(result==='stalemate'){chessEndGame("Stalemate â€” it's a draw!");return;}
-  const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=chessInCheck(chessBoard,'w',castleRights,enPassantTarget)?'âš  Check! Your turn (White)':'Your turn (White)';
+  if(result==='checkmate'){chessEndGame('Black wins by checkmate! ♚');return;}if(result==='stalemate'){chessEndGame("Stalemate — it's a draw!");return;}
+  const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=chessInCheck(chessBoard,'w',castleRights,enPassantTarget)?'⚠ Check! Your turn (White)':'Your turn (White)';
 }
 function chessCheckThreefold(){const last=positionHistory[positionHistory.length-1];return positionHistory.filter(p=>p===last).length>=3;}
-function chessAfterMove(opp){const fen=chessFEN(chessBoard,opp,castleRights,enPassantTarget);positionHistory.push(fen);if(chessCheckThreefold()){renderChess();chessEndGame("Draw â€” threefold repetition!");return true;}const result=chessCheckResult(chessBoard,opp,castleRights,enPassantTarget);if(result==='checkmate'){renderChess();chessEndGame((chessTurn==='w'?'White':'Black')+' wins by checkmate! '+(chessTurn==='w'?'â™”':'â™š'));return true;}if(result==='stalemate'){renderChess();chessEndGame("Stalemate â€” it's a draw!");return true;}return false;}
+function chessAfterMove(opp){const fen=chessFEN(chessBoard,opp,castleRights,enPassantTarget);positionHistory.push(fen);if(chessCheckThreefold()){renderChess();chessEndGame("Draw — threefold repetition!");return true;}const result=chessCheckResult(chessBoard,opp,castleRights,enPassantTarget);if(result==='checkmate'){renderChess();chessEndGame((chessTurn==='w'?'White':'Black')+' wins by checkmate! '+(chessTurn==='w'?'♔':'♚'));return true;}if(result==='stalemate'){renderChess();chessEndGame("Stalemate — it's a draw!");return true;}return false;}
 function chessSquareClick(r,c){
   if(chessOver||pendingPromotion)return;
   if(chessSelected){const[sr,sc]=chessSelected;const move=chessHighlights.find(([hr,hc])=>hr===r&&hc===c);if(move){const[,,flag]=move;if(flag==='promo'||flag==='promo-cap'){pendingPromotion={fr:sr,fc:sc,tr:r,tc:c,flag};chessSelected=null;chessHighlights=[];renderChess();showPromoDialog(chessBoard[sr][sc].col);return;}chessExecuteMove(sr,sc,r,c,flag,'Q');return;}chessSelected=null;chessHighlights=[];}
@@ -2437,7 +2426,7 @@ function chessExecuteMove(fr,fc,tr,tc,flag,promo){
   const opp=chessTurn==='w'?'b':'w';chessSelected=null;chessHighlights=[];pendingPromotion=null;
   if(chessAfterMove(opp))return;
   if(gameMode==='bot'){chessTurn='b';renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';setTimeout(chessBotMove,300+chessLevel*80);}
-  else{chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'âš  Check! ':'')+(opp==='w'?"White's turn":"Black's turn");}
+  else{chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'⚠ Check! ':'')+(opp==='w'?"White's turn":"Black's turn");}
 }
 function showPromoDialog(col){const pieces=['Q','R','B','N'];const existing=document.getElementById('promo-dialog');if(existing)existing.remove();const d=document.createElement('div');d.id='promo-dialog';d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:center;justify-content:center';d.innerHTML=`<div style="background:#1a1a2e;border:1px solid rgba(124,58,237,.4);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center"><p style="color:#fff;font-size:14px;font-weight:700">Choose promotion piece</p><div style="display:flex;gap:10px">${pieces.map(t=>`<button onclick="chessPromote('${t}')" style="width:52px;height:52px;border-radius:12px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center">${CHESS_UNICODE[t][col==='w'?0:1]}</button>`).join('')}</div></div>`;document.body.appendChild(d);}
 function chessPromote(piece){const d=document.getElementById('promo-dialog');if(d)d.remove();if(!pendingPromotion)return;const{fr,fc,tr,tc,flag}=pendingPromotion;pendingPromotion=null;chessExecuteMove(fr,fc,tr,tc,flag,piece);}
@@ -2450,4 +2439,5 @@ function renderChess(){
 function chessEndGame(msg){chessOver=true;const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s)s.style.display='none';const res=document.getElementById('chess-result');if(res)res.style.display='flex';const txt=document.getElementById('chess-result-text');if(txt)txt.textContent=msg;}
 function resetChess(){chessInit();chessSelected=null;chessTurn='w';chessOver=false;chessHighlights=[];pendingPromotion=null;positionHistory=[];const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s){s.style.display='block';s.textContent='Your turn (White)';}const res=document.getElementById('chess-result');if(res)res.style.display='none';const txt=document.getElementById('chess-result-text');if(txt)txt.textContent='';renderChess();}
 </script>
+
 
