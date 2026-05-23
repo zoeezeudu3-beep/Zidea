@@ -1324,9 +1324,9 @@ async function handleCredentialResponse(response){
     });
     loginSuccess({email: data.user.email, username: data.user.username, avatar: data.user.avatar || ''});
   } catch (error) {
-    const msg = String(error?.message || '');
+    const msg = String(error?.message || 'Google sign-in failed. Please try again.');
     console.error('Google auth failed', error);
-    showToast(msg.includes('registered') ? msg : msg.includes('fetch') ? 'Connection error. Check your internet and retry.' : 'Google sign-in failed. Please try again.');
+    showToast(msg);
   }
 }
 if (window.pendingGoogleCredentialResponse && typeof window.handleCredentialResponse === 'function') {
