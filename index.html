@@ -1,14 +1,16 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"/>
-<title>Zidea — Connect, Call, Play</title>
+<title>Zidea &mdash; Connect, Call, Play</title>
 <meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script>try{if(JSON.parse(localStorage.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>try{const s=window.localStorage;if(s&&JSON.parse(s.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
 <style>html.has-session #page-landing{display:none!important}</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -43,6 +45,9 @@ button:active{transform:scale(.98)}
 .input-wrap .input-field{padding-left:36px}
 .error-msg{color:#F87171;font-size:13px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);border-radius:12px;padding:12px 16px;display:none}
 .error-msg.show{display:block}
+.field-error{color:#F87171;font-size:12px;line-height:1.5;display:none}
+.field-error.show{display:block}
+.input-field.invalid{border-color:#F87171;box-shadow:0 0 0 3px rgba(248,113,113,.08)}
 .toast-wrap{position:fixed;top:16px;right:16px;display:flex;flex-direction:column;gap:8px;z-index:500}
 .toast{background:rgba(15,15,30,.95);border:1px solid rgba(124,58,237,.4);color:#e2e8f0;padding:10px 12px;border-radius:12px;font-size:12px;min-width:220px;box-shadow:0 10px 32px rgba(0,0,0,.45)}
 .mob-avatar-chip{width:18px;height:18px;border-radius:50%;background:rgba(124,58,237,.22);border:1px solid rgba(124,58,237,.35);display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#d8b4fe;margin-right:4px}
@@ -50,7 +55,7 @@ button:active{transform:scale(.98)}
 </head>
 <body>
 <style>
-/* PAGES — landing visible by default before JS */
+/* PAGES â€” landing visible by default before JS */
 .page{display:none;opacity:0}
 .page.active{display:flex;opacity:1;transition:opacity .2s ease}
 #page-landing{display:flex;opacity:1;flex-direction:column;min-height:100vh}
@@ -85,10 +90,14 @@ body.app-active #page-landing footer{display:none}
 .auth-form{display:flex;flex-direction:column;gap:12px}
 .divider{display:flex;align-items:center;gap:12px;color:#4B5563;font-size:13px}
 .divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;border-radius:12px;border:1px solid var(--border);background:transparent;color:#D1D5DB;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s}
-.google-btn:hover{border-color:var(--brand);color:#fff}
+.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:11px;border-radius:12px;border:1px solid #DADCE0;background:#fff;color:#3C4043;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:box-shadow .2s,border-color .2s}
+.google-btn:hover{box-shadow:0 2px 8px rgba(0,0,0,.18);border-color:#C8CDD2}
+.google-logo{width:18px;height:18px;display:inline-block;flex-shrink:0}
 .auth-footer{text-align:center;color:#6B7280;font-size:14px}
 .auth-footer a{color:var(--brand-light);cursor:pointer}
+.auth-link{background:none;border:none;color:var(--brand-light);font:inherit;font-size:13px;cursor:pointer;padding:0}
+.auth-link:hover{text-decoration:underline}
+.community-line{font-size:13px;color:#9CA3AF;text-align:center;margin-top:2px}
 /* Sidebar */
 .sidebar{width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px;gap:16px;flex-shrink:0;background:var(--surface)}
 .sidebar-nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
@@ -138,6 +147,20 @@ body.app-active #page-landing footer{display:none}
 .game-emoji{font-size:26px;flex-shrink:0}
 .game-info strong{color:#fff;font-size:14px}
 .game-info p{color:#6B7280;font-size:12px;margin-top:2px}
+.arcade-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.arcade-card{display:flex;flex-direction:column;gap:12px;min-height:220px;transition:border-color .2s,transform .2s}
+.arcade-card:hover{border-color:rgba(124,58,237,.48);transform:translateY(-2px)}
+.arcade-icon{width:48px;height:48px;border-radius:14px;background:rgba(124,58,237,.16);border:1px solid rgba(124,58,237,.25);display:flex;align-items:center;justify-content:center;font-size:24px}
+.arcade-card-title{font-size:15px;font-weight:800;color:#fff}
+.arcade-card-copy{font-size:12px;color:#9CA3AF;line-height:1.5;min-height:34px}
+.arcade-actions{display:flex;flex-direction:column;gap:8px;margin-top:auto}
+.arcade-panel{display:flex;flex-direction:column;gap:10px}
+.arcade-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--border)}
+.game-lobby{display:none;flex-direction:column;gap:12px}
+.room-code{font-size:26px;font-weight:900;letter-spacing:.18em;color:#fff}
+.result-modal-summary{color:#9CA3AF;font-size:13px;line-height:1.6}
+@media(max-width:960px){.arcade-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:420px){.arcade-grid{grid-template-columns:1fr}.arcade-row{align-items:flex-start;flex-direction:column}}
 .back-link{display:inline-flex;align-items:center;gap:6px;color:#6B7280;font-size:14px;cursor:pointer;background:none;border:none;font-family:inherit;transition:color .2s}
 .back-link:hover{color:#fff}
 .chess-lvl-btn{padding:5px 11px;border-radius:20px;border:1px solid var(--border);background:transparent;color:#6B7280;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
@@ -176,6 +199,7 @@ body.app-active #page-landing footer{display:none}
 .convo-tab{flex:1;padding:9px 0;font-size:12px;font-weight:700;color:#4b5563;background:none;border:none;cursor:pointer;transition:all .2s;font-family:inherit;border-bottom:2px solid transparent}
 .convo-tab.active{color:#a78bfa;border-bottom-color:#a78bfa}
 .chat-window{flex:1;display:flex;flex-direction:column;min-width:0;background:var(--chat-bg)}
+.chat-back{display:none}
 .chat-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(15,15,30,.98);border-bottom:1px solid rgba(124,58,237,.2);flex-shrink:0}
 .chat-header-info{flex:1}
 .chat-header-name{font-size:15px;font-weight:800;background:linear-gradient(135deg,#e2e8f0,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -200,6 +224,7 @@ body.app-active #page-landing footer{display:none}
 .msg-time{font-size:10px;color:#1f2937;padding:2px 4px;margin-top:1px}
 .msg-group.mine .msg-time{text-align:right;color:#4b5563}
 .chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#1f2937}
+.chat-empty .btn-primary{margin-top:6px}
 .chat-placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at center,rgba(124,58,237,.06) 0%,transparent 65%),var(--chat-bg)}
 .chat-placeholder p{font-size:14px;font-weight:500;color:#1f2937}
 .chat-input-bar{padding:12px 14px;background:rgba(15,15,30,.98);border-top:1px solid rgba(124,58,237,.2);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;position:relative}
@@ -217,6 +242,14 @@ body.app-active #page-landing footer{display:none}
 .send-btn{width:40px;height:40px;border-radius:13px;flex-shrink:0;background:linear-gradient(135deg,#7C3AED,#c026d3);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 14px rgba(124,58,237,.4)}
 .send-btn:hover{transform:scale(1.08)}
 .send-btn:active{transform:scale(.94)}
+@media(max-width:768px){
+  #page-chat{display:flex!important}
+  #page-chat .chat-layout{width:100%;height:calc(100vh - 64px);padding-bottom:0}
+  #page-chat .convo-list{width:100%;border-right:none}
+  #page-chat .chat-window{position:fixed;inset:0 0 64px 0;z-index:62;transform:translateX(100%);transition:transform .22s ease;background:var(--chat-bg)}
+  #page-chat.chat-open .chat-window{transform:translateX(0)}
+  .chat-back{display:inline-flex}
+}
 .bubble-img{max-width:240px;border-radius:12px;cursor:pointer;display:block;margin-top:2px}
 .bubble-video{max-width:240px;border-radius:12px;display:block;margin-top:2px}
 .bubble-file{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;font-size:12px;cursor:pointer;margin-top:2px;text-decoration:none;color:inherit;transition:all .2s}
@@ -269,6 +302,10 @@ body.app-active #page-landing footer{display:none}
 .idea-action-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:8px;border:1px solid var(--border);background:transparent;color:#6B7280;font-size:11px;cursor:pointer;font-family:inherit;transition:all .2s}
 .idea-action-btn:hover{border-color:var(--brand);color:#fff}
 .idea-action-btn.active{background:rgba(124,58,237,.15);border-color:var(--brand);color:#a78bfa}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:36px 20px;color:#6B7280}
+.empty-state-icon{width:56px;height:56px;border-radius:18px;background:rgba(124,58,237,.14);border:1px solid rgba(124,58,237,.24);display:flex;align-items:center;justify-content:center;color:#a78bfa}
+.empty-state-title{font-size:15px;font-weight:800;color:#fff}
+.empty-state-copy{font-size:13px;line-height:1.6;max-width:320px}
 .matchmaker-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .matchmaker-form{display:flex;flex-direction:column;gap:12px}
 .matchmaker-step{display:none;flex-direction:column;gap:12px}
@@ -314,6 +351,14 @@ body.app-active #page-landing footer{display:none}
 .btn-loading::after{content:'';position:absolute;right:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
 /* Call overlay */
 .call-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:20px}
+.video-call-stage{display:none;grid-template-columns:minmax(180px,1fr) minmax(120px,220px);gap:12px;width:min(900px,92vw);height:min(520px,55vh)}
+.video-call-stage.show{display:grid}
+.video-tile{background:#05050a;border:1px solid rgba(124,58,237,.28);border-radius:18px;overflow:hidden;position:relative;min-height:160px}
+.video-tile video{width:100%;height:100%;object-fit:cover;display:block;background:#05050a}
+.video-label{position:absolute;left:10px;bottom:10px;background:rgba(0,0,0,.55);color:#fff;font-size:12px;font-weight:700;border-radius:999px;padding:5px 9px}
+.call-game-dock{display:none;width:min(620px,92vw);max-height:52vh;overflow:auto;background:#0f0f1e;border:1px solid rgba(124,58,237,.3);border-radius:18px;padding:14px}
+.call-game-dock.show{display:block}
+@media(max-width:760px){.video-call-stage{grid-template-columns:1fr;height:auto}.video-tile{height:220px}.video-tile.local{height:150px}}
 .gcall-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(12px);z-index:210;flex-direction:column;align-items:center;justify-content:center;gap:20px}
 .gcall-overlay.show{display:flex}
 .gcall-grid{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;max-width:700px}
@@ -326,15 +371,26 @@ body.app-active #page-landing footer{display:none}
 .idea-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:160;align-items:center;justify-content:center;padding:16px}
 .idea-modal-overlay.show{display:flex}
 /* Mobile nav */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);z-index:50;padding:6px 0}
-.mobile-nav-inner{display:flex;overflow-x:auto;padding:0 4px;gap:0}
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(26,26,36,.98);border-top:1px solid var(--border);z-index:80;padding:6px 0 env(safe-area-inset-bottom);box-shadow:0 -12px 30px rgba(0,0,0,.28)}
+.mobile-nav-inner{display:grid;grid-template-columns:repeat(6,1fr);padding:0 4px;gap:0}
 .mobile-nav-inner::-webkit-scrollbar{display:none}
-.mob-nav-btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 10px;background:none;border:none;color:#6B7280;font-size:9px;font-weight:500;cursor:pointer;font-family:inherit;transition:color .15s;white-space:nowrap;flex-shrink:0}
+.mob-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;background:none;border:none;color:#6B7280;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;transition:color .15s;white-space:nowrap;position:relative;min-width:0}
+.mob-nav-btn svg,.mob-nav-btn .mob-more-dot{width:18px;height:18px;display:block}
 .mob-nav-btn.active,.mob-nav-btn:hover{color:var(--brand-light)}
+.mob-nav-btn.active::after{content:'';position:absolute;bottom:0;width:22px;height:2px;border-radius:999px;background:var(--brand-light)}
+.mobile-more-drawer{display:none;position:fixed;left:12px;right:12px;bottom:70px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:10px;z-index:90;box-shadow:0 18px 50px rgba(0,0,0,.5)}
+.mobile-more-drawer.show{display:flex;flex-direction:column;gap:6px}
+.mobile-more-drawer button{justify-content:flex-start;width:100%}
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
 .modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:18px}
+.info-modal-body{color:#9CA3AF;font-size:13px;line-height:1.7}
+.welcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.welcome-item{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:12px;display:flex;gap:10px;align-items:flex-start}
+.welcome-icon{width:30px;height:30px;border-radius:10px;background:rgba(124,58,237,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.welcome-item strong{display:block;color:#fff;font-size:13px;margin-bottom:3px}
+.welcome-item span{display:block;color:#6B7280;font-size:12px;line-height:1.45}
 .auth-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(6px);z-index:170;align-items:center;justify-content:center;padding:20px}
 .auth-modal.show{display:flex!important;opacity:1}
 .rand-animate{animation:randPulse .45s ease}
@@ -347,6 +403,7 @@ body.app-active #page-landing footer{display:none}
   .mobile-nav{display:block}
   #page-dashboard,#page-arcade,#page-chat,#page-zidai,#page-ideas,#page-library,#page-explore,#page-profile,#page-settings,#page-help{padding-bottom:64px}
 }
+@media(max-width:520px){.welcome-grid{grid-template-columns:1fr}.modal-box{padding:22px}}
 </style>
 
 <!-- LANDING -->
@@ -366,26 +423,27 @@ body.app-active #page-landing footer{display:none}
   <section class="hero">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.4);color:var(--brand-light);font-size:12px;padding:6px 16px;border-radius:999px;animation:fadeInUp .6s ease">
       <span style="width:7px;height:7px;border-radius:50%;background:#22d3a0;box-shadow:0 0 8px #22d3a0;display:inline-block"></span>
-      Live now — join free
+      Live now â€” join free
     </div>
     <h1 style="animation:fadeInUp .7s ease .1s both">Connect. Call. <em>Play.</em></h1>
-    <p style="animation:fadeInUp .7s ease .2s both">Find friends by username, jump into voice calls, challenge them to games, and chat with AI — all in one place.</p>
+    <p style="animation:fadeInUp .7s ease .2s both">Find friends by username, jump into voice calls, challenge them to games, and chat with AI â€” all in one place.</p>
     <div class="hero-actions" style="animation:fadeInUp .7s ease .3s both">
-      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(124,58,237,.4)" onclick="showPage('signup')">Get Started Free →</button>
+      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(124,58,237,.4)" onclick="showPage('signup')">Get Started Free â†’</button>
       <button class="btn-ghost" style="padding:14px 32px;font-size:15px" onclick="showPage('login')">Log In</button>
     </div>
     <div style="display:flex;gap:40px;margin-top:16px;flex-wrap:wrap;justify-content:center;animation:fadeInUp .7s ease .4s both">
       <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="stat-users">100+</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Users joined</div></div>
-      <div style="text-align:center"><div style="font-size:28px;font-weight:800;color:#22d3a0;text-shadow:0 0 20px rgba(34,211,160,.4)" id="stat-online">0</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Online now</div></div>
+      <div style="text-align:center" id="stat-online-wrap"><div style="font-size:28px;font-weight:800;color:#22d3a0;text-shadow:0 0 20px rgba(34,211,160,.4)" id="stat-online">0</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Online now</div></div>
+      <div class="community-line" id="stat-community-line" style="display:none">Join a growing community of builders.</div>
       <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#f97316,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">4</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Games</div></div>
     </div>
   </section>
   <div style="max-width:800px;margin:0 auto 40px;padding:0 20px;position:relative;z-index:1">
     <h2 style="text-align:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:28px">How it works</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">🔍<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">ðŸ‘¤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">ðŸ”<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">ðŸ“ž<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
     </div>
   </div>
   <div class="features">
@@ -399,22 +457,24 @@ body.app-active #page-landing footer{display:none}
     <p style="color:#9CA3AF;font-size:14px;margin-bottom:24px">Join free. No credit card. No download.</p>
     <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="showPage('signup')">Create your account</button>
   </div>
-  <footer>&copy; 2026 Zidea. All rights reserved. &middot; <a href="#" onclick="showToast('Privacy policy coming soon.');return false;">Privacy Policy</a> &middot; <a href="#" onclick="showToast('Terms of service coming soon.');return false;">Terms of Service</a> &middot; <a href="#" onclick="showToast('Contact: hello@zidea.app');return false;">Contact</a></footer>
+  <footer>&copy; 2026 Zidea. All rights reserved. &middot; <a href="#privacy" onclick="openInfoModal('privacy');return false;">Privacy Policy</a> &middot; <a href="#terms" onclick="openInfoModal('terms');return false;">Terms of Service</a> &middot; <a href="#contact" onclick="openInfoModal('contact');return false;">Contact</a></footer>
 
 </div>
 
 <!-- LOGIN -->
 <div id="page-login" class="page auth-page auth-modal" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-box card">
-    <button type="button" onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#6B7280;font-size:24px;line-height:1">Ã—</button>
+    <button type="button" aria-label="Close login modal" onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#6B7280;font-size:24px;line-height:1">&times;</button>
     <div class="auth-header"><div class="logo" style="justify-content:center;font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div><p>Welcome back</p></div>
     <div id="login-error" class="error-msg"></div>
     <form class="auth-form" onsubmit="handleLogin(event)">
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="login-email" placeholder="Email" required/></div>
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="input-field" type="password" id="login-password" placeholder="Password" required/></div>
+      <div style="display:flex;justify-content:flex-end"><button type="button" class="auth-link" onclick="handleForgotPassword()">Forgot password?</button></div>
       <button type="submit" class="btn-primary" style="width:100%">Log In</button>
     </form>
-    <div class="divider">Use email + password</div>
+    <div class="divider">or continue with Google</div>
+    <button type="button" class="google-btn" onclick="handleGoogleLogin()"><svg class="google-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.3 9.14 5.38 12 5.38z"/></svg> Sign in with Google</button>
     <p class="auth-footer">No account? <a onclick="showPage('signup')">Sign up</a></p>
   </div>
 </div>
@@ -422,7 +482,7 @@ body.app-active #page-landing footer{display:none}
 <!-- SIGNUP -->
 <div id="page-signup" class="page auth-page auth-modal" onclick="if(event.target===this)closeAuthModal()">
   <div class="auth-box card">
-    <button type="button" onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#6B7280;font-size:24px;line-height:1">Ã—</button>
+    <button type="button" aria-label="Close signup modal" onclick="closeAuthModal()" style="position:absolute;top:14px;right:14px;background:none;border:none;color:#6B7280;font-size:24px;line-height:1">&times;</button>
     <div class="auth-header"><div class="logo" style="justify-content:center;font-size:18px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div><p>Create your account</p></div>
     <div id="signup-error" class="error-msg"></div>
     <form class="auth-form" onsubmit="handleSignup(event)">
@@ -431,6 +491,8 @@ body.app-active #page-landing footer{display:none}
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="input-field" type="password" id="signup-password" placeholder="Password (min 6 chars)" minlength="6" required/></div>
       <button type="submit" class="btn-primary" style="width:100%">Create Account</button>
     </form>
+    <div class="divider">or continue with Google</div>
+    <button type="button" class="google-btn" onclick="handleGoogleLogin()"><svg class="google-logo" viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.1c-.22-.66-.35-1.36-.35-2.1s.13-1.44.35-2.1V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06L5.84 9.9C6.71 7.3 9.14 5.38 12 5.38z"/></svg> Sign in with Google</button>
     <p class="auth-footer">Already have an account? <a onclick="showPage('login')">Log in</a></p>
   </div>
 </div>
@@ -441,18 +503,18 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item active" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item active" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="dash-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
@@ -468,22 +530,48 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item active" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item active" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="arcade-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">🎮 Arcade</div><div class="page-subtitle">Quick games and friend challenges</div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:8px">Games</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Chess, Tic-Tac-Toe, Rock Paper Scissors, and Among Us mode live here.</p></div><div id="game-root"></div></div>
+  <div class="main-content">
+    <div><div class="page-title">ðŸŽ® Arcade</div><div class="page-subtitle">Play quick games solo or while you are on a call</div></div>
+    <div id="game-picker" style="display:flex;flex-direction:column;gap:16px">
+      <div class="arcade-grid" id="arcade-game-grid"></div>
+      <div class="card arcade-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff">Active game sessions</div><div style="font-size:12px;color:#6B7280;margin-top:3px">Pending challenges and open rooms</div></div><button class="btn-ghost" style="font-size:12px;padding:7px 10px" onclick="renderArcadeHome()">Refresh</button></div>
+        <div id="arcade-invites"></div>
+      </div>
+      <div class="card arcade-panel">
+        <div style="font-size:15px;font-weight:800;color:#fff">Recent results</div>
+        <div id="arcade-results"></div>
+      </div>
+      <div class="card arcade-panel">
+        <div style="font-size:15px;font-weight:800;color:#fff">Leaderboard</div>
+        <div id="arcade-leaderboard"></div>
+      </div>
+      <div class="card game-lobby" id="game-lobby">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff" id="lobby-title">Game Lobby</div><div style="font-size:12px;color:#6B7280;margin-top:3px" id="lobby-status">Waiting for opponent...</div></div><button class="btn-ghost" style="font-size:12px" onclick="exitLobby()">Exit lobby</button></div>
+        <div class="room-code" id="lobby-code">----</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><input class="input-field" id="join-room-code" placeholder="Enter room code" style="max-width:220px;text-transform:uppercase"/><button class="btn-primary" onclick="joinGameRoom()">Join room</button></div>
+      </div>
+    </div>
+    <div id="game-ttt" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="ttt-status" style="color:#fff;font-weight:800">Your turn</div><div id="ttt-grid" class="ttt-grid"></div><div id="ttt-result" style="display:none;flex-direction:column;align-items:center;gap:8px"><div id="ttt-result-text" style="color:#fff;font-weight:800"></div><button class="btn-primary" onclick="resetTTT()">Play again</button></div></div>
+    <div id="game-chess" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="chess-status" style="color:#fff;font-weight:800">Your turn (White)</div><div id="chess-board" class="chess-board"></div><button class="btn-ghost" onclick="resetChess()">Reset chess</button></div>
+    <div id="game-rps" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="rpsPlay('rock')">âœŠ Rock</button><button class="btn-primary" onclick="rpsPlay('paper')">âœ‹ Paper</button><button class="btn-primary" onclick="rpsPlay('scissors')">âœŒï¸ Scissors</button></div><div id="rps-result" style="color:#fff;font-weight:800">Pick a move</div><div id="rps-score" style="color:#9CA3AF">You: 0 â€” Bot: 0</div><button class="btn-ghost" onclick="resetRPS()">Reset</button></div>
+    <div id="game-amongus" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><canvas id="amongus-canvas" width="640" height="360" style="width:100%;max-width:720px;border-radius:16px;background:#080811"></canvas><div id="au-status" style="color:#9CA3AF;font-size:13px">Move with arrow keys or WASD.</div><button class="btn-ghost" onclick="auMeeting()">ðŸš¨ Meeting</button><div id="au-vote-panel" style="display:none;flex-direction:column;gap:8px"></div></div>
+  </div>
 </div>
 
 <!-- CHAT -->
@@ -491,22 +579,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item active" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item active" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="chat-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="chat-shell"><div class="chat-sidebar"><div class="chat-side-header"><span>💬 Messages</span><button class="btn-ghost" style="font-size:12px;padding:7px 10px" onclick="openGroupModal()">New group</button></div><div class="convo-tabs"><button class="convo-tab active" id="tab-dms" onclick="switchConvoTab('dms')">💬 Direct</button><button class="convo-tab" id="tab-groups" onclick="switchConvoTab('groups')">👥 Groups</button></div><div id="convo-items" class="convo-list"></div></div><div class="chat-window" id="chat-window"><div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Select a conversation</p></div></div></div>
+  <div class="chat-layout"><div class="convo-list"><div class="convo-list-header"><span>Messages</span><button class="btn-ghost" style="font-size:12px;padding:7px 10px" onclick="openCreateGroup()">New group</button></div><input class="convo-search" placeholder="Search conversations..." oninput="filterConvos(this.value)"/><div class="convo-tabs"><button class="convo-tab active" id="tab-dms" onclick="switchConvoTab('dms')">Direct</button><button class="convo-tab" id="tab-groups" onclick="switchConvoTab('groups')">Groups</button></div><div id="convo-items" class="convo-items"></div></div><div class="chat-window" id="chat-window"><div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>Select a conversation</p></div></div></div>
 </div>
 
 <!-- ZID AI -->
@@ -514,22 +602,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item active" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item active" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="zidai-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">➤</button></div></div>
+  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">ðŸ¤– ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">âž¤</button></div></div>
 </div>
 
 <!-- GENERATE IDEAS -->
@@ -537,33 +625,34 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item active" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item active" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="ideas-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">💡 Generate Ideas</div><div class="page-subtitle">Profile your idea and match with real Zidea users</div></div>
+  <div class="main-content"><div><div class="page-title">ðŸ’¡ Generate Ideas</div><div class="page-subtitle">Profile your idea and match with real Zidea users</div></div>
     <div class="card matchmaker-form" id="idea-matchmaker">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:16px;font-weight:800;color:#fff">Collaboration Matcher</div><div style="font-size:12px;color:#6B7280;margin-top:4px">Submit your idea, answer quick prompts, then see your top near matches.</div></div><button class="btn-ghost" style="font-size:12px;padding:7px 12px" onclick="renderMatchAdmin()">View all submissions</button></div>
       <div class="match-progress"><span id="match-progress-bar"></span></div>
-      <div id="match-step-0" class="matchmaker-step active"><div class="matchmaker-grid"><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Your name</label><input class="input-field" id="match-name" placeholder="Alex Morgan"/></div><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Email</label><input class="input-field" id="match-email" type="email" placeholder="alex@example.com"/></div></div><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Idea title</label><input class="input-field" id="match-title" placeholder="Campus SkillSwap"/></div><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Short description</label><textarea class="input-field" id="match-description" rows="2" placeholder="A short version of what you want to build." style="resize:vertical"></textarea></div></div>
-      <div id="match-step-1" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What problem does your idea solve?</label><textarea class="input-field" id="match-problem" rows="3"></textarea></div>
+      <div id="match-step-0" class="matchmaker-step active"><div class="matchmaker-grid"><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Your name</label><input class="input-field" id="match-name" placeholder="Alex Morgan"/></div><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Email</label><input class="input-field" id="match-email" type="email" placeholder="alex@example.com"/></div></div><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Idea title</label><input class="input-field" id="match-title" placeholder="e.g. Campus SkillSwap"/></div><div><label style="font-size:12px;color:#6B7280;display:block;margin-bottom:6px">Short description</label><textarea class="input-field" id="match-description" rows="2" placeholder="e.g. A peer learning app for students to trade tutoring sessions." style="resize:vertical"></textarea></div></div>
+      <div id="match-step-1" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What problem does your idea solve?</label><textarea class="input-field" id="match-problem" rows="3" placeholder="e.g. Students need affordable help outside class."></textarea></div>
       <div id="match-step-2" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What industry or category does it fall under?</label><select class="input-field" id="match-industry"><option>Tech</option><option>Health</option><option>Education</option><option>Finance</option><option>Social</option><option>Other</option></select></div>
       <div id="match-step-3" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What stage is the idea at?</label><select class="input-field" id="match-stage"><option>Just an idea</option><option>Have a plan</option><option>Already started</option></select></div>
-      <div id="match-step-4" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What skills do you bring?</label><input class="input-field" id="match-skills" placeholder="technical, design, sales, research"/></div>
+      <div id="match-step-4" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What skills do you bring?</label><input class="input-field" id="match-skills" placeholder="e.g. UI design, Python, marketing"/></div>
       <div id="match-step-5" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What collaborator are you looking for?</label><select class="input-field" id="match-collaborator"><option>Technical</option><option>Business</option><option>Creative</option><option>Any</option></select></div>
       <div id="match-step-6" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">How much time can you commit per week?</label><select class="input-field" id="match-commitment"><option>&lt; 5hrs</option><option>5-10hrs</option><option>10+ hrs</option></select></div>
-      <div id="match-step-7" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What's the target audience?</label><textarea class="input-field" id="match-audience" rows="3" placeholder="students, small businesses, creators..."></textarea></div>
+      <div id="match-step-7" class="matchmaker-step"><label style="font-size:12px;color:#6B7280">What's the target audience?</label><textarea class="input-field" id="match-audience" rows="3" placeholder="e.g. students, small businesses, creators"></textarea></div>
+      <div id="match-error" class="field-error" aria-live="polite"></div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center"><button class="btn-ghost" id="match-back-btn" style="font-size:13px;padding:10px 16px;display:none" onclick="matchPrevStep()">Back</button><button class="btn-primary" id="match-next-btn" style="padding:10px 22px" onclick="matchNextStep()">Next</button><button class="btn-ghost" style="font-size:13px;padding:10px 16px" onclick="resetMatchmaker()">Reset</button></div><div id="match-output" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
   </div>
@@ -574,22 +663,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item active" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item active" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="library-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div class="page-title">📚 My Library</div><div class="page-subtitle">Ideas you have created on Zidea</div></div><div style="display:flex;gap:8px"><button class="lib-tab-btn active" id="lib-tab-created" onclick="switchLibTab('created')">Created</button><button class="lib-tab-btn" id="lib-tab-saved" onclick="switchLibTab('saved')">Saved</button><button class="lib-tab-btn" id="lib-tab-starred" onclick="switchLibTab('starred')">Starred</button></div></div><div class="input-wrap" style="max-width:360px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="lib-search" placeholder="Search ideas..." oninput="renderLibrary()"/></div><div style="display:flex;gap:6px;flex-wrap:wrap" id="lib-tag-filter"></div><div id="library-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
+  <div class="main-content"><div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px"><div><div class="page-title">ðŸ“š My Library</div><div class="page-subtitle">Ideas you have created on Zidea</div></div><div style="display:flex;gap:8px"><button class="lib-tab-btn active" id="lib-tab-created" onclick="switchLibTab('created')">Created</button><button class="lib-tab-btn" id="lib-tab-saved" onclick="switchLibTab('saved')">Saved</button><button class="lib-tab-btn" id="lib-tab-starred" onclick="switchLibTab('starred')">Starred</button></div></div><div class="input-wrap" style="max-width:360px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="lib-search" placeholder="Search ideas..." oninput="renderLibrary()"/></div><div style="display:flex;gap:6px;flex-wrap:wrap" id="lib-tag-filter"></div><div id="library-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
 </div>
 
 <!-- EXPLORE -->
@@ -597,22 +686,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item active" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item active" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="explore-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">🔥 Explore</div><div class="page-subtitle">Trending ideas from the community</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="explore-cat-btn active" onclick="filterExplore('all')">All</button><button class="explore-cat-btn" onclick="filterExplore('startup')">🚀 Startup</button><button class="explore-cat-btn" onclick="filterExplore('app')">📱 App</button><button class="explore-cat-btn" onclick="filterExplore('finance')">💰 Finance</button><button class="explore-cat-btn" onclick="filterExplore('health')">🏥 Health</button></div><div id="explore-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
+  <div class="main-content"><div><div class="page-title">ðŸ”¥ Explore</div><div class="page-subtitle">Trending ideas from the community</div></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="explore-cat-btn active" onclick="filterExplore('all')">All</button><button class="explore-cat-btn" onclick="filterExplore('startup')">ðŸš€ Startup</button><button class="explore-cat-btn" onclick="filterExplore('app')">ðŸ“± App</button><button class="explore-cat-btn" onclick="filterExplore('finance')">ðŸ’° Finance</button><button class="explore-cat-btn" onclick="filterExplore('health')">ðŸ¥ Health</button></div><div id="explore-list" style="display:flex;flex-direction:column;gap:10px"></div></div>
 </div>
 
 <!-- PROFILE -->
@@ -620,22 +709,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item active" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item active" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="profile-username-sidebar">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">👤 Profile</div></div><div class="card" style="display:flex;align-items:center;gap:16px"><div id="profile-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;overflow:hidden"></div><div><div id="profile-name" style="color:#fff;font-size:18px;font-weight:800"></div><div id="profile-email" style="color:#9CA3AF;font-size:13px;margin-top:4px"></div><label class="btn-ghost" style="display:inline-flex;margin-top:10px;font-size:12px"><input type="file" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)"/>Upload avatar</label><button id="remove-avatar-btn" class="btn-ghost" style="font-size:12px;margin-left:8px" onclick="removeAvatar()">Remove</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"><div class="card" style="text-align:center"><div id="profile-ideas-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Ideas</div></div><div class="card" style="text-align:center"><div id="profile-saved-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Saved</div></div><div class="card" style="text-align:center"><div id="profile-starred-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Starred</div></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Recent ideas</div><div id="profile-recent-ideas"></div></div></div>
+  <div class="main-content"><div><div class="page-title">ðŸ‘¤ Profile</div></div><div class="card" style="display:flex;align-items:center;gap:16px"><div id="profile-avatar" style="width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;overflow:hidden"></div><div><div id="profile-name" style="color:#fff;font-size:18px;font-weight:800"></div><div id="profile-email" style="color:#9CA3AF;font-size:13px;margin-top:4px"></div><label class="btn-ghost" style="display:inline-flex;margin-top:10px;font-size:12px"><input type="file" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)"/>Upload avatar</label><button id="remove-avatar-btn" class="btn-ghost" style="font-size:12px;margin-left:8px" onclick="removeAvatar()">Remove</button></div></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"><div class="card" style="text-align:center"><div id="profile-ideas-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Ideas</div></div><div class="card" style="text-align:center"><div id="profile-saved-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Saved</div></div><div class="card" style="text-align:center"><div id="profile-starred-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#6B7280">Starred</div></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Game stats</div><div id="profile-game-stats"></div></div><div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Recent ideas</div><div id="profile-recent-ideas"></div></div></div>
 </div>
 
 <!-- SETTINGS -->
@@ -643,22 +732,22 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item active" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item active" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="settings-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">⚙️ Settings</div></div><div class="card"><div style="color:#fff;font-weight:800;margin-bottom:8px">Account</div><div id="settings-account-info" style="color:#9CA3AF;font-size:13px"></div></div><div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="color:#fff;font-weight:700">Theme</div><div style="color:#6B7280;font-size:12px">Toggle light/dark filter</div></div><button id="theme-toggle" onclick="toggleTheme()" style="width:46px;height:26px;border-radius:999px;border:none;position:relative;cursor:pointer"><span id="theme-knob" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></span></button></div><div class="card"><button class="btn-ghost" style="color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="clearSavedIdeas()">Clear saved ideas</button></div></div>
+  <div class="main-content"><div><div class="page-title">âš™ï¸ Settings</div></div><div class="card"><div style="color:#fff;font-weight:800;margin-bottom:8px">Account</div><div id="settings-account-info" style="color:#9CA3AF;font-size:13px"></div></div><div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div><div style="color:#fff;font-weight:700">Theme</div><div style="color:#6B7280;font-size:12px">Toggle light/dark filter</div></div><button id="theme-toggle" onclick="toggleTheme()" style="width:46px;height:26px;border-radius:999px;border:none;position:relative;cursor:pointer"><span id="theme-knob" style="position:absolute;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s"></span></button></div><div class="card"><button class="btn-ghost" style="color:#ef4444;border-color:rgba(239,68,68,.3)" onclick="clearSavedIdeas()">Clear saved ideas</button></div></div>
 </div>
 
 <!-- HELP -->
@@ -666,22 +755,29 @@ body.app-active #page-landing footer{display:none}
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
-      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+      <button class="nav-item" onclick="showPage('dashboard')">ðŸ  Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">ðŸ’¡ Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">ðŸ“š Library</button>
+      <button class="nav-item" onclick="showPage('explore')">ðŸ”¥ Explore</button>
       <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <button class="nav-item" onclick="showPage('chat')">ðŸ’¬ Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">ðŸŽ® Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">ðŸ¤– ZiD AI</button>
       <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item active" onclick="showPage('help')">❓ Help</button>
+      <button class="nav-item" onclick="showPage('profile')">ðŸ‘¤ Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">âš™ï¸ Settings</button>
+      <button class="nav-item active" onclick="showPage('help')">â“ Help</button>
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="help-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content" style="max-width:760px"><div><div class="page-title">❓ Help & How It Works</div></div><div style="display:flex;flex-direction:column;gap:12px"><div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">🚀 What is Zidea?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Zidea helps you create ideas, find collaborators, chat, call, and play.</p></div><div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">💡 Generate Ideas</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Use Generate Ideas to profile an idea and match with real users.</p></div><div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">💬 Chat</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Connect opens a direct message with the matched person.</p></div></div></div>
+  <div class="main-content" style="max-width:760px"><div><div class="page-title">Help &amp; How It Works</div><div class="page-subtitle">Quick answers for the core Zidea flows.</div></div><div style="display:flex;flex-direction:column;gap:12px">
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do voice calls work?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Open a conversation or profile card, tap Call, and allow microphone access. Zidea connects the call in-browser and shows a timer once the peer connection is active.</p></div>
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How does the collaboration matcher work?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Generate Ideas asks a few structured questions, saves your idea, then scores real submissions by category, audience overlap, skills, collaborator need, and weekly commitment.</p></div>
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I play games?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Go to Arcade to play solo against the bot or switch to multiplayer mode. During a call, use the Play button to open a lightweight in-call game dock.</p></div>
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">What can ZiD AI do?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">ZiD AI can brainstorm, explain Zidea features, help shape an idea, draft messages, and answer general questions when an API key is configured.</p></div>
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I reset my password?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">On the login modal, choose Forgot password? and enter your account email. Zidea starts a reset request and shows confirmation without exposing whether an email exists.</p></div>
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I delete my account?</div><p style="color:#9CA3AF;font-size:13px;line-height:1.7">Open Contact from the footer or email hello@zidea.app from your account email. Include your @username and request account deletion so support can verify and remove your data.</p></div>
+  </div></div>
 </div>
 <!-- MOBILE NAV -->
 <nav class="mobile-nav">
@@ -691,27 +787,61 @@ body.app-active #page-landing footer{display:none}
     <button class="mob-nav-btn" id="mob-explore" onclick="showPage('explore')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Explore</button>
     <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
     <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
-    <button class="mob-nav-btn" id="mob-zidai" onclick="showPage('zidai')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>ZiD AI</button>
-    <button class="mob-nav-btn" id="mob-library" onclick="showPage('library')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library</button>
-    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><span class="mob-avatar-chip" id="mob-avatar-chip">U</span>Profile</button>
+    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
+    <button class="mob-nav-btn" id="mob-more" onclick="toggleMobileMore()"><span class="mob-more-dot" style="font-size:22px;line-height:14px">⋯</span>More</button>
   </div>
 </nav>
+<div class="mobile-more-drawer" id="mobile-more-drawer">
+  <button class="btn-ghost" onclick="showPage('zidai');toggleMobileMore(false)">ZiD AI</button>
+  <button class="btn-ghost" onclick="showPage('library');toggleMobileMore(false)">Library</button>
+  <button class="btn-ghost" onclick="showPage('settings');toggleMobileMore(false)">Settings</button>
+  <button class="btn-ghost" onclick="showPage('help');toggleMobileMore(false)">Help</button>
+</div>
+
+<!-- CHAT GROUP MODAL -->
+<div class="group-modal-overlay" id="group-modal-overlay" onclick="if(event.target===this)closeCreateGroup()">
+  <div class="group-modal">
+    <h3>Create group</h3>
+    <input class="input-field" id="group-name-input" placeholder="Group name"/>
+    <input class="input-field" id="group-member-search" placeholder="Search @username" oninput="filterGroupMembers(this.value)"/>
+    <div class="group-member-list" id="group-member-list"></div>
+    <div style="display:flex;gap:10px"><button class="btn-ghost" style="flex:1" onclick="closeCreateGroup()">Cancel</button><button class="btn-primary" style="flex:1" onclick="confirmCreateGroup()">Create</button></div>
+  </div>
+</div>
+
+<!-- GAME CHALLENGE MODAL -->
+<div class="modal-overlay" id="challenge-modal" onclick="if(event.target===this)closeChallengeModal()">
+  <div class="modal-box">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div><h2 id="challenge-title" style="color:#fff;font-size:18px;font-weight:800">Challenge Friend</h2><p style="color:#6B7280;font-size:12px;margin-top:4px">Search by @username and send a realtime invite.</p></div><button type="button" aria-label="Close challenge modal" onclick="closeChallengeModal()" style="background:none;border:none;color:#6B7280;font-size:24px;line-height:1">&times;</button></div>
+    <input class="input-field" id="challenge-search" placeholder="Enter @username"/>
+    <div id="challenge-status" style="color:#9CA3AF;font-size:13px;line-height:1.6"></div>
+    <button class="btn-primary" onclick="sendGameChallenge()">Send challenge</button>
+  </div>
+</div>
+
+<!-- GAME RESULT MODAL -->
+<div class="modal-overlay" id="game-result-modal" onclick="if(event.target===this)closeGameResult()">
+  <div class="modal-box">
+    <h2 id="game-result-title" style="color:#fff;font-size:20px;font-weight:900">Game over</h2>
+    <div id="game-result-summary" class="result-modal-summary"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="rematchGame()">Rematch</button><button class="btn-ghost" onclick="newGameFromResult()">New Game</button><button class="btn-ghost" onclick="backToArcadeFromResult()">Back to Arcade</button></div>
+  </div>
+</div>
 
 <!-- CALL OVERLAY -->
 <div class="call-overlay" id="call-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:20px">
-  <div style="width:80px;height:80px;border-radius:50%;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--brand-light)" id="call-avatar">?</div>
+  <div style="width:80px;height:80px;border-radius:50%;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--brand-light);overflow:hidden" id="call-avatar"></div>
   <div style="text-align:center"><div style="color:#fff;font-size:18px;font-weight:700" id="call-name">@user</div><div style="color:#9CA3AF;font-size:13px;margin-top:4px" id="call-status">Connecting...</div></div>
-  <div style="display:flex;gap:16px">
-    <button onclick="toggleMute()" id="mute-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">🎤</button>
-    <button onclick="endCall()" style="width:64px;height:64px;border-radius:50%;background:#DC2626;border:none;color:#fff;font-size:22px;cursor:pointer">📵</button>
-  </div>
+  <div class="video-call-stage" id="video-call-stage"><div class="video-tile"><video id="remote-video" autoplay playsinline></video><span class="video-label">Remote</span></div><div class="video-tile local"><video id="local-video" autoplay muted playsinline></video><span class="video-label">You</span></div></div>
+  <div class="call-game-dock" id="call-game-dock"></div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center"><button onclick="toggleMute()" id="mute-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">ðŸŽ¤</button><button onclick="toggleVideo()" id="video-btn" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:20px;cursor:pointer">ðŸ“¹</button><button onclick="toggleCallGameDock()" id="call-game-btn" style="height:56px;border-radius:999px;background:rgba(124,58,237,.25);border:1px solid rgba(124,58,237,.45);color:#fff;font-size:13px;font-weight:800;padding:0 18px;cursor:pointer">ðŸŽ® Play</button><button onclick="endCall()" style="width:64px;height:64px;border-radius:50%;background:#DC2626;border:none;color:#fff;font-size:22px;cursor:pointer">ðŸ“µ</button></div>
   <div id="call-timer" style="color:#6B7280;font-size:12px;font-family:monospace">00:00</div>
 </div>
 
 <!-- INCOMING CALL -->
 <div id="incoming-toast" style="display:none;position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:20px;z-index:201;min-width:260px;box-shadow:0 20px 60px rgba(0,0,0,.5)">
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-    <div style="width:44px;height:44px;border-radius:50%;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand-light)" id="incoming-avatar">?</div>
+    <div style="width:44px;height:44px;border-radius:50%;background:rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--brand-light);overflow:hidden" id="incoming-avatar"></div>
     <div><div style="color:#fff;font-weight:700;font-size:14px" id="incoming-name">@user</div><div style="color:#22C55E;font-size:12px">Incoming call...</div></div>
   </div>
   <div style="display:flex;gap:10px">
@@ -720,10 +850,38 @@ body.app-active #page-landing footer{display:none}
   </div>
 </div>
 
-<!-- GOOGLE MODAL -->
-<div class="modal-overlay" id="google-modal" style="display:none" onclick="if(event.target===this)closeGoogleModal()">
+<!-- SITE INFO MODAL -->
+<div class="modal-overlay" id="info-modal" onclick="if(event.target===this)closeInfoModal()">
   <div class="modal-box">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Enter your email and password</p></div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <h2 id="info-modal-title" style="color:#fff;font-size:18px;font-weight:800"></h2>
+      <button type="button" aria-label="Close information modal" onclick="closeInfoModal()" style="background:none;border:none;color:#6B7280;font-size:24px;line-height:1">&times;</button>
+    </div>
+    <div id="info-modal-body" class="info-modal-body"></div>
+  </div>
+</div>
+
+<!-- WELCOME MODAL -->
+<div class="modal-overlay" id="welcome-modal" onclick="if(event.target===this)dismissWelcomeTour()">
+  <div class="modal-box" style="max-width:560px">
+    <div>
+      <h2 style="color:#fff;font-size:20px;font-weight:800;margin-bottom:6px">Welcome to Zidea</h2>
+      <p style="color:#9CA3AF;font-size:13px;line-height:1.6">Here are the four places worth trying first.</p>
+    </div>
+    <div class="welcome-grid">
+      <div class="welcome-item"><div class="welcome-icon">💡</div><div><strong>Generate Ideas</strong><span>Profile an idea and find collaborator matches.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">💬</div><div><strong>Messages</strong><span>Chat, share files, and start calls.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">🎮</div><div><strong>Arcade</strong><span>Play games solo or with friends.</span></div></div>
+      <div class="welcome-item"><div class="welcome-icon">🤖</div><div><strong>ZiD AI</strong><span>Brainstorm and get quick answers.</span></div></div>
+    </div>
+    <button class="btn-primary" onclick="dismissWelcomeTour()">Got it</button>
+  </div>
+</div>
+
+<!-- GOOGLE MODAL -->
+<div class="modal-overlay" id="google-modal" onclick="if(event.target===this)closeGoogleModal()">
+  <div class="modal-box">
+    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#9CA3AF;font-size:13px">Google OAuth is not connected yet. Use email and password for now.</p></div>
     <div id="google-error" class="error-msg"></div>
     <form style="display:flex;flex-direction:column;gap:12px" onsubmit="handleGoogleSubmit(event)">
       <div id="google-step1"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="google-email" placeholder="your@gmail.com"/></div></div>
@@ -745,12 +903,49 @@ const db = {
   async read(p){for(let n=0;n<3;n++){try{const r=await fetch(`${FB}/${p}.json`);if(r.ok)return await r.json();}catch(_){}if(n<2)await new Promise(res=>setTimeout(res,400*(n+1)));}return null;},
   del(p){return fetch(`${FB}/${p}.json`,{method:'DELETE'}).catch(()=>{})}
 };
-async function testFirebaseAccess(){try{const r=await fetch(`${FB}/_test.json`,{method:'PUT',body:JSON.stringify({ok:true}),headers:{'Content-Type':'application/json'}});if(!r.ok){const t=await r.text();if(t.includes('Permission denied')||t.includes('PERMISSION_DENIED')){const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';b.innerHTML='⚠ Firebase rules blocking writes. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> → Realtime Database → Rules → set { "rules": { ".read": true, ".write": true } }';document.body.prepend(b);}}else{fetch(`${FB}/_test.json`,{method:'DELETE'});}}catch(_){}}
+async function testFirebaseAccess(){try{const r=await fetch(`${FB}/_test.json`,{method:'PUT',body:JSON.stringify({ok:true}),headers:{'Content-Type':'application/json'}});if(!r.ok){const t=await r.text();if(t.includes('Permission denied')||t.includes('PERMISSION_DENIED')){const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';b.innerHTML='âš  Firebase rules blocking writes. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> â†’ Realtime Database â†’ Rules â†’ set { "rules": { ".read": true, ".write": true } }';document.body.prepend(b);}}else{fetch(`${FB}/_test.json`,{method:'DELETE'});}}catch(_){}}
 // Storage
-const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-const load=k=>{try{return JSON.parse(localStorage.getItem(k))}catch{return null}};
+const memoryStore={};
+function getLocalStorage(){
+  try{return window.localStorage;}catch(_){return null;}
+}
+function storageAvailable(){
+  const store=getLocalStorage();
+  if(!store)return false;
+  try{
+    const key='zidea_storage_test';
+    store.setItem(key,'1');
+    store.removeItem(key);
+    return true;
+  }catch(_){return false;}
+}
+const canUseLocalStorage=storageAvailable();
+const save=(k,v)=>{
+  const value=JSON.stringify(v);
+  memoryStore[k]=value;
+  const store=canUseLocalStorage?getLocalStorage():null;
+  if(store){try{store.setItem(k,value);}catch(_){}}
+};
+const load=k=>{
+  try{
+    const store=canUseLocalStorage?getLocalStorage():null;
+    const value=store?store.getItem(k):memoryStore[k];
+    return value?JSON.parse(value):null;
+  }catch(_){
+    try{return memoryStore[k]?JSON.parse(memoryStore[k]):null;}catch{return null;}
+  }
+};
+function removeStored(k){
+  delete memoryStore[k];
+  const store=canUseLocalStorage?getLocalStorage():null;
+  if(store){try{store.removeItem(k);}catch(_){}}
+}
+const timeoutPromise=(ms)=>new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms));
+const withTimeout=(promise,ms=1800)=>Promise.race([promise,timeoutPromise(ms)]);
+const onlineReady=()=>navigator.onLine!==false;
 // State
 let currentUser=null,fbUsers={},fbSSE=null,fbStarted=false,incomingSSE=null,searchQuery='';
+let googleClientId='',googleReady=false,googleTokenClient=null;
 const PAGE_META={
   landing:{title:'Zidea - Connect, Call, Play',desc:'Connect with friends, generate ideas, chat, call, and play games on Zidea.'},
   login:{title:'Sign In - Zidea',desc:'Sign in to your Zidea account.'},
@@ -782,6 +977,39 @@ function showToast(message){
   const t=document.createElement('div');t.className='toast';t.textContent=message;wrap.appendChild(t);
   setTimeout(()=>{t.remove();},2600);
 }
+const INFO_CONTENT={
+  privacy:{
+    title:'Privacy Policy',
+    body:'Zidea stores account details, profile settings, ideas, messages, and presence data needed to run the app. Do not share sensitive personal information in chats or idea submissions. A fuller policy will be published before production launch.'
+  },
+  terms:{
+    title:'Terms of Service',
+    body:'Use Zidea respectfully. You are responsible for the content you create, messages you send, and calls you join. Do not abuse, impersonate, spam, or upload content you do not have permission to share.'
+  },
+  contact:{
+    title:'Contact',
+    body:'Questions, account deletion requests, and support issues can be sent to hello@zidea.app. Include your @username and account email so the team can verify the request.'
+  }
+};
+function openInfoModal(kind){
+  const item=INFO_CONTENT[kind]||INFO_CONTENT.contact;
+  document.getElementById('info-modal-title').textContent=item.title;
+  document.getElementById('info-modal-body').textContent=item.body;
+  document.getElementById('info-modal').classList.add('show');
+}
+function closeInfoModal(){document.getElementById('info-modal').classList.remove('show');}
+function showWelcomeTour(){
+  if(!currentUser)return;
+  const key=`zidea_welcome_seen_${currentUser.username}`;
+  if(load(key))return;
+  const modal=document.getElementById('welcome-modal');
+  if(modal)modal.classList.add('show');
+}
+function dismissWelcomeTour(){
+  if(currentUser)save(`zidea_welcome_seen_${currentUser.username}`,true);
+  const modal=document.getElementById('welcome-modal');
+  if(modal)modal.classList.remove('show');
+}
 function applyTheme(){
   const theme=load(currentUser?`zidea_theme_${currentUser.username}`:'zidea_theme')||'dark';
   document.documentElement.style.filter=theme==='light'?'invert(1) hue-rotate(180deg)':'';
@@ -805,6 +1033,12 @@ function syncSidebarActive(name){
     const match=click.match(/showPage\('([^']+)'\)/);
     btn.classList.toggle('active',!!match&&match[1]===name);
   });
+}
+function toggleMobileMore(force){
+  const drawer=document.getElementById('mobile-more-drawer');
+  if(!drawer)return;
+  const show=typeof force==='boolean'?force:!drawer.classList.contains('show');
+  drawer.classList.toggle('show',show);
 }
 function openAuthModal(kind,skipHash=false){
   const login=document.getElementById('page-login'),signup=document.getElementById('page-signup');
@@ -831,13 +1065,18 @@ function showPage(name,opts={}){
   setPageMeta(name);
   updateLandingAuthUI();
   syncSidebarActive(name);
-  ['discover','ideas','explore','chat','arcade','zidai','library','profile'].forEach(k=>{
+  ['discover','ideas','explore','chat','arcade','profile'].forEach(k=>{
     const b=document.getElementById('mob-'+k);
     if(b)b.classList.toggle('active',(k==='discover'&&name==='dashboard')||(k===name));
   });
+  const more=document.getElementById('mob-more');
+  if(more)more.classList.toggle('active',['zidai','library','settings','help'].includes(name));
+  toggleMobileMore(false);
   if(!opts.skipHash){suppressHashChange=true;window.location.hash=name;setTimeout(()=>{suppressHashChange=false;},0);}
   if(name==='dashboard'){searchQuery='';const si=document.getElementById('search-input');if(si)si.value='';renderUsers();renderOnline();}
   if(name==='chat'){document.getElementById('chat-username').textContent='@'+(currentUser?.username||'');const ci=document.getElementById('convo-items');if(ci&&!Object.keys(chatCache).length)ci.innerHTML=skeletonConvos(5);loadAllConvos().then(()=>{renderConvos(activeChatUser);if(!activeChatUser&&!activeGroupId){const chatted=Object.keys(chatCache);if(chatted.length)openConvo(chatted[0]);}});loadMyGroups().then(()=>{if(activeConvoTab==='groups')renderGroupList();});}
+  if(name!=='chat')document.getElementById('page-chat')?.classList.remove('chat-open');
+  if(name==='arcade'){const u=document.getElementById('arcade-username');if(u)u.textContent='@'+(currentUser?.username||'');renderArcadeHome();listenGameInvites();}
   if(name==='zidai'){if(!document.querySelector('.zidai-msg'))initZidAi();}
   if(name==='ideas'){const u=document.getElementById('ideas-username');if(u)u.textContent='@'+(currentUser?.username||'');ensureMatchSeeds();prefillMatchUser();updateMatchStep();syncMatchIdeasFromFirebase().then(()=>updateMatchStep());}
   if(name==='library'){const u=document.getElementById('library-username');if(u)u.textContent='@'+(currentUser?.username||'');const list=document.getElementById('library-list');if(list)list.innerHTML=skeletonUserCards(2);Promise.all([syncMatchIdeasFromFirebase(),syncCreatedIdeasFromFirebase()]).then(renderLibrary).catch(renderLibrary);}
@@ -862,39 +1101,103 @@ function handleHashRoute(){
 window.addEventListener('hashchange',handleHashRoute);
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuthModal();});
 // Auth
-function handleLogin(e){
+function normalizeEmail(email){return String(email||'').trim().toLowerCase();}
+function getAccounts(){
+  const raw=load('zidea_accounts')||{};
+  const accounts={};
+  Object.entries(raw).forEach(([key,value])=>{
+    if(!value||typeof value!=='object')return;
+    const email=normalizeEmail(value.email||key);
+    if(email)accounts[email]={...value,email};
+  });
+  save('zidea_accounts',accounts);
+  return accounts;
+}
+async function findRemoteAccount(email){
+  if(!onlineReady())return null;
+  const data=await withTimeout(db.read('accounts'),1600).catch(()=>null);
+  if(!data)return null;
+  const found=Object.values(data).find(a=>normalizeEmail(a?.email)===email);
+  if(!found)return null;
+  return {email,username:found.username,password:found.password||'',wins:found.wins||0,losses:found.losses||0};
+}
+function saveAccount(email,account){
+  const accounts=getAccounts();
+  accounts[email]={...account,email};
+  save('zidea_accounts',accounts);
+}
+function enterApp(user){
+  currentUser=user;
+  save('zidea_session',user);
+  try{setLoggedInUI();}catch(error){console.warn('setLoggedInUI failed',error);}
+  try{updateLandingAuthUI();}catch(error){console.warn('updateLandingAuthUI failed',error);}
+  try{closeAuthModal(true);}catch(error){console.warn('closeAuthModal failed',error);}
+  try{showPage('dashboard');}catch(error){console.warn('showPage dashboard failed',error);}
+  setTimeout(()=>{try{startFirebase();listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();}catch(error){console.warn('background sync failed',error);}},100);
+  setTimeout(showWelcomeTour,350);
+  showToast('Signed in successfully.');
+}
+function syncAccountOnline(email,account){
+  if(!onlineReady()||!account?.username)return;
+  withTimeout(db.write(`accounts/${account.username}`,{
+    email,
+    username:account.username,
+    password:account.password||'',
+    wins:account.wins||0,
+    losses:account.losses||0,
+    createdAt:account.createdAt||Date.now(),
+    updatedAt:Date.now()
+  }),1800).catch(()=>{});
+}
+function syncAllAccountsOnline(){
+  if(!onlineReady())return;
+  const accounts=getAccounts();
+  Object.entries(accounts).forEach(([email,account])=>syncAccountOnline(email,account));
+}
+async function handleLogin(e){
   e.preventDefault();
   const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.classList.add('btn-loading');
-  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const email=normalizeEmail(document.getElementById('login-email').value);
   const pw=document.getElementById('login-password').value;
   const err=document.getElementById('login-error');
-  const accounts=load('zidea_accounts')||{};
-  const acc=accounts[email];
+  const accounts=getAccounts();
+  let acc=accounts[email];
+  if(!acc){acc=await findRemoteAccount(email);if(acc)saveAccount(email,acc);}
   if(!acc){err.textContent='No account found.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
   if(acc.password!==pw){err.textContent='Wrong password.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
   err.classList.remove('show');
+  if(btn)btn.classList.remove('btn-loading');
+  syncAccountOnline(email,acc);
   loginSuccess({email,username:acc.username});
 }
 function handleSignup(e){
   e.preventDefault();
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.classList.add('btn-loading');
+  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
   const username=document.getElementById('signup-username').value.trim().toLowerCase();
-  const email=document.getElementById('signup-email').value.trim().toLowerCase();
+  const email=normalizeEmail(document.getElementById('signup-email').value);
   const pw=document.getElementById('signup-password').value;
   const err=document.getElementById('signup-error');
-  const accounts=load('zidea_accounts')||{};
-  if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  err.classList.remove('show');
-  accounts[email]={username,password:pw,wins:0,losses:0};
-  save('zidea_accounts',accounts);
-  db.write(`accounts/${username}`,{email,username,createdAt:Date.now()}).catch(()=>{});
-  loginSuccess({email,username});
+  try{
+    const accounts=getAccounts();
+    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent='Use 3-20 letters, numbers, or underscores for username.';err.classList.add('show');return;}
+    if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');return;}
+    if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');return;}
+    err.classList.remove('show');
+    const account={email,username,password:pw,wins:0,losses:0,createdAt:Date.now()};
+    saveAccount(email,account);
+    err.classList.remove('show');
+    enterApp({email,username});
+    setTimeout(()=>syncAccountOnline(email,account),50);
+  }catch(error){
+    err.textContent='Could not create account: '+(error?.message||'Try again.');
+    err.classList.add('show');
+    console.error(error);
+  }finally{
+    if(btn)btn.disabled=false;
+  }
 }
 function loginSuccess(user){
-  currentUser=user;save('zidea_session',user);setLoggedInUI();updateLandingAuthUI();closeAuthModal(true);startFirebase();showPage('dashboard');setTimeout(listenIncoming,1000);
-  setTimeout(()=>{syncIdeasFromFirebase();syncAvatarFromFirebase();},1500);
-  showToast('Signed in successfully.');
+  enterApp(user);
 }
 function setLoggedInUI(){
   const n='@'+currentUser.username;
@@ -909,17 +1212,73 @@ function handleLogout(force=false){
   if(incomingSSE){incomingSSE.close();incomingSSE=null;}
   if(fbSSE){fbSSE.close();fbSSE=null;}
   if(currentUser&&fbStarted)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});
-  fbStarted=false;currentUser=null;localStorage.removeItem('zidea_session');showPage('landing');showToast('Signed out.');
+  fbStarted=false;currentUser=null;removeStored('zidea_session');showPage('landing');showToast('Signed out.');
   updateLandingAuthUI();
 }
-// Google mock
+async function handleForgotPassword(){
+  const email=normalizeEmail(document.getElementById('login-email')?.value||prompt('Enter your account email for password reset:')||'');
+  const err=document.getElementById('login-error');
+  if(!email){if(err){err.textContent='Enter your email first so we know where to send reset instructions.';err.classList.add('show');}return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){if(err){err.textContent='Enter a valid email address.';err.classList.add('show');}return;}
+  const request={email,requestedAt:Date.now(),status:'requested'};
+  const requests=load('zidea_password_reset_requests')||[];
+  save('zidea_password_reset_requests',[request,...requests].slice(0,25));
+  await db.patch('passwordResets',{[Date.now()]:request}).catch(()=>{});
+  if(err)err.classList.remove('show');
+  showToast('Password reset instructions have been sent if this email is registered.');
+}
+async function loadGoogleConfig(){
+  if(googleClientId)return googleClientId;
+  try{
+    const res=await fetch('/api/config');
+    if(res.ok){const data=await res.json();googleClientId=data.googleClientId||'';}
+  }catch(_){}
+  // Static local previews can set this manually before loading the page.
+  googleClientId=googleClientId||window.NEXT_PUBLIC_GOOGLE_CLIENT_ID||window.VITE_GOOGLE_CLIENT_ID||'';
+  return googleClientId;
+}
+async function initGoogleAuth(){
+  const clientId=await loadGoogleConfig();
+  if(!clientId){showToast('Google sign-in is not configured yet.');return false;}
+  if(!window.google?.accounts?.id){showToast('Google sign-in is still loading. Try again in a moment.');return false;}
+  if(!googleReady){
+    google.accounts.id.initialize({
+      client_id:clientId,
+      callback:handleGoogleCredential,
+      ux_mode:'popup',
+      auto_select:false
+    });
+    googleReady=true;
+  }
+  return true;
+}
+async function handleGoogleLogin(){
+  const ready=await initGoogleAuth();
+  if(!ready)return;
+  try{google.accounts.id.prompt(notification=>{if(notification.isNotDisplayed?.()||notification.isSkippedMoment?.())google.accounts.id.renderButton(document.body.appendChild(Object.assign(document.createElement('div'),{style:'position:fixed;left:-9999px'})),{theme:'outline',size:'large'});});}
+  catch(_){showToast('Google sign-in failed. Please try again.');}
+}
+async function handleGoogleCredential(response){
+  const idToken=response?.credential;
+  if(!idToken){showToast('Google sign-in failed. Please try again.');return;}
+  try{
+    const res=await fetch('/api/auth/google',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({idToken})});
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok||!data.success)throw new Error(data.message||'Authentication failed. Try again.');
+    if(data.token)save('zidea_google_session_token',data.token);
+    if(data.user?.avatar)save(`zidea_avatar_data_${data.user.username}`,data.user.avatar);
+    saveAccount(normalizeEmail(data.user.email),{email:data.user.email,username:data.user.username,password:'',google_id:data.user.google_id||'',avatar:data.user.avatar||'',wins:0,losses:0});
+    loginSuccess({email:data.user.email,username:data.user.username,avatar:data.user.avatar||''});
+  }catch(error){
+    const msg=String(error?.message||'');
+    showToast(msg.includes('registered')?msg:msg.includes('fetch')?'Connection error. Check your internet and retry.':'Google sign-in failed. Please try again.');
+  }
+}
 let gStep='email',gEmail='';
-const GOOGLE_ACCS={'nova@gmail.com':'nova1234','pixel@gmail.com':'pixel999','demo@gmail.com':'demo123'};
-function handleGoogleLogin(){showToast('Google sign-in is disabled. Use email + password.');}
 function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
 function handleGoogleSubmit(e){
   e.preventDefault();
-  showToast('Google sign-in is disabled in this build.');
+  handleGoogleLogin();
 }
 </script>
 
@@ -947,10 +1306,17 @@ function renderUsers(){
   if(!searchQuery){list.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center"><div style="width:64px;height:64px;border-radius:20px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div><p style="color:#e2e8f0;font-size:15px;font-weight:700;margin-bottom:6px">Find someone</p><p style="color:#4b5563;font-size:13px;line-height:1.6">Search by @username to find people</p></div></div>`;return;}
   const users=getAllUsers().filter(u=>u.username.toLowerCase().includes(searchQuery.toLowerCase()));
   if(!users.length){list.innerHTML=`<p style="color:#4b5563;font-size:14px;text-align:center;padding:40px 20px">No users found for "<strong style="color:#a78bfa">${esc(searchQuery)}</strong>"</p>`;return;}
-  list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#22C55E':'#6B7280'}">${isOnline(u)?'● Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
+  list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#22C55E':'#6B7280'}">${isOnline(u)?'â— Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
 }
 function renderOnline(){const el=document.getElementById('online-list');if(!el)return;const online=getAllUsers().filter(u=>isOnline(u));if(!online.length){el.innerHTML='<div class="online-empty">No one online yet</div>';return;}el.innerHTML=online.map(u=>`<div class="online-user-row"><div class="online-avatar">${u.username.slice(0,2).toUpperCase()}</div><div><div class="online-user-name">@${u.username}</div></div></div>`).join('');}
-function updateStats(){db.read('users').then(data=>{const su=document.getElementById('stat-users');const so=document.getElementById('stat-online');if(!data){if(su)su.textContent='-';if(so)so.textContent='-';return;}const users=Object.values(data).filter(Boolean);if(su)su.textContent=String(users.length);if(so)so.textContent=String(users.filter(u=>isOnline(u)).length);}).catch(()=>{const su=document.getElementById('stat-users');const so=document.getElementById('stat-online');if(su)su.textContent='-';if(so)so.textContent='-';});}
+function updateLandingOnlineStat(count){
+  const wrap=document.getElementById('stat-online-wrap'),line=document.getElementById('stat-community-line'),num=document.getElementById('stat-online');
+  const showLive=Number(count)>=5;
+  if(num)num.textContent=String(count);
+  if(wrap)wrap.style.display=showLive?'block':'none';
+  if(line)line.style.display=showLive?'none':'flex';
+}
+function updateStats(){db.read('users').then(data=>{const su=document.getElementById('stat-users');if(!data){if(su)su.textContent='-';updateLandingOnlineStat(0);return;}const users=Object.values(data).filter(Boolean);if(su)su.textContent=String(users.length);updateLandingOnlineStat(users.filter(u=>isOnline(u)).length);}).catch(()=>{const su=document.getElementById('stat-users');if(su)su.textContent='-';updateLandingOnlineStat(0);});}
 // Skeletons
 function skeletonConvos(n=5){return Array(n).fill(0).map(()=>`<div class="skeleton-convo"><div class="skeleton skeleton-circle" style="width:42px;height:42px;flex-shrink:0"></div><div style="flex:1;min-width:0"><div class="skeleton" style="height:13px;width:70%;margin-bottom:7px;border-radius:6px"></div><div class="skeleton" style="height:11px;width:50%;border-radius:6px"></div></div></div>`).join('');}
 function skeletonUserCards(n=3){return Array(n).fill(0).map(()=>`<div class="skeleton-card"><div class="skeleton skeleton-circle" style="width:44px;height:44px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:13px;width:60%;margin-bottom:8px;border-radius:6px"></div><div class="skeleton" style="height:11px;width:40%;border-radius:6px"></div></div><div style="display:flex;gap:8px"><div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div><div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div></div></div>`).join('');}
@@ -964,11 +1330,26 @@ let rtcPeer=null,localStream=null,activeCallUser=null,callMuted=false,callTimer=
 const RTC_CONFIG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
 function callChan(a,b){return[a,b].sort().join('__');}
 function sigPath(chan){return`webrtc/${chan}`;}
+function renderAvatar(el,username,size='100%'){
+  if(!el)return;
+  const remote=fbUsers?.[username]?.avatar||null;
+  const local=username===currentUser?.username?load(ideaStoreKey('avatar_data')):null;
+  const avatar=remote||local;
+  el.style.background=`linear-gradient(135deg,${userColor(username)},#c026d3)`;
+  el.innerHTML=avatar?`<img src="${avatar}" alt="@${esc(username)} avatar" style="width:${size};height:${size};object-fit:cover;border-radius:50%"/>`:getUserInitials(username);
+}
+function prepareCallUI(username,status){
+  stopCallTimer();
+  document.getElementById('call-name').textContent='@'+username;
+  renderAvatar(document.getElementById('call-avatar'),username);
+  document.getElementById('call-status').textContent=status||'Connecting...';
+  document.getElementById('call-timer').textContent='00:00';
+}
 async function toggleCall(username){if(activeCallUser){endCall();return;}await startCall(username);}
 async function startCall(username){
   if(!currentUser)return;activeCallUser=username;
   const overlay=document.getElementById('call-overlay');overlay.style.display='flex';
-  document.getElementById('call-name').textContent='@'+username;document.getElementById('call-avatar').textContent=getUserInitials(username);document.getElementById('call-status').textContent='Connecting...';document.getElementById('call-timer').textContent='00:00';
+  prepareCallUI(username,'Connecting...');
   const chan=callChan(currentUser.username,username);
   await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,ts:Date.now()});
   try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;showToast('Microphone unavailable.');return;}
@@ -993,7 +1374,7 @@ async function endCall(){
   if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
   const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
 }
-function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'🔇':'🎤';}
+function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'ðŸ”‡':'ðŸŽ¤';}
 function startCallTimer(){callSecs=0;callTimer=setInterval(()=>{callSecs++;const m=String(Math.floor(callSecs/60)).padStart(2,'0');const s=String(callSecs%60).padStart(2,'0');const el=document.getElementById('call-timer');if(el)el.textContent=m+':'+s;},1000);}
 function stopCallTimer(){if(callTimer){clearInterval(callTimer);callTimer=null;}callSecs=0;}
 function listenIncoming(){
@@ -1003,7 +1384,7 @@ function listenIncoming(){
 }
 async function acceptCall(){
   if(!incomingUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser;incomingUser=null;activeCallUser=caller;
-  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';document.getElementById('call-name').textContent='@'+caller;document.getElementById('call-avatar').textContent=getUserInitials(caller);document.getElementById('call-status').textContent='Connecting...';document.getElementById('call-timer').textContent='00:00';
+  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';prepareCallUI(caller,'Connecting...');
   try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;return;}
   rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
   rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
@@ -1013,6 +1394,73 @@ async function acceptCall(){
   const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
 }
 function declineCall(){incomingUser=null;document.getElementById('incoming-toast').style.display='none';if(currentUser)db.del('calls/'+currentUser.username+'/incoming');}
+</script>
+
+<script>
+// ------ Video calls + in-call games --------------------------------------------------
+let incomingCallVideo=false;
+function toggleVideoCall(username){if(activeCallUser){endCall();return;}return startCall(username,true);}
+function setupCallMedia(stream,isVideo){
+  const stage=document.getElementById('video-call-stage'),localVideo=document.getElementById('local-video');
+  if(stage)stage.classList.toggle('show',!!isVideo);
+  if(localVideo)localVideo.srcObject=isVideo?stream:null;
+}
+function attachRemoteStream(stream){
+  const hasVideo=stream.getVideoTracks&&stream.getVideoTracks().length;
+  const stage=document.getElementById('video-call-stage'),remoteVideo=document.getElementById('remote-video');
+  if(hasVideo&&stage&&remoteVideo){stage.classList.add('show');remoteVideo.srcObject=stream;}
+  let audio=document.getElementById('rtc-remote-audio');
+  if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}
+  audio.srcObject=stream;
+}
+async function startCall(username,isVideo=false){
+  if(!currentUser)return;activeCallUser=username;
+  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';
+  prepareCallUI(username,isVideo?'Requesting camera and microphone...':'Requesting microphone...');
+  document.getElementById('call-game-dock')?.classList.remove('show');
+  const chan=callChan(currentUser.username,username);
+  await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,video:!!isVideo,ts:Date.now()});
+  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:!!isVideo});}catch(err){document.getElementById('call-status').textContent='Permission error: '+err.message;showToast(isVideo?'Camera or microphone unavailable.':'Microphone unavailable.');return;}
+  setupCallMedia(localStream,isVideo);
+  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
+  rtcPeer.ontrack=e=>{attachRemoteStream(e.streams[0]);document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
+  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';showToast('Call connection failed.');setTimeout(endCall,900);}};
+  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
+  const offer=await rtcPeer.createOffer();await rtcPeer.setLocalDescription(offer);await db.write(sigPath(chan)+'/offer',{sdp:offer.sdp,type:offer.type,from:currentUser.username});
+  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='No answer';showToast('No answer. Call ended.');endCall();}},30000);
+  listenSignals(chan,false);renderUsers();
+}
+function listenIncoming(){
+  if(!currentUser||incomingSSE)return;
+  const sse=new EventSource(`${FB}/calls/${currentUser.username}/incoming.json`);incomingSSE=sse;
+  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data||!data.from||data.from===currentUser?.username||activeCallUser)return;incomingUser=data.from;incomingCallVideo=!!data.video;document.getElementById('incoming-name').textContent='@'+data.from;renderAvatar(document.getElementById('incoming-avatar'),data.from);const label=document.querySelector('#incoming-name')?.nextElementSibling;if(label)label.textContent=incomingCallVideo?'Incoming video call...':'Incoming call...';document.getElementById('incoming-toast').style.display='block';setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);}catch(_){}});}
+async function acceptCall(){
+  if(!incomingUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser,isVideo=!!incomingCallVideo;incomingUser=null;incomingCallVideo=false;activeCallUser=caller;
+  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';prepareCallUI(caller,isVideo?'Requesting camera and microphone...':'Requesting microphone...');
+  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});}catch(err){document.getElementById('call-status').textContent='Permission error: '+err.message;return;}
+  setupCallMedia(localStream,isVideo);
+  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
+  rtcPeer.ontrack=e=>{attachRemoteStream(e.streams[0]);document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
+  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';setTimeout(endCall,900);}};
+  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);const chan=callChan(currentUser.username,caller);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
+  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
+  const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
+}
+function toggleVideo(){const track=localStream?.getVideoTracks?.()[0];if(!track){showToast('Start a video call to use camera.');return;}track.enabled=!track.enabled;document.getElementById('video-btn').textContent=track.enabled?'ðŸ“¹':'ðŸš«';}
+function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'ðŸ”‡':'ðŸŽ¤';}
+async function endCall(){
+  if(!activeCallUser)return;const u=activeCallUser;activeCallUser=null;callMuted=false;
+  if(currentUser){db.del('calls/'+currentUser.username+'/incoming');db.del('calls/'+u+'/incoming');const chan=callChan(currentUser.username,u);db.del(sigPath(chan));}
+  if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}
+  if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
+  const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();const lv=document.getElementById('local-video'),rv=document.getElementById('remote-video');if(lv)lv.srcObject=null;if(rv)rv.srcObject=null;document.getElementById('video-call-stage')?.classList.remove('show');document.getElementById('call-game-dock')?.classList.remove('show');document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
+}
+function toggleCallGameDock(){
+  const dock=document.getElementById('call-game-dock');if(!dock)return;
+  if(!dock.innerHTML)dock.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px"><div style="color:#fff;font-weight:800">Play during call</div><button class="idea-action-btn" onclick="toggleCallGameDock()">Close</button></div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"><button class="btn-primary" onclick="renderCallMiniGame('ttt')">â­• Tic-Tac-Toe</button><button class="btn-primary" onclick="renderCallMiniGame('rps')">âœŠ RPS</button></div><div id="call-mini-game"></div>`;
+  dock.classList.toggle('show');if(dock.classList.contains('show')&&!document.getElementById('call-mini-game').innerHTML)renderCallMiniGame('ttt');
+}
+function renderCallMiniGame(type){const root=document.getElementById('call-mini-game');if(!root)return;if(type==='rps'){root.innerHTML=`<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked rock'">âœŠ Rock</button><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked paper'">âœ‹ Paper</button><button class="btn-ghost" onclick="this.parentElement.nextElementSibling.textContent='You picked scissors'">âœŒï¸ Scissors</button></div><div style="color:#9CA3AF;margin-top:10px">Pick a move.</div>`;return;}root.innerHTML=`<div class="ttt-grid">${Array.from({length:9},(_,i)=>`<button onclick="this.textContent=this.textContent?'':'X';this.disabled=true" style="aspect-ratio:1;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.06);color:#fff;font-size:26px;font-weight:900"></button>`).join('')}</div>`;}
 </script>
 
 <script>
@@ -1029,23 +1477,29 @@ function renderConvos(active){
   const el=document.getElementById('convo-items');if(!el)return;
   const users=getAllUsers();const chatted=Object.keys(chatCache).filter(u=>!users.find(x=>x.username===u));
   const allUsers=[...users,...chatted.map(u=>({username:u,wins:0,losses:0,lastSeen:0}))];
-  if(!allUsers.length){el.innerHTML='<div style="padding:16px;font-size:13px;color:#6B7280">No users yet</div>';return;}
+  if(!allUsers.length){el.innerHTML=emptyStateHTML('💬','No messages yet','Find someone by @username and start a conversation.','Find People',"showPage('dashboard')");return;}
   allUsers.sort((a,b)=>{const ma=chatCache[a.username]||[],mb=chatCache[b.username]||[];return(mb[mb.length-1]?.ts||0)-(ma[ma.length-1]?.ts||0);});
   el.innerHTML=allUsers.map(u=>{
     const msgs=chatCache[u.username]||[];const last=msgs[msgs.length-1];const online=isOnline(u);
     const unread=msgs.filter(m=>m.from!==currentUser?.username&&!m.read).length;
-    const preview=last?(last.type&&last.type!=='text'?'📎 '+(last.name||last.type.replace('_ref','')):(last.from===currentUser?.username?'You: ':'')+esc(last.text||'')):'Say hello!';
-    return`<div class="convo-item${active===u.username?' active':''}" onclick="openConvo('${u.username}')"><div class="convo-avatar">${u.username.slice(0,2).toUpperCase()}${online?'<div class="online-dot"></div>':''}</div><div class="convo-meta"><div class="convo-name">@${u.username}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;
+    const preview=last?(last.type&&last.type!=='text'?'ðŸ“Ž '+(last.name||last.type.replace('_ref','')):(last.from===currentUser?.username?'You: ':'')+esc(last.text||'')):'Say hello!';
+    return`<div class="convo-item${active===u.username?' active':''}" onclick="openConvo('${u.username}')"><div class="convo-avatar">${getUserInitials(u.username)}${online?'<div class="online-dot"></div>':''}</div><div class="convo-meta"><div class="convo-name">@${u.username}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${relativeTime(last.ts)}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;
   }).join('');
+}
+function relativeTime(ts){
+  const diff=Date.now()-(Number(ts)||0),m=Math.floor(diff/60000),h=Math.floor(diff/3600000),d=Math.floor(diff/86400000);
+  if(!ts)return'';if(m<1)return'now';if(m<60)return`${m}m ago`;if(h<24)return`${h}h ago`;if(d===1)return'Yesterday';return`${d}d ago`;
 }
 function openConvo(username){
   activeChatUser=username;if(chatSSE){chatSSE.close();chatSSE=null;}
+  document.getElementById('page-chat')?.classList.add('chat-open');
   const user=getAllUsers().find(u=>u.username===username);const online=user&&isOnline(user);
   document.getElementById('chat-window').innerHTML=`
     <div class="chat-header">
-      <div class="convo-avatar" style="width:40px;height:40px;font-size:13px;flex-shrink:0">${username.slice(0,2).toUpperCase()}${online?'<div class="online-dot"></div>':''}</div>
+      <button class="icon-btn chat-back" onclick="closeMobileChat()" title="Back">←</button>
+      <div class="convo-avatar" style="width:40px;height:40px;font-size:13px;flex-shrink:0">${getUserInitials(username)}${online?'<div class="online-dot"></div>':''}</div>
       <div class="chat-header-info"><div class="chat-header-name">@${username}</div><div class="chat-header-status${online?'':' offline'}">${online?'Online now':'Offline'}</div></div>
-      <div class="chat-header-actions"><button class="icon-btn" onclick="toggleCall('${username}')" title="Voice call"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></button></div>
+      <div class="chat-header-actions"><button class="icon-btn" onclick="openChallengeModal('chess','${username}')" title="Challenge friend">♟</button><button class="icon-btn" onclick="toggleCall('${username}')" title="Voice call">ðŸ“ž</button><button class="icon-btn" onclick="toggleVideoCall('${username}')" title="Video call">ðŸ“¹</button></div>
     </div>
     <div class="chat-messages" id="chat-msgs"></div>
     <div class="chat-input-bar" style="position:relative">
@@ -1079,7 +1533,7 @@ function markRead(username){if(!chatCache[username])return;chatCache[username].f
 function renderMsgs(){
   const el=document.getElementById('chat-msgs');if(!el||!activeChatUser)return;
   const msgs=chatCache[activeChatUser]||[];const myInit=currentUser?.username.slice(0,2).toUpperCase()||'ME';
-  if(!msgs.length){el.innerHTML='<div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet — say hi! 👋</p></div>';return;}
+  if(!msgs.length){el.innerHTML=`<div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet. Say hi when you are ready.</p><button class="btn-primary" style="font-size:12px" onclick="showPage('ideas')">Generate your first idea</button></div>`;return;}
   let html='',i=0,lastDate='';
   while(i<msgs.length){
     const m=msgs[i];const msgDate=new Date(m.ts).toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'});
@@ -1099,7 +1553,7 @@ function renderBubble(m){
   if(m.type==='audio_ref')return`<div class="bubble"><div class="voice-msg-wrap"><div class="voice-msg-label"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg> Voice</div><audio class="bubble-audio" id="audio_${m.ts}" controls onplay="loadAudioRef(this,'${m.ref}','${m.ts}')"></audio></div></div>`;
   if(m.type==='image_ref')return`<div class="bubble" style="padding:6px"><img class="bubble-img" src="" data-ref="${m.ref}" data-ts="${m.ts}" alt="${esc(m.name||'image')}" style="min-width:80px;min-height:60px;background:rgba(255,255,255,.05);border-radius:10px" loading="lazy"/></div>`;
   if(m.type==='file'||m.type==='file_ref'){const ext=(m.name||'').split('.').pop().toUpperCase().slice(0,4)||'FILE';const href=m.type==='file'?m.url||'#':'#';const onclick=m.type==='file_ref'?`onclick="loadMediaRef('${m.ts}','${m.ref}').then(u=>{if(u){const a=document.createElement('a');a.href=u;a.download='${esc(m.name||'file')}';a.click();}});return false"`:'';return`<div class="bubble" style="padding:6px 10px"><a class="bubble-file" href="${href}" ${onclick} target="_blank" download="${esc(m.name||'file')}"><div class="bubble-file-icon"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div><div><div style="font-size:13px;font-weight:600;color:#f1f5f9">${esc(m.name||'file')}</div><div style="font-size:11px;color:#64748b;margin-top:2px">${ext}</div></div></a></div>`;}
-  return`<div class="bubble">${esc(m.text||'')}${m._failed?`<span style="font-size:10px;color:#ef4444;margin-left:6px;cursor:pointer" onclick="retryMsg(${m.ts})">⚠ Retry</span>`:''}</div>`;
+  return`<div class="bubble">${esc(m.text||'')}${m._failed?`<span style="font-size:10px;color:#ef4444;margin-left:6px;cursor:pointer" onclick="retryMsg(${m.ts})">âš  Retry</span>`:''}</div>`;
 }
 const audioRefCache={};
 async function loadAudioRef(audioEl,ref,ts){if(audioRefCache[ts]){audioEl.src=audioRefCache[ts];return;}audioEl.src='';const data=await db.read('chatmedia/'+ref);if(!data)return;let full='';for(let i=0;i<data.total;i++)full+=data[`chunk_${i}`]||'';audioRefCache[ts]=full;audioEl.src=full;audioEl.play().catch(()=>{});}
@@ -1182,6 +1636,7 @@ function openCreateGroup(){
   db.read('users').then(data=>{const users=data?Object.values(data).filter(u=>u&&u.username&&u.username!==currentUser?.username):getAllUsers();if(!users.length){list.innerHTML='<div style="padding:16px;text-align:center;color:#4b5563;font-size:13px">No other users found.</div>';return;}list.innerHTML=users.map(u=>`<div class="group-member-row" id="gmr-${u.username}" onclick="toggleGroupMember('${u.username}')"><div class="gm-avatar">${u.username.slice(0,2).toUpperCase()}</div><span class="gm-name">@${u.username}</span><div class="gm-check" id="gmc-${u.username}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div></div>`).join('');});
 }
 function toggleGroupMember(username){const row=document.getElementById('gmr-'+username);if(!row)return;row.classList.toggle('selected');const check=row.querySelector('.gm-check svg');if(check)check.style.display=row.classList.contains('selected')?'block':'none';}
+function filterGroupMembers(q){document.querySelectorAll('.group-member-row').forEach(row=>{row.style.display=row.textContent.toLowerCase().includes(String(q||'').toLowerCase())?'flex':'none';});}
 function closeCreateGroup(){document.getElementById('group-modal-overlay').classList.remove('show');}
 async function confirmCreateGroup(){
   const name=document.getElementById('group-name-input').value.trim();if(!name){alert('Enter a group name.');return;}
@@ -1195,7 +1650,7 @@ function renderGroupList(){
   const el=document.getElementById('convo-items');if(!el)return;const groups=Object.values(myGroups);
   if(!groups.length){el.innerHTML=`<div style="padding:24px 16px;text-align:center;color:#374151;font-size:13px">No groups yet.<br><span style="color:#7C3AED;cursor:pointer" onclick="openCreateGroup()">+ Create one</span></div>`;return;}
   groups.sort((a,b)=>{const ma=groupCache[a.id]||[],mb=groupCache[b.id]||[];return(mb[mb.length-1]?.ts||b.ts)-(ma[ma.length-1]?.ts||a.ts);});
-  el.innerHTML=groups.map(g=>{const msgs=groupCache[g.id]||[];const last=msgs[msgs.length-1];const unread=msgs.filter(m=>m.from!==currentUser.username&&!m.read).length;const preview=last?(last.type?'📎 '+(last.name||'file'):(last.from===currentUser.username?'You: ':last.from+': ')+esc(last.text||'')):'No messages yet';return`<div class="convo-item${activeGroupId===g.id?' active':''}" onclick="openGroupConvo('${g.id}')"><div class="convo-avatar" style="background:linear-gradient(135deg,#f97316,#ec4899)">${g.name.slice(0,2).toUpperCase()}</div><div class="convo-meta"><div class="convo-name">${esc(g.name)}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;}).join('');
+  el.innerHTML=groups.map(g=>{const msgs=groupCache[g.id]||[];const last=msgs[msgs.length-1];const unread=msgs.filter(m=>m.from!==currentUser.username&&!m.read).length;const preview=last?(last.type?'ðŸ“Ž '+(last.name||'file'):(last.from===currentUser.username?'You: ':last.from+': ')+esc(last.text||'')):'No messages yet';return`<div class="convo-item${activeGroupId===g.id?' active':''}" onclick="openGroupConvo('${g.id}')"><div class="convo-avatar" style="background:linear-gradient(135deg,#f97316,#ec4899)">${g.name.slice(0,2).toUpperCase()}</div><div class="convo-meta"><div class="convo-name">${esc(g.name)}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;}).join('');
 }
 function openGroupConvo(groupId){
   activeGroupId=groupId;activeChatUser=null;if(chatSSE){chatSSE.close();chatSSE=null;}if(groupSSE){groupSSE.close();groupSSE=null;}
@@ -1222,7 +1677,7 @@ function openGroupConvo(groupId){
 }
 function renderGroupMsgs(groupId){
   const el=document.getElementById('chat-msgs');if(!el)return;const msgs=groupCache[groupId]||[];const myInit=currentUser.username.slice(0,2).toUpperCase();
-  if(!msgs.length){el.innerHTML='<div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet — say hi! 👋</p></div>';return;}
+  if(!msgs.length){el.innerHTML=`<div class="chat-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><p>No messages yet. Start the group conversation.</p><button class="btn-primary" style="font-size:12px" onclick="showPage('ideas')">Generate your first idea</button></div>`;return;}
   let html='',i=0,lastDate='';
   while(i<msgs.length){const m=msgs[i];const msgDate=new Date(m.ts).toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'});if(msgDate!==lastDate){const isToday=msgDate===new Date().toLocaleDateString([],{weekday:'long',month:'short',day:'numeric'});html+=`<div class="msg-date-divider">${isToday?'Today':msgDate}</div>`;lastDate=msgDate;}const mine=m.from===currentUser.username;const init=mine?myInit:m.from.slice(0,2).toUpperCase();let bubbles=renderBubble(m);if(!mine)bubbles=`<div style="font-size:10px;color:#7C3AED;font-weight:700;margin-bottom:2px;padding-left:2px">@${esc(m.from)}</div>`+bubbles;let j=i+1;while(j<msgs.length&&msgs[j].from===m.from&&!msgs[j].type&&!m.type){bubbles+=renderBubble(msgs[j]);j++;}html+=`<div class="msg-group${mine?' mine':''}"><div class="msg-avatar">${init}</div><div class="msg-bubbles">${bubbles}<span class="msg-time">${m.time}</span></div></div>`;i=j;}
   el.innerHTML=html;el.scrollTop=el.scrollHeight;
@@ -1239,7 +1694,7 @@ async function startGroupCall(groupId){
   const group=myGroups[groupId];if(!group)return;gcallGroupId=groupId;gcallPeers={};gcallMuted=false;
   try{gcallStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){alert('Mic error: '+err.message);return;}
   await db.write(`groupcalls/${groupId}/members/${currentUser.username}`,{joined:true,ts:Date.now()});
-  document.getElementById('gcall-group-name').textContent='📞 '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
+  document.getElementById('gcall-group-name').textContent='ðŸ“ž '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
   const grid=document.getElementById('gcall-grid');if(grid)grid.innerHTML=group.members.map(u=>`<div class="gcall-tile" id="gcall-tile-${u}"><div class="gcall-avatar">${u.slice(0,2).toUpperCase()}</div><div class="gcall-name">@${esc(u)}${u===currentUser.username?' (you)':''}</div><div class="gcall-speaking"></div></div>`).join('');
   document.getElementById('gcall-overlay').classList.add('show');gcallSecs=0;gcallConnected=false;
   listenGroupCallSignals(groupId);const existing=await db.read(`groupcalls/${groupId}/members`);if(existing){const others=Object.keys(existing).filter(u=>u!==currentUser.username);for(const u of others)await gcallConnectTo(groupId,u,true);}
@@ -1266,7 +1721,7 @@ async function handleGcallData(groupId,data){
   if(data.members){for(const u of Object.keys(data.members)){if(u!==me&&!gcallPeers[u])await gcallConnectTo(groupId,u,false);}}
   if(data.signals){for(const[fromUser,toMap]of Object.entries(data.signals)){if(fromUser===me)continue;const sig=toMap[me];if(!sig)continue;const pc=gcallPeers[fromUser];if(sig.offer&&(!pc||!pc.remoteDescription)){let peer=pc;if(!peer){await gcallConnectTo(groupId,fromUser,false);peer=gcallPeers[fromUser];}if(!peer||peer.remoteDescription)continue;await peer.setRemoteDescription(new RTCSessionDescription({type:sig.offer.type,sdp:sig.offer.sdp}));const answer=await peer.createAnswer();await peer.setLocalDescription(answer);await db.write(`groupcalls/${groupId}/signals/${me}/${fromUser}/answer`,{sdp:answer.sdp,type:answer.type});}if(sig.answer&&pc&&!pc.remoteDescription){await pc.setRemoteDescription(new RTCSessionDescription({type:sig.answer.type,sdp:sig.answer.sdp}));}if(sig.ice&&pc&&pc.remoteDescription){for(const key of Object.keys(sig.ice)){try{await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(sig.ice[key])));}catch(_){}}}}}
 }
-function gcallToggleMute(){gcallMuted=!gcallMuted;if(gcallStream)gcallStream.getAudioTracks().forEach(t=>t.enabled=!gcallMuted);document.getElementById('gcall-mute-btn').textContent=gcallMuted?'🔇':'🎤';}
+function gcallToggleMute(){gcallMuted=!gcallMuted;if(gcallStream)gcallStream.getAudioTracks().forEach(t=>t.enabled=!gcallMuted);document.getElementById('gcall-mute-btn').textContent=gcallMuted?'ðŸ”‡':'ðŸŽ¤';}
 async function endGroupCall(){if(gcallGroupId&&currentUser)await db.del(`groupcalls/${gcallGroupId}/members/${currentUser.username}`);if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}Object.values(gcallPeers).forEach(pc=>pc.close());gcallPeers={};if(gcallStream){gcallStream.getTracks().forEach(t=>t.stop());gcallStream=null;}document.querySelectorAll('[id^="gcall-audio-"]').forEach(a=>a.remove());if(gcallTimer){clearInterval(gcallTimer);gcallTimer=null;}gcallConnected=false;gcallSecs=0;gcallGroupId=null;document.getElementById('gcall-overlay').classList.remove('show');}
 </script>
 
@@ -1356,7 +1811,9 @@ function updateMatchStep(){
   if(back)back.style.display=matchStep?'inline-flex':'none';
   if(next)next.textContent=matchStep===matchFields.length-1?'Find Matches':'Next';
   if(bar)bar.style.width=`${Math.round((matchStep/(matchFields.length-1))*100)}%`;
+  setMatchError('');
 }
+function closeMobileChat(){document.getElementById('page-chat')?.classList.remove('chat-open');}
 function prefillMatchUser(){
   if(!currentUser)return;
   const name=document.getElementById('match-name'),email=document.getElementById('match-email');
@@ -1364,9 +1821,26 @@ function prefillMatchUser(){
   if(email&&!email.value)email.value=currentUser.email||`${currentUser.username}@zidea.local`;
 }
 function matchPrevStep(){if(matchStep>0){matchStep--;updateMatchStep();}}
-function matchNextStep(){
+function setMatchError(message,fieldId){
+  const err=document.getElementById('match-error');
+  matchFields.flat().forEach(id=>document.getElementById(id)?.classList.remove('invalid'));
+  if(err){err.textContent=message||'';err.classList.toggle('show',!!message);}
+  if(fieldId){const field=document.getElementById(fieldId);field?.classList.add('invalid');field?.focus();}
+}
+function validateMatchStep(){
+  const labels={
+    'match-name':'your name','match-email':'your email','match-title':'an idea title','match-description':'a short description',
+    'match-problem':'the problem your idea solves','match-skills':'the skills you bring','match-audience':'the target audience'
+  };
   const missing=matchFields[matchStep].find(id=>!String(document.getElementById(id)?.value||'').trim());
-  if(missing){showToast('Please complete this step first.');return;}
+  if(missing){setMatchError(`Add ${labels[missing]||'this answer'} before continuing.`,missing);return false;}
+  const email=document.getElementById('match-email');
+  if(matchStep===0&&email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())){setMatchError('Use a valid email address so collaborators can reach you.', 'match-email');return false;}
+  setMatchError('');
+  return true;
+}
+function matchNextStep(){
+  if(!validateMatchStep())return;
   if(matchStep<matchFields.length-1){matchStep++;updateMatchStep();return;}
   submitMatchIdea();
 }
@@ -1419,7 +1893,7 @@ function pushIdeaUnique(list,idea){const id=ideaUid(idea);if(list.some(x=>ideaUi
 function createIdeaCardHTML(idea,ctx='ideas'){
   const id=ideaUid(idea),saved=getSavedIdeas().some(x=>ideaUid(x)===id),starred=getStarredIdeas().some(x=>ideaUid(x)===id);
   const canCall=!!idea.author&&idea.author!==currentUser?.username;
-  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">💾 ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">⭐ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">👁 Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">📤 Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">📞 Call @${esc(idea.author)}</button>`:''}</div></div>`;
+  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">ðŸ’¾ ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">â­ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">ðŸ‘ Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">ðŸ“¤ Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">ðŸ“ž Call @${esc(idea.author)}</button>`:''}</div></div>`;
 }
 function getCurrentGeneratedIdeas(){return load(ideaStoreKey('generated_now'))||[];}
 function setCurrentGeneratedIdeas(v){save(ideaStoreKey('generated_now'),v);}
@@ -1500,7 +1974,7 @@ function openIdeaDetails(id,ctx){
 function closeIdeaModal(){document.getElementById('idea-modal-overlay').classList.remove('show');activeIdeaModal=null;}
 function shareIdea(id,ctx){
   const idea=getIdeaFromContext(id,ctx);if(!idea)return;
-  const text=`${idea.title} — ${idea.description}`;
+  const text=`${idea.title} â€” ${idea.description}`;
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>showToast('Idea copied to clipboard.')).catch(()=>showToast('Copy failed.'));}
   else showToast(text);
 }
@@ -1513,6 +1987,9 @@ function createdIdeaCardHTML(idea){
   return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(new Date(idea.createdAt).toLocaleString())}</div></div><span class="idea-tag">${esc(idea.industry||'Idea')}</span></div><p class="idea-card-body">${esc(idea.description||'')}</p><div class="idea-card-tags"><span class="idea-tag">${esc(idea.stage||'Stage')}</span><span class="idea-tag">Looking for ${esc(idea.collaborator||'Any')}</span><span class="idea-tag">${esc(idea.commitment||'Time')}</span></div><div class="idea-card-body"><strong style="color:#d1d5db">Problem:</strong> ${esc(idea.problem||'')}</div><div class="idea-card-body"><strong style="color:#d1d5db">Audience:</strong> ${esc(idea.audience||'')}</div></div>`;
 }
 function switchLibTab(tab){libTab=tab;['created','saved','starred'].forEach(t=>{const b=document.getElementById('lib-tab-'+t);if(b)b.classList.toggle('active',t===tab);});renderLibrary();}
+function emptyStateHTML(icon,title,copy,cta,action){
+  return `<div class="card empty-state"><div class="empty-state-icon">${icon}</div><div><div class="empty-state-title">${esc(title)}</div><div class="empty-state-copy">${esc(copy)}</div></div>${cta?`<button class="btn-primary" style="font-size:12px" onclick="${action}">${esc(cta)}</button>`:''}</div>`;
+}
 function renderLibrary(){
   const list=document.getElementById('library-list');if(!list)return;
   const q=(document.getElementById('lib-search')?.value||'').toLowerCase().trim();
@@ -1521,7 +1998,7 @@ function renderLibrary(){
   const tags=[...new Set(source.map(i=>i.category||i.industry).filter(Boolean))];
   const tagWrap=document.getElementById('lib-tag-filter');
   if(tagWrap)tagWrap.innerHTML=tags.map(t=>`<button class="idea-tag" onclick="document.getElementById('lib-search').value='${t}';renderLibrary()">${esc(CAT_LABEL[t]||t)}</button>`).join('');
-  if(!filtered.length){list.innerHTML=`<div class="card" style="text-align:center;color:#6B7280"><div style="font-size:14px;color:#fff;font-weight:700;margin-bottom:6px">No ideas here yet</div><div style="font-size:12px;color:#6B7280">Create an idea in Generate Ideas and it will appear here.</div><button class="btn-primary" style="margin-top:10px;font-size:12px" onclick="showPage('ideas')">Create Idea</button></div>`;return;}
+  if(!filtered.length){list.innerHTML=emptyStateHTML('💡','No ideas yet','Generate your first idea and it will appear in your library.','Generate your first idea',"showPage('ideas')");return;}
   list.innerHTML=filtered.map(i=>libTab==='created'?createdIdeaCardHTML(i):createIdeaCardHTML(i,'library')).join('');
 }
 function filterExplore(cat){
@@ -1535,6 +2012,7 @@ function filterExplore(cat){
 function renderExplore(){
   const el=document.getElementById('explore-list');if(!el)return;
   const ideas=EXPLORE_MOCK.filter(i=>exploreCategory==='all'||i.category===exploreCategory);
+  if(!ideas.length){el.innerHTML=emptyStateHTML('🔥','No trending ideas here','Try another category or generate a new idea to get the momentum started.','Generate an idea',"showPage('ideas')");return;}
   el.innerHTML=ideas.map(i=>createIdeaCardHTML(i,'explore')).join('');
 }
 function callIdeaAuthor(username){
@@ -1557,6 +2035,11 @@ function renderProfile(){
   document.getElementById('profile-ideas-count').textContent=getIdeaHistory().length;
   document.getElementById('profile-saved-count').textContent=getSavedIdeas().length;
   document.getElementById('profile-starred-count').textContent=getStarredIdeas().length;
+  const gameStats=document.getElementById('profile-game-stats');
+  if(gameStats){
+    const stats=getGameStats(),rows=Object.entries(stats);
+    gameStats.innerHTML=rows.length?rows.map(([type,s])=>`<div class="arcade-row"><span>${gameIcon(type)} ${gameLabel(type)}</span><span style="color:#a78bfa;font-weight:800">${s.wins||0}W ${s.losses||0}L ${s.draws||0}D</span></div>`).join(''):'<div style="color:#6B7280;font-size:13px">No game stats yet.</div>';
+  }
   const recent=document.getElementById('profile-recent-ideas');
   const top=getIdeaHistory().slice(0,5);
   recent.innerHTML=top.length?top.map(i=>`<div class="card" style="padding:10px 12px"><div style="font-size:13px;color:#fff;font-weight:600">${esc(i.title)}</div><div style="font-size:11px;color:#6B7280;margin-top:3px">${esc(CAT_LABEL[i.category]||i.category||'Idea')}</div></div>`).join(''):'<div style="color:#6B7280;font-size:13px">No ideas yet.</div>';
@@ -1567,7 +2050,7 @@ function renderSettings(){
   const btn=document.getElementById('theme-toggle'),knob=document.getElementById('theme-knob');
   if(btn&&knob){btn.style.background=theme==='light'?'#94A3B8':'var(--brand)';knob.style.left=theme==='light'?'23px':'3px';}
   const info=document.getElementById('settings-account-info');
-  if(info)info.textContent=`@${currentUser.username} · ${currentUser.email||'local account'}`;
+  if(info)info.textContent=`@${currentUser.username} Â· ${currentUser.email||'local account'}`;
 }
 function toggleTheme(){
   const cur=load(ideaStoreKey('theme'))||'dark',next=cur==='dark'?'light':'dark';
@@ -1585,7 +2068,7 @@ function handleAvatarUpload(event){
   reader.onload=()=>{save(ideaStoreKey('avatar_data'),reader.result);renderProfile();syncAvatarToFirebase();};
   reader.readAsDataURL(file);
 }
-function removeAvatar(){localStorage.removeItem(ideaStoreKey('avatar_data'));renderProfile();syncAvatarToFirebase(true);}
+function removeAvatar(){removeStored(ideaStoreKey('avatar_data'));renderProfile();syncAvatarToFirebase(true);}
 function syncIdeasToFirebase(){
   if(!currentUser)return;
   db.patch(`ideas/${currentUser.username}`,{saved:getSavedIdeas(),starred:getStarredIdeas(),history:getIdeaHistory().slice(0,80),updatedAt:Date.now()}).catch(()=>{});
@@ -1617,6 +2100,8 @@ function seedExploreUsers(){
 // Boot
 testFirebaseAccess();
 seedExploreUsers();
+window.addEventListener('online',syncAllAccountsOnline);
+setTimeout(syncAllAccountsOnline,1200);
 document.getElementById('incoming-toast').style.display='none';
 updateStats();
 if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
@@ -1632,18 +2117,129 @@ if(window.location.hash)handleHashRoute();else showPage(currentUser?'dashboard':
 const ZIDAI_KEY='AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
 const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise and warm.';
 let zidHistory=[];
-function zidAiMsg(role,text){const el=document.getElementById('zidai-messages');const init=currentUser?.username.slice(0,1).toUpperCase()||'U';const isAi=role==='ai';const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');const div=document.createElement('div');div.className='zidai-msg '+role;div.innerHTML=`<div class="zidai-msg-avatar">${isAi?'🤖':init}</div><div class="zidai-bubble">${fmt}</div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
-function zidAiTyping(){const el=document.getElementById('zidai-messages');const div=document.createElement('div');div.className='zidai-msg ai';div.id='zidai-typing';div.innerHTML=`<div class="zidai-msg-avatar">🤖</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
+function zidAiMsg(role,text){const el=document.getElementById('zidai-messages');const init=currentUser?.username.slice(0,1).toUpperCase()||'U';const isAi=role==='ai';const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');const div=document.createElement('div');div.className='zidai-msg '+role;div.innerHTML=`<div class="zidai-msg-avatar">${isAi?'ðŸ¤–':init}</div><div class="zidai-bubble">${fmt}</div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
+function zidAiTyping(){const el=document.getElementById('zidai-messages');const div=document.createElement('div');div.className='zidai-msg ai';div.id='zidai-typing';div.innerHTML=`<div class="zidai-msg-avatar">ðŸ¤–</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
 async function sendZidAi(){
   const input=document.getElementById('zidai-input');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';document.getElementById('zidai-send').disabled=true;
   zidAiMsg('user',text);zidHistory.push({role:'user',parts:[{text}]});zidAiTyping();
-  try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:ZIDAI_SYS}]},contents:zidHistory,generationConfig:{temperature:0.8,maxOutputTokens:1024}})});const data=await res.json();const t=document.getElementById('zidai-typing');if(t)t.remove();if(data.error){zidAiMsg('ai','⚠️ '+data.error.message);}else{const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';zidHistory.push({role:'model',parts:[{text:reply}]});zidAiMsg('ai',reply);}}catch(err){const t=document.getElementById('zidai-typing');if(t)t.remove();zidAiMsg('ai','⚠️ Could not reach AI.');}
+  try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:ZIDAI_SYS}]},contents:zidHistory,generationConfig:{temperature:0.8,maxOutputTokens:1024}})});const data=await res.json();const t=document.getElementById('zidai-typing');if(t)t.remove();if(data.error){zidAiMsg('ai','âš ï¸ '+data.error.message);}else{const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';zidHistory.push({role:'model',parts:[{text:reply}]});zidAiMsg('ai',reply);}}catch(err){const t=document.getElementById('zidai-typing');if(t)t.remove();zidAiMsg('ai','âš ï¸ Could not reach AI.');}
   document.getElementById('zidai-send').disabled=false;
 }
 function zidAiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendZidAi();}}
 function clearZidAi(){zidHistory=[];document.getElementById('zidai-messages').innerHTML='';initZidAi();}
-function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!");}
+function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI âš¡ Ask me anything â€” I'm powered by Gemini!");}
 // ------ Arcade ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+const ARCADE_GAMES=[
+  {id:'chess',icon:'♟️',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},
+  {id:'tictactoe',icon:'❌',name:'Tic-Tac-Toe',desc:'First to 3 in a row wins.'},
+  {id:'rps',icon:'✊',name:'Rock Paper Scissors',desc:'Best of 3. No luck allowed.'},
+  {id:'amongus',icon:'🔴',name:'Among Us Mode',desc:"Find the impostor before it's too late."}
+];
+let pendingChallengeGame='chess',gameInviteSSE=null,currentRoom=null,currentResultGame='tictactoe';
+function gameLabel(type){return ARCADE_GAMES.find(g=>g.id===type)?.name||type;}
+function gameIcon(type){return ARCADE_GAMES.find(g=>g.id===type)?.icon||'🎮';}
+function renderArcadeHome(){
+  const grid=document.getElementById('arcade-game-grid');
+  if(grid)grid.innerHTML=ARCADE_GAMES.map(g=>`<div class="card arcade-card"><div class="arcade-icon">${g.icon}</div><div><div class="arcade-card-title">${g.name}</div><div class="arcade-card-copy">${g.desc}</div></div><div class="arcade-actions"><button class="btn-primary" style="font-size:12px" onclick="startGame('${g.id}')">Play vs AI</button><button class="btn-ghost" style="font-size:12px" onclick="openChallengeModal('${g.id}')">Challenge Friend</button></div></div>`).join('');
+  renderInvites();renderRecentResults();renderLeaderboard();
+}
+function roomCode(){return Math.random().toString(36).slice(2,8).toUpperCase();}
+async function createGameRoom(type){
+  if(!currentUser)return showPage('login');
+  const code=roomCode();currentRoom={code,type,host:currentUser.username};
+  await db.write(`gameRooms/${code}`,{code,type,host:currentUser.username,players:[currentUser.username],state:'waiting',updatedAt:Date.now()});
+  document.getElementById('game-lobby').style.display='flex';
+  document.getElementById('lobby-title').textContent=`${gameLabel(type)} room`;
+  document.getElementById('lobby-status').textContent='Waiting for opponent... Share this room code.';
+  document.getElementById('lobby-code').textContent=code;
+  listenGameRoom(code);
+}
+async function joinGameRoom(){
+  const code=String(document.getElementById('join-room-code')?.value||'').trim().toUpperCase();
+  if(!code||!currentUser)return;
+  const room=await db.read(`gameRooms/${code}`);
+  if(!room){showToast('Room not found.');return;}
+  const players=[...new Set([...(room.players||[]),currentUser.username])].slice(0,2);
+  await db.patch(`gameRooms/${code}`,{players,state:players.length>1?'active':'waiting',updatedAt:Date.now()});
+  currentRoom={code,type:room.type,host:room.host};
+  listenGameRoom(code);startGame(room.type);
+}
+function listenGameRoom(code){
+  const sse=new EventSource(`${FB}/gameRooms/${code}.json`);
+  sse.addEventListener('put',e=>{try{updateLobbyFromRoom(JSON.parse(e.data).data);}catch(_){}});
+  sse.addEventListener('patch',e=>{try{db.read(`gameRooms/${code}`).then(updateLobbyFromRoom);}catch(_){}});
+  setTimeout(()=>sse.close(),60*60*1000);
+}
+function updateLobbyFromRoom(room){
+  if(!room)return;
+  const status=document.getElementById('lobby-status');
+  if(status)status.textContent=(room.players||[]).length>1?`Opponent joined: @${room.players.find(p=>p!==currentUser?.username)}`:'Waiting for opponent...';
+}
+function exitLobby(){document.getElementById('game-lobby').style.display='none';currentRoom=null;}
+function openChallengeModal(type,username=''){
+  pendingChallengeGame=type;
+  document.getElementById('challenge-title').textContent=`Challenge Friend: ${gameLabel(type)}`;
+  document.getElementById('challenge-search').value=username?`@${username}`:'';
+  document.getElementById('challenge-status').textContent='';
+  document.getElementById('challenge-modal').classList.add('show');
+}
+function closeChallengeModal(){document.getElementById('challenge-modal').classList.remove('show');}
+async function sendGameChallenge(){
+  if(!currentUser)return showPage('login');
+  const to=String(document.getElementById('challenge-search').value||'').trim().replace(/^@/,'').toLowerCase();
+  if(!to||to===currentUser.username){document.getElementById('challenge-status').textContent='Enter a valid friend username.';return;}
+  const code=roomCode();await db.write(`gameRooms/${code}`,{code,type:pendingChallengeGame,host:currentUser.username,players:[currentUser.username],state:'waiting',updatedAt:Date.now()});
+  await db.patch(`gameInvites/${to}`,{[code]:{code,type:pendingChallengeGame,from:currentUser.username,to,ts:Date.now(),status:'pending'}});
+  document.getElementById('challenge-status').textContent=`Waiting for @${to} to accept... Room ${code}`;
+  currentRoom={code,type:pendingChallengeGame,host:currentUser.username};listenGameRoom(code);renderArcadeHome();
+}
+function listenGameInvites(){
+  if(!currentUser||gameInviteSSE)return;
+  gameInviteSSE=new EventSource(`${FB}/gameInvites/${currentUser.username}.json`);
+  gameInviteSSE.addEventListener('put',e=>{try{renderInvites(JSON.parse(e.data).data);}catch(_){}});
+  gameInviteSSE.addEventListener('patch',()=>renderInvites());
+}
+async function renderInvites(data){
+  const el=document.getElementById('arcade-invites');if(!el)return;
+  const invites=data||await db.read(`gameInvites/${currentUser?.username}`)||{};
+  const list=Object.values(invites).filter(i=>i&&i.status==='pending');
+  if(!list.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">No active games — challenge a friend!</div>';return;}
+  el.innerHTML=list.map(i=>`<div class="arcade-row"><div><div style="color:#fff;font-weight:800">${gameIcon(i.type)} Pending ${gameLabel(i.type)} challenge</div><div style="color:#9CA3AF;font-size:12px;margin-top:3px">From @${esc(i.from)} · room ${esc(i.code)}</div></div><div style="display:flex;gap:8px"><button class="btn-primary" style="font-size:12px" onclick="acceptGameInvite('${i.code}','${i.type}')">Accept</button><button class="btn-ghost" style="font-size:12px" onclick="declineGameInvite('${i.code}')">Decline</button></div></div>`).join('');
+}
+async function acceptGameInvite(code,type){document.getElementById('join-room-code').value=code;await joinGameRoom();await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'accepted'});startGame(type);}
+async function declineGameInvite(code){await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'declined'});renderInvites();}
+function getGameStats(){return load(ideaStoreKey('game_stats'))||{};}
+function setGameStats(v){save(ideaStoreKey('game_stats'),v);}
+function recordGameResult(type,result,opponent='AI'){
+  const stats=getGameStats();const s=stats[type]||{wins:0,losses:0,draws:0};
+  if(result==='win')s.wins++;else if(result==='loss')s.losses++;else s.draws++;
+  stats[type]=s;setGameStats(stats);
+  const recent=load(ideaStoreKey('game_results'))||[];
+  save(ideaStoreKey('game_results'),[{type,result,opponent,ts:Date.now()},...recent].slice(0,20));
+  db.patch(`gameStats/${currentUser?.username||'guest'}`,stats).catch(()=>{});
+}
+function renderRecentResults(){
+  const el=document.getElementById('arcade-results');if(!el)return;
+  const recent=(load(ideaStoreKey('game_results'))||[]).slice(0,3);
+  if(!recent.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">No recent results yet.</div>';return;}
+  el.innerHTML=recent.map(r=>`<div class="arcade-row"><span>${gameIcon(r.type)} You ${r.result==='win'?'beat':r.result==='loss'?'lost to':'drew with'} @${esc(r.opponent)} at ${gameLabel(r.type)} · ${relativeTime(r.ts)}</span></div>`).join('');
+}
+function renderLeaderboard(){
+  const el=document.getElementById('arcade-leaderboard');if(!el)return;
+  const stats=getGameStats(),rows=Object.entries(stats).map(([type,s])=>({type,...s,score:(s.wins||0)*3+(s.draws||0)})).sort((a,b)=>b.score-a.score).slice(0,5);
+  if(!rows.length){el.innerHTML='<div class="arcade-row" style="color:#6B7280;font-size:13px">Play a game to enter the leaderboard.</div>';return;}
+  el.innerHTML=rows.map((r,i)=>`<div class="arcade-row"><span>${i+1}. ${gameIcon(r.type)} @${esc(currentUser?.username||'you')} · ${gameLabel(r.type)}</span><span style="color:#a78bfa;font-weight:800">${r.wins||0}W ${r.losses||0}L ${r.draws||0}D</span></div>`).join('');
+}
+function showGameResult(type,title,summary,result){
+  currentResultGame=type;recordGameResult(type,result);
+  document.getElementById('game-result-title').textContent=title;
+  document.getElementById('game-result-summary').textContent=summary;
+  document.getElementById('game-result-modal').classList.add('show');
+}
+function closeGameResult(){document.getElementById('game-result-modal').classList.remove('show');}
+function rematchGame(){closeGameResult();startGame(currentResultGame);}
+function newGameFromResult(){closeGameResult();exitGame();}
+function backToArcadeFromResult(){closeGameResult();exitGame();showPage('arcade');}
 let gameMode='bot',chessLevel=1;
 function setMode(m){gameMode=m;document.getElementById('mode-bot').classList.toggle('active',m==='bot');document.getElementById('mode-multi').classList.toggle('active',m==='multiplayer');}
 function setChessLevel(lvl){chessLevel=lvl;document.querySelectorAll('.chess-lvl-btn').forEach(b=>b.classList.toggle('active',+b.dataset.lvl===lvl));resetChess();}
@@ -1672,13 +2268,13 @@ function tttWinner(b){for(const[a,c,d]of WINS){if(b[a]&&b[a]===b[c]&&b[a]===b[d]
 function tttBotMove(b){for(const m of['O','X']){for(const[a,c,d]of WINS){const l=[b[a],b[c],b[d]];if(l.filter(x=>x===m).length===2&&l.includes(null))return[a,c,d][l.indexOf(null)];}}const e=b.map((v,i)=>v===null?i:-1).filter(i=>i!==-1);return e[Math.floor(Math.random()*e.length)];}
 function renderTTT(){document.getElementById('ttt-grid').innerHTML=tttBoard.map((c,i)=>`<button class="ttt-cell${c==='X'?' x':c==='O'?' o':''}" onclick="tttClick(${i})"${(c||tttOver)?'disabled':''}>${c||''}</button>`).join('');}
 function tttClick(i){if(tttBoard[i]||tttOver)return;tttBoard[i]=tttX?'X':'O';tttX=!tttX;renderTTT();const w=tttWinner(tttBoard);if(w){tttEnd(w);return;}if(gameMode==='bot'&&!tttX){document.getElementById('ttt-status').textContent='Bot thinking...';setTimeout(()=>{const idx=tttBotMove(tttBoard);if(idx!==undefined){tttBoard[idx]='O';tttX=true;renderTTT();const w2=tttWinner(tttBoard);if(w2)tttEnd(w2);else document.getElementById('ttt-status').textContent='Your turn (X)';}},400);}else{document.getElementById('ttt-status').textContent=tttX?'Your turn (X)':"Player 2's turn (O)";}}
-function tttEnd(r){tttOver=true;renderTTT();document.getElementById('ttt-status').style.display='none';document.getElementById('ttt-result').style.display='flex';document.getElementById('ttt-result-text').textContent=r==='draw'?"It's a draw!":r==='X'?'You win! 🎉':gameMode==='bot'?'Bot wins!':'Player 2 wins!';}
+function tttEnd(r){tttOver=true;renderTTT();document.getElementById('ttt-status').style.display='none';document.getElementById('ttt-result').style.display='flex';const text=r==='draw'?"It's a draw!":r==='X'?'You win!':'Player 2 wins!';document.getElementById('ttt-result-text').textContent=text;showGameResult('tictactoe',text,`Final board: ${tttBoard.map(x=>x||'-').join(' ')}`,r==='draw'?'draw':r==='X'?'win':'loss');}
 function resetTTT(){tttBoard=Array(9).fill(null);tttX=true;tttOver=false;document.getElementById('ttt-status').style.display='block';document.getElementById('ttt-status').textContent='Your turn (X)';document.getElementById('ttt-result-text').textContent='';document.getElementById('ttt-result').style.display='none';renderTTT();}
 // RPS
 let rpsYou=0,rpsBot=0,rpsRound=0;
-const RPS_EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
-function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win! 🎉';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} — ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} — Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;}
-function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
+const RPS_EMOJI={rock:'âœŠ',paper:'âœ‹',scissors:'âœŒï¸'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
+function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win!';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} — ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} — Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;if(rpsRound>=5||rpsYou===3||rpsBot===3){const outcome=rpsYou===rpsBot?'draw':rpsYou>rpsBot?'win':'loss';showGameResult('rps',outcome==='win'?'You won the series':outcome==='loss'?'You lost the series':'Series draw',`Final score: You ${rpsYou}, Bot ${rpsBot}.`,outcome);}}
+function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 â€” Bot: 0';}
 // Among Us (lightweight local simulation)
 let auRaf=null,auRole='Crewmate',auPlayers=[],auPos={x:280,y:210},auMeetingOpen=false,auImpostorAlive=true;
 function randomRoom(){return['Cafeteria','Electrical','MedBay','Admin','Navigation'][Math.floor(Math.random()*5)];}
@@ -1740,11 +2336,11 @@ function auEnd(text){
 // ------ Chess (full rules + minimax) ------------------------------------------------------------------------------------------------------------------------------
 let chessBoard=[],chessSelected=null,chessTurn='w',chessOver=false,chessHighlights=[];
 let castleRights={w:{K:true,Q:true},b:{K:true,Q:true}},enPassantTarget=null,positionHistory=[],pendingPromotion=null;
-const CHESS_UNICODE={K:['♔','♚'],Q:['♕','♛'],R:['♖','♜'],B:['♗','♝'],N:['♘','♞'],P:['♙','♟']};
+const CHESS_UNICODE={K:['â™”','â™š'],Q:['â™•','â™›'],R:['â™–','â™œ'],B:['â™—','â™'],N:['â™˜','â™ž'],P:['â™™','â™Ÿ']};
 const PIECE_VAL={K:20000,Q:900,R:500,B:330,N:320,P:100};
 const PST={P:[[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],N:[[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],B:[[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],R:[[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],Q:[[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],K:[[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]};
 function chessInit(){const order=['R','N','B','Q','K','B','N','R'];chessBoard=Array(8).fill(null).map(()=>Array(8).fill(null));for(let c=0;c<8;c++){chessBoard[0][c]={t:order[c],col:'b'};chessBoard[1][c]={t:'P',col:'b'};chessBoard[6][c]={t:'P',col:'w'};chessBoard[7][c]={t:order[c],col:'w'};}castleRights={w:{K:true,Q:true},b:{K:true,Q:true}};enPassantTarget=null;positionHistory=[];pendingPromotion=null;}
-function chessFEN(b,turn,cr,ep){let s='';for(let r=0;r<8;r++){let e=0;for(let c=0;c<8;c++){const p=b[r][c];if(!p){e++;}else{if(e){s+=e;e=0;}s+=p.col==='w'?p.t:p.t.toLowerCase();}}if(e)s+=e;if(r<7)s+='/';}s+=' '+turn+' '+(cr.w.K?'K':'')+(cr.w.Q?'Q':'')+(cr.b.K?'k':'')+(cr.b.Q?'q':'');s+=' '+(ep?String.fromCharCode(97+ep[1])+(8-ep[0]):'–');return s;}
+function chessFEN(b,turn,cr,ep){let s='';for(let r=0;r<8;r++){let e=0;for(let c=0;c<8;c++){const p=b[r][c];if(!p){e++;}else{if(e){s+=e;e=0;}s+=p.col==='w'?p.t:p.t.toLowerCase();}}if(e)s+=e;if(r<7)s+='/';}s+=' '+turn+' '+(cr.w.K?'K':'')+(cr.w.Q?'Q':'')+(cr.b.K?'k':'')+(cr.b.Q?'q':'');s+=' '+(ep?String.fromCharCode(97+ep[1])+(8-ep[0]):'â€“');return s;}
 function chessRawMoves(b,r,c,cr,ep){const p=b[r][c];if(!p)return[];const{t,col}=p,moves=[];const inB=(r,c)=>r>=0&&r<8&&c>=0&&c<8;const empty=(r,c)=>!b[r][c];const enemy=(r,c)=>b[r][c]&&b[r][c].col!==col;const slide=(dr,dc)=>{let nr=r+dr,nc=c+dc;while(inB(nr,nc)){if(empty(nr,nc)){moves.push([nr,nc,'']);}else{if(enemy(nr,nc))moves.push([nr,nc,'cap']);break;}nr+=dr;nc+=dc;}};if(t==='P'){const d=col==='w'?-1:1,s=col==='w'?6:1;if(inB(r+d,c)&&empty(r+d,c)){moves.push([r+d,c,r+d===0||r+d===7?'promo':'']);if(r===s&&empty(r+d*2,c))moves.push([r+d*2,c,'double']);}for(const dc of[-1,1]){if(inB(r+d,c+dc)){if(enemy(r+d,c+dc))moves.push([r+d,c+dc,r+d===0||r+d===7?'promo':'cap']);if(ep&&ep[0]===r+d&&ep[1]===c+dc)moves.push([r+d,c+dc,'ep']);}}}if(t==='N'){for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc,'']);}}if(t==='K'){for(const[dr,dc]of[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc,'']);}const row=col==='w'?7:0;if(r===row&&c===4){if(cr[col].K&&empty(row,5)&&empty(row,6)&&b[row][7]?.t==='R'&&b[row][7]?.col===col)moves.push([row,6,'castle-K']);if(cr[col].Q&&empty(row,3)&&empty(row,2)&&empty(row,1)&&b[row][0]?.t==='R'&&b[row][0]?.col===col)moves.push([row,2,'castle-Q']);}}if(t==='R'||t==='Q'){slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);}if(t==='B'||t==='Q'){slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);}return moves;}
 function chessApply(b,fr,fc,tr,tc,flag,cr,ep,promo){const next=b.map(row=>[...row]);const p=next[fr][fc];const ncr={w:{...cr.w},b:{...cr.b}};let nep=null;if(flag==='ep')next[fr][tc]=null;next[tr][tc]=p;next[fr][fc]=null;if(flag==='promo'||flag==='promo-cap')next[tr][tc]={t:promo||'Q',col:p.col};if(flag==='double')nep=[fr+(tr-fr)/2,fc];if(flag==='castle-K'){next[tr][5]={t:'R',col:p.col};next[tr][7]=null;}if(flag==='castle-Q'){next[tr][3]={t:'R',col:p.col};next[tr][0]=null;}if(p.t==='K'){ncr[p.col].K=false;ncr[p.col].Q=false;}if(p.t==='R'){if(fc===7)ncr[p.col].K=false;if(fc===0)ncr[p.col].Q=false;}if(tr===7&&tc===7)ncr['w'].K=false;if(tr===7&&tc===0)ncr['w'].Q=false;if(tr===0&&tc===7)ncr['b'].K=false;if(tr===0&&tc===0)ncr['b'].Q=false;return{board:next,cr:ncr,ep:nep};}
 function chessIsAttacked(b,r,c,byCol,cr,ep){for(let pr=0;pr<8;pr++)for(let pc=0;pc<8;pc++){const p=b[pr][pc];if(!p||p.col!==byCol)continue;if(chessRawMoves(b,pr,pc,cr||{w:{K:false,Q:false},b:{K:false,Q:false}},ep||null).some(([mr,mc])=>mr===r&&mc===c))return true;}return false;}
@@ -1764,13 +2360,13 @@ function chessBotMove(){
   else{let best=Infinity,bestMoves=[];for(const[fr,fc,tr,tc,flag]of all){const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');const val=minimax(res.board,cfg.depth-1,-Infinity,Infinity,true,res.cr,res.ep);if(val<best){best=val;bestMoves=[[fr,fc,tr,tc,flag]];}else if(val===best)bestMoves.push([fr,fc,tr,tc,flag]);}chosen=bestMoves[Math.floor(Math.random()*bestMoves.length)];}
   const[fr,fc,tr,tc,flag]=chosen;const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');chessBoard=res.board;castleRights=res.cr;enPassantTarget=res.ep;chessTurn='w';
   const fen=chessFEN(chessBoard,chessTurn,castleRights,enPassantTarget);positionHistory.push(fen);renderChess();
-  if(chessCheckThreefold()){chessEndGame("Draw — threefold repetition!");return;}
+  if(chessCheckThreefold()){chessEndGame("Draw â€” threefold repetition!");return;}
   const result=chessCheckResult(chessBoard,'w',castleRights,enPassantTarget);
-  if(result==='checkmate'){chessEndGame('Black wins by checkmate! ♚');return;}if(result==='stalemate'){chessEndGame("Stalemate — it's a draw!");return;}
-  const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=chessInCheck(chessBoard,'w',castleRights,enPassantTarget)?'⚠ Check! Your turn (White)':'Your turn (White)';
+  if(result==='checkmate'){chessEndGame('Black wins by checkmate! â™š');return;}if(result==='stalemate'){chessEndGame("Stalemate â€” it's a draw!");return;}
+  const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=chessInCheck(chessBoard,'w',castleRights,enPassantTarget)?'âš  Check! Your turn (White)':'Your turn (White)';
 }
 function chessCheckThreefold(){const last=positionHistory[positionHistory.length-1];return positionHistory.filter(p=>p===last).length>=3;}
-function chessAfterMove(opp){const fen=chessFEN(chessBoard,opp,castleRights,enPassantTarget);positionHistory.push(fen);if(chessCheckThreefold()){renderChess();chessEndGame("Draw — threefold repetition!");return true;}const result=chessCheckResult(chessBoard,opp,castleRights,enPassantTarget);if(result==='checkmate'){renderChess();chessEndGame((chessTurn==='w'?'White':'Black')+' wins by checkmate! '+(chessTurn==='w'?'♔':'♚'));return true;}if(result==='stalemate'){renderChess();chessEndGame("Stalemate — it's a draw!");return true;}return false;}
+function chessAfterMove(opp){const fen=chessFEN(chessBoard,opp,castleRights,enPassantTarget);positionHistory.push(fen);if(chessCheckThreefold()){renderChess();chessEndGame("Draw â€” threefold repetition!");return true;}const result=chessCheckResult(chessBoard,opp,castleRights,enPassantTarget);if(result==='checkmate'){renderChess();chessEndGame((chessTurn==='w'?'White':'Black')+' wins by checkmate! '+(chessTurn==='w'?'â™”':'â™š'));return true;}if(result==='stalemate'){renderChess();chessEndGame("Stalemate â€” it's a draw!");return true;}return false;}
 function chessSquareClick(r,c){
   if(chessOver||pendingPromotion)return;
   if(chessSelected){const[sr,sc]=chessSelected;const move=chessHighlights.find(([hr,hc])=>hr===r&&hc===c);if(move){const[,,flag]=move;if(flag==='promo'||flag==='promo-cap'){pendingPromotion={fr:sr,fc:sc,tr:r,tc:c,flag};chessSelected=null;chessHighlights=[];renderChess();showPromoDialog(chessBoard[sr][sc].col);return;}chessExecuteMove(sr,sc,r,c,flag,'Q');return;}chessSelected=null;chessHighlights=[];}
@@ -1782,7 +2378,7 @@ function chessExecuteMove(fr,fc,tr,tc,flag,promo){
   const opp=chessTurn==='w'?'b':'w';chessSelected=null;chessHighlights=[];pendingPromotion=null;
   if(chessAfterMove(opp))return;
   if(gameMode==='bot'){chessTurn='b';renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';setTimeout(chessBotMove,300+chessLevel*80);}
-  else{chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'⚠ Check! ':'')+(opp==='w'?"White's turn":"Black's turn");}
+  else{chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'âš  Check! ':'')+(opp==='w'?"White's turn":"Black's turn");}
 }
 function showPromoDialog(col){const pieces=['Q','R','B','N'];const existing=document.getElementById('promo-dialog');if(existing)existing.remove();const d=document.createElement('div');d.id='promo-dialog';d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:center;justify-content:center';d.innerHTML=`<div style="background:#1a1a2e;border:1px solid rgba(124,58,237,.4);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center"><p style="color:#fff;font-size:14px;font-weight:700">Choose promotion piece</p><div style="display:flex;gap:10px">${pieces.map(t=>`<button onclick="chessPromote('${t}')" style="width:52px;height:52px;border-radius:12px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center">${CHESS_UNICODE[t][col==='w'?0:1]}</button>`).join('')}</div></div>`;document.body.appendChild(d);}
 function chessPromote(piece){const d=document.getElementById('promo-dialog');if(d)d.remove();if(!pendingPromotion)return;const{fr,fc,tr,tc,flag}=pendingPromotion;pendingPromotion=null;chessExecuteMove(fr,fc,tr,tc,flag,piece);}
@@ -1795,3 +2391,4 @@ function renderChess(){
 function chessEndGame(msg){chessOver=true;const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s)s.style.display='none';const res=document.getElementById('chess-result');if(res)res.style.display='flex';const txt=document.getElementById('chess-result-text');if(txt)txt.textContent=msg;}
 function resetChess(){chessInit();chessSelected=null;chessTurn='w';chessOver=false;chessHighlights=[];pendingPromotion=null;positionHistory=[];const d=document.getElementById('promo-dialog');if(d)d.remove();const s=document.getElementById('chess-status');if(s){s.style.display='block';s.textContent='Your turn (White)';}const res=document.getElementById('chess-result');if(res)res.style.display='none';const txt=document.getElementById('chess-result-text');if(txt)txt.textContent='';renderChess();}
 </script>
+
