@@ -1269,7 +1269,6 @@ async function handleGoogleLogin(){
   const ready=await initGoogleAuth();
   if(!ready)return;
   try {
-    google.accounts.id.cancel();
     google.accounts.id.prompt(notification => {
       console.log('Google prompt notification', notification);
       if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
