@@ -16,6 +16,12 @@
     }
     window.pendingGoogleCredentialResponse = response;
   };
+  window.processPendingGoogleCredentialResponse = function() {
+    if (window.pendingGoogleCredentialResponse && typeof window.handleCredentialResponse === 'function') {
+      window.handleCredentialResponse(window.pendingGoogleCredentialResponse);
+      window.pendingGoogleCredentialResponse = null;
+    }
+  };
   window.g_id_onload = {
     client_id: '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com',
     callback: window.zideaGoogleCredentialCallback,
@@ -1281,11 +1287,9 @@ async function handleGoogleLogin(){
   if(!ready)return;
   try {
     google.accounts.id.prompt(notification => {
+      console.log('Google prompt notification', notification);
       if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
-        google.accounts.id.renderButton(
-          document.body.appendChild(Object.assign(document.createElement('div'), {style:'position:fixed;left:-9999px'})),
-          {theme:'outline', size:'large'}
-        );
+        showToast('Google prompt was blocked or did not appear. Please allow popups and try again.');
       }
     });
   } catch (error) {
@@ -1324,6 +1328,10 @@ async function handleCredentialResponse(response){
     console.error('Google auth failed', error);
     showToast(msg.includes('registered') ? msg : msg.includes('fetch') ? 'Connection error. Check your internet and retry.' : 'Google sign-in failed. Please try again.');
   }
+}
+if (window.pendingGoogleCredentialResponse && typeof window.handleCredentialResponse === 'function') {
+  window.handleCredentialResponse(window.pendingGoogleCredentialResponse);
+  window.pendingGoogleCredentialResponse = null;
 }
 let gStep='email',gEmail='';
 function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
