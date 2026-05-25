@@ -5,7 +5,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"/>
-<title>Zidea &mdash; Connect, Call, Play</title>
+<title>Zidea &mdash; Create ideas, Connect, Play</title>
 <meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -384,17 +384,34 @@ body.app-active #page-landing footer{display:none}
 /* Idea modal */
 .idea-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);backdrop-filter:blur(6px);z-index:160;align-items:center;justify-content:center;padding:16px}
 .idea-modal-overlay.show{display:flex}
-/* Mobile nav */
-.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:rgba(26,26,36,.98);border-top:1px solid var(--border);z-index:80;padding:6px 0 env(safe-area-inset-bottom);box-shadow:0 -12px 30px rgba(0,0,0,.28)}
-.mobile-nav-inner{display:grid;grid-template-columns:repeat(6,1fr);padding:0 4px;gap:0}
-.mobile-nav-inner::-webkit-scrollbar{display:none}
-.mob-nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:5px 2px;background:none;border:none;color:#6B7280;font-size:9px;font-weight:700;cursor:pointer;font-family:inherit;transition:color .15s;white-space:nowrap;position:relative;min-width:0}
-.mob-nav-btn svg,.mob-nav-btn .mob-more-dot{width:18px;height:18px;display:block}
-.mob-nav-btn.active,.mob-nav-btn:hover{color:var(--brand-light)}
-.mob-nav-btn.active::after{content:'';position:absolute;bottom:0;width:22px;height:2px;border-radius:999px;background:var(--brand-light)}
-.mobile-more-drawer{display:none;position:fixed;left:12px;right:12px;bottom:70px;background:var(--card);border:1px solid var(--border);border-radius:18px;padding:10px;z-index:90;box-shadow:0 18px 50px rgba(0,0,0,.5)}
-.mobile-more-drawer.show{display:flex;flex-direction:column;gap:6px}
-.mobile-more-drawer button{justify-content:flex-start;width:100%}
+/* Mobile nav — top bar + side drawer */
+.mobile-nav{display:none}
+.mob-topbar{display:none;position:fixed;top:0;left:0;right:0;height:56px;background:rgba(10,10,18,.96);border-bottom:1px solid rgba(124,58,237,.18);backdrop-filter:blur(16px);z-index:80;align-items:center;justify-content:space-between;padding:0 16px}
+.mob-hamburger{width:40px;height:40px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:12px;cursor:pointer;flex-shrink:0;transition:background .2s}
+.mob-hamburger:hover,.mob-hamburger.open{background:rgba(124,58,237,.22);border-color:rgba(124,58,237,.4)}
+.mob-hamburger span{display:block;width:18px;height:2px;border-radius:2px;background:#a78bfa;transition:all .25s}
+.mob-hamburger.open span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.mob-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0)}
+.mob-hamburger.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+.mob-topbar-logo{font-size:17px;font-weight:800;color:#fff;display:flex;align-items:center;gap:7px}
+.mob-user-chip{display:flex;align-items:center;gap:7px;padding:6px 12px;background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.28);border-radius:999px;cursor:pointer;font-size:12px;font-weight:700;color:#d8b4fe;transition:all .2s}
+.mob-user-chip:hover{background:rgba(124,58,237,.22)}
+.mob-drawer-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(2px);z-index:85}
+.mob-drawer-overlay.show{display:block}
+.mob-drawer{position:fixed;top:0;left:0;bottom:0;width:280px;background:linear-gradient(180deg,#0d0d1a 0%,#0a0a15 100%);border-right:1px solid rgba(124,58,237,.22);z-index:86;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);overflow-y:auto;overflow-x:hidden;will-change:transform}
+.mob-drawer.open{transform:translateX(0)}
+.mob-drawer-head{padding:20px 18px 16px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.mob-drawer-avatar{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,#7C3AED,#c026d3);display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:800;color:#fff;flex-shrink:0}
+.mob-drawer-user strong{display:block;color:#fff;font-size:14px;font-weight:800}
+.mob-drawer-user span{font-size:12px;color:#6B7280;margin-top:2px;display:block}
+.mob-drawer-section{padding:14px 18px 4px;font-size:10px;color:#4B5563;text-transform:uppercase;letter-spacing:.12em;font-weight:700}
+.mob-drawer-nav{display:flex;flex-direction:column;gap:1px;padding:2px 8px}
+.mob-nav-btn{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:14px;background:none;border:1px solid transparent;color:#9CA3AF;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s;width:100%;text-align:left}
+.mob-nav-btn svg{width:18px;height:18px;flex-shrink:0;color:currentColor}
+.mob-nav-btn:hover{background:rgba(124,58,237,.1);color:#e2e8f0}
+.mob-nav-btn.active{background:rgba(124,58,237,.16);color:#fff;border-color:rgba(124,58,237,.3)}
+.mob-drawer-footer{margin-top:auto;padding:14px 10px max(24px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.06)}
+.mobile-more-drawer{display:none!important}
 /* Modal */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.show{display:flex}
@@ -411,11 +428,13 @@ body.app-active #page-landing footer{display:none}
 @keyframes randPulse{0%{transform:scale(1)}40%{transform:scale(1.03)}100%{transform:scale(1)}}
 @media(max-width:768px){
   .sidebar{display:none!important}
-  .main-content{height:auto;min-height:calc(100vh - 64px)}
+  .mob-topbar{display:flex}
+  .main-content{height:auto;min-height:calc(100vh - 56px);padding-top:16px}
   .dashboard-grid{grid-template-columns:1fr}
   .online-panel{display:none}
-  .mobile-nav{display:block}
-  #page-dashboard,#page-arcade,#page-chat,#page-zidai,#page-ideas,#page-library,#page-explore,#page-profile,#page-settings,#page-help{padding-bottom:64px}
+  #page-dashboard,#page-arcade,#page-chat,#page-zidai,#page-ideas,#page-library,#page-explore,#page-profile,#page-settings,#page-help{padding-top:72px;padding-bottom:20px}
+  #page-chat .chat-layout{height:calc(100vh - 56px)}
+  #page-chat .chat-window{inset:56px 0 0 0}
 }
 @media(max-width:520px){.welcome-grid{grid-template-columns:1fr}.modal-box{padding:22px}}
 </style>
@@ -584,6 +603,7 @@ body.app-active #page-landing footer{display:none}
     <div id="game-ttt" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="ttt-status" style="color:#fff;font-weight:800">Your turn</div><div id="ttt-grid" class="ttt-grid"></div><div id="ttt-result" style="display:none;flex-direction:column;align-items:center;gap:8px"><div id="ttt-result-text" style="color:#fff;font-weight:800"></div><button class="btn-primary" onclick="resetTTT()">Play again</button></div></div>
     <div id="game-chess" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center">
       <div id="chess-status" style="color:#fff;font-weight:800">Your turn (White)</div>
+      <div id="chess-material" style="color:#0ae144;font-size:13px">Material: Even</div>
       <div class="chess-clock-row" style="width:100%;max-width:720px;justify-content:center">
         <div class="chess-clock-label" id="chess-clock-white">White: 05:00</div>
         <div class="chess-clock-label" id="chess-clock-black">Black: 05:00</div>
@@ -816,23 +836,83 @@ body.app-active #page-landing footer{display:none}
   </div></div>
 </div>
 <!-- MOBILE NAV -->
-<nav class="mobile-nav">
-  <div class="mobile-nav-inner">
-    <button class="mob-nav-btn active" id="mob-discover" onclick="showPage('dashboard')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>Home</button>
-    <button class="mob-nav-btn" id="mob-ideas" onclick="showPage('ideas')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Ideas</button>
-    <button class="mob-nav-btn" id="mob-explore" onclick="showPage('explore')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Explore</button>
-    <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button>
-    <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade</button>
-    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</button>
-    <button class="mob-nav-btn" id="mob-more" onclick="toggleMobileMore()"><span class="mob-more-dot" style="font-size:22px;line-height:14px">?</span>More</button>
+<!-- MOBILE TOP BAR -->
+<header class="mob-topbar" id="mob-topbar">
+  <button class="mob-hamburger" id="mob-hamburger" onclick="toggleMobileDrawer()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+  <div class="mob-topbar-logo">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Zidea
+  </div>
+  <button class="mob-user-chip" id="mob-user-chip" onclick="showPage('profile');closeMobileDrawer()">
+    <span id="mob-avatar-chip" style="width:22px;height:22px;border-radius:8px;background:rgba(124,58,237,.3);display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#d8b4fe;flex-shrink:0">U</span>
+    <span id="mob-chip-name" style="max-width:72px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Account</span>
+  </button>
+</header>
+
+<!-- MOBILE DRAWER OVERLAY -->
+<div class="mob-drawer-overlay" id="mob-drawer-overlay" onclick="closeMobileDrawer()"></div>
+
+<!-- MOBILE SIDE DRAWER -->
+<nav class="mob-drawer" id="mob-drawer" aria-label="Navigation">
+  <div class="mob-drawer-head">
+    <div class="mob-drawer-avatar" id="mob-drawer-avatar">Z</div>
+    <div class="mob-drawer-user">
+      <strong id="mob-drawer-username">Zidea</strong>
+      <span id="mob-drawer-email">Welcome back</span>
+    </div>
+  </div>
+
+  <div class="mob-drawer-section">Main</div>
+  <div class="mob-drawer-nav">
+    <button class="mob-nav-btn active" id="mob-discover" onclick="showPage('dashboard');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Home
+    </button>
+    <button class="mob-nav-btn" id="mob-ideas" onclick="showPage('ideas');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Generate Ideas
+    </button>
+    <button class="mob-nav-btn" id="mob-library" onclick="showPage('library');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library
+    </button>
+    <button class="mob-nav-btn" id="mob-explore" onclick="showPage('explore');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Explore
+    </button>
+  </div>
+
+  <div class="mob-drawer-section">Social</div>
+  <div class="mob-drawer-nav">
+    <button class="mob-nav-btn" id="mob-chat" onclick="showPage('chat');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages
+    </button>
+    <button class="mob-nav-btn" id="mob-arcade" onclick="showPage('arcade');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>Arcade
+    </button>
+    <button class="mob-nav-btn" id="mob-zidai" onclick="showPage('zidai');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>ZiD AI
+    </button>
+  </div>
+
+  <div class="mob-drawer-section">Account</div>
+  <div class="mob-drawer-nav">
+    <button class="mob-nav-btn" id="mob-profile" onclick="showPage('profile');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile
+    </button>
+    <button class="mob-nav-btn" id="mob-settings" onclick="showPage('settings');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Settings
+    </button>
+    <button class="mob-nav-btn" id="mob-help" onclick="showPage('help');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Help
+    </button>
+  </div>
+
+  <div class="mob-drawer-footer">
+    <button class="mob-nav-btn" style="color:#ef4444" onclick="handleLogout();closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Sign Out
+    </button>
   </div>
 </nav>
-<div class="mobile-more-drawer" id="mobile-more-drawer">
-  <button class="btn-ghost" onclick="showPage('zidai');toggleMobileMore(false)">ZiD AI</button>
-  <button class="btn-ghost" onclick="showPage('library');toggleMobileMore(false)">Library</button>
-  <button class="btn-ghost" onclick="showPage('settings');toggleMobileMore(false)">Settings</button>
-  <button class="btn-ghost" onclick="showPage('help');toggleMobileMore(false)">Help</button>
-</div>
+<div class="mobile-more-drawer" id="mobile-more-drawer"></div>
 
 <!-- CHAT GROUP MODAL -->
 <div class="group-modal-overlay" id="group-modal-overlay" onclick="if(event.target===this)closeCreateGroup()">
@@ -1020,6 +1100,7 @@ const withTimeout=(promise,ms=1800)=>Promise.race([promise,timeoutPromise(ms)]);
 const onlineReady=()=>navigator.onLine!==false;
 // State
 let currentUser=null,fbUsers={},fbSSE=null,fbStarted=false,incomingSSE=null,searchQuery='';
+let friendRequestsIn={},friendRequestsOut={},friendsByUsername={},friendRequestSSE=null,friendOutgoingSSE=null,friendListSSE=null;
 let googleClientId='',googleReady=false,googleTokenClient=null;
 const PAGE_META={
   landing:{title:'Zidea - Connect, Call, Play',desc:'Connect with friends, generate ideas, chat, call, and play games on Zidea.'},
@@ -1109,11 +1190,26 @@ function syncSidebarActive(name){
     btn.classList.toggle('active',!!match&&match[1]===name);
   });
 }
-function toggleMobileMore(force){
-  const drawer=document.getElementById('mobile-more-drawer');
+function toggleMobileMore(force){}
+function toggleMobileDrawer(){
+  const drawer=document.getElementById('mob-drawer');
+  const overlay=document.getElementById('mob-drawer-overlay');
+  const hamburger=document.getElementById('mob-hamburger');
   if(!drawer)return;
-  const show=typeof force==='boolean'?force:!drawer.classList.contains('show');
-  drawer.classList.toggle('show',show);
+  const open=drawer.classList.toggle('open');
+  overlay.classList.toggle('show',open);
+  hamburger.classList.toggle('open',open);
+  document.body.style.overflow=open?'hidden':'';
+}
+function closeMobileDrawer(){
+  const drawer=document.getElementById('mob-drawer');
+  const overlay=document.getElementById('mob-drawer-overlay');
+  const hamburger=document.getElementById('mob-hamburger');
+  if(!drawer)return;
+  drawer.classList.remove('open');
+  overlay.classList.remove('show');
+  if(hamburger)hamburger.classList.remove('open');
+  document.body.style.overflow='';
 }
 function openAuthModal(kind,skipHash=false){
   const login=document.getElementById('page-login'),signup=document.getElementById('page-signup');
@@ -1133,20 +1229,19 @@ function showPage(name,opts={}){
   closeAuthModal(true);
   if(PRIVATE_PAGES.has(name)&&!currentUser){name='landing';openAuthModal('login',true);showToast('Please sign in to continue.');}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const el=document.getElementById('page-'+name);
+  let el=document.getElementById('page-'+name);
+  if(!el){name='landing';el=document.getElementById('page-'+name);}
   if(!el)return;
   el.classList.add('active');
   document.body.classList.toggle('app-active',name!=='landing'&&name!=='login'&&name!=='signup');
   setPageMeta(name);
   updateLandingAuthUI();
   syncSidebarActive(name);
-  ['discover','ideas','explore','chat','arcade','profile'].forEach(k=>{
+  ['discover','ideas','explore','chat','arcade','profile','library','zidai','settings','help'].forEach(k=>{
     const b=document.getElementById('mob-'+k);
     if(b)b.classList.toggle('active',(k==='discover'&&name==='dashboard')||(k===name));
   });
-  const more=document.getElementById('mob-more');
-  if(more)more.classList.toggle('active',['zidai','library','settings','help'].includes(name));
-  toggleMobileMore(false);
+  closeMobileDrawer();
   if(!opts.skipHash){suppressHashChange=true;window.location.hash=name;setTimeout(()=>{suppressHashChange=false;},0);}
   if(name==='dashboard'){searchQuery='';const si=document.getElementById('search-input');if(si)si.value='';renderUsers();renderOnline();}
   if(name==='chat'){document.getElementById('chat-username').textContent='@'+(currentUser?.username||'');const ci=document.getElementById('convo-items');if(ci&&!Object.keys(chatCache).length)ci.innerHTML=skeletonConvos(5);loadAllConvos().then(()=>{renderConvos(activeChatUser);if(!activeChatUser&&!activeGroupId){const chatted=Object.keys(chatCache);if(chatted.length)openConvo(chatted[0]);}});loadMyGroups().then(()=>{if(activeConvoTab==='groups')renderGroupList();});}
@@ -1174,7 +1269,7 @@ function handleHashRoute(){
   showPage(route||'landing',{skipHash:true});
 }
 window.addEventListener('hashchange',handleHashRoute);
-window.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuthModal();});
+window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAuthModal();closeMobileDrawer();}});
 // Auth
 function normalizeEmail(email){return String(email||'').trim().toLowerCase();}
 function getAccounts(){
@@ -1277,8 +1372,17 @@ function loginSuccess(user){
 function setLoggedInUI(){
   const n='@'+currentUser.username;
   ['dash-username','arcade-username','chat-username','zidai-username','ideas-username','library-username','explore-username','profile-username-sidebar','settings-username','help-username'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=n;});
+  const initials=getUserInitials(currentUser.username);
   const chip=document.getElementById('mob-avatar-chip');
-  if(chip){chip.textContent=getUserInitials(currentUser.username);}
+  if(chip)chip.textContent=initials;
+  const chipName=document.getElementById('mob-chip-name');
+  if(chipName)chipName.textContent=currentUser.username;
+  const dAvatar=document.getElementById('mob-drawer-avatar');
+  if(dAvatar)dAvatar.textContent=initials;
+  const dUser=document.getElementById('mob-drawer-username');
+  if(dUser)dUser.textContent=n;
+  const dEmail=document.getElementById('mob-drawer-email');
+  if(dEmail)dEmail.textContent=currentUser.email||'';
   applyTheme();
 }
 function handleLogout(force=false){
@@ -1412,6 +1516,7 @@ function startFirebase(){
   sse.addEventListener('patch',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]={...(fbUsers[k]||{}),...u};});renderUsers();renderOnline();updateStats();}catch(_){}});
   sse.onerror=()=>{sse.close();fbSSE=null;setTimeout(startFirebase,5000);};
   window.addEventListener('beforeunload',()=>{if(currentUser)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});});
+  listenFriendUpdates();
 }
 function isOnline(u){if(!u)return false;return u.online===true&&Date.now()-(u.lastSeen||0)<180000;}
 function touchPresence(){if(!currentUser||!fbStarted)return;db.patch('users/'+currentUser.username,{lastSeen:Date.now(),online:true});}
@@ -1425,7 +1530,117 @@ function renderUsers(){
   if(!searchQuery){list.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center"><div style="width:64px;height:64px;border-radius:20px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div><p style="color:#e2e8f0;font-size:15px;font-weight:700;margin-bottom:6px">Find someone</p><p style="color:#4b5563;font-size:13px;line-height:1.6">Search by @username to find people</p></div></div>`;return;}
   const users=getAllUsers().filter(u=>u.username.toLowerCase().includes(searchQuery.toLowerCase()));
   if(!users.length){list.innerHTML=`<p style="color:#4b5563;font-size:14px;text-align:center;padding:40px 20px">No users found for "<strong style="color:#a78bfa">${esc(searchQuery)}</strong>"</p>`;return;}
-  list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#22C55E':'#6B7280'}">${isOnline(u)?'● Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
+  list.innerHTML=users.map(u=>{
+    const username=u.username.toLowerCase();
+    const online=isOnline(u);
+    const isFriend=!!friendsByUsername[username];
+    const incoming=friendRequestsIn[username]?.status==='pending';
+    const outgoing=friendRequestsOut[username]?.status==='pending';
+    const friendLabel=isFriend?'<span style="color:#22c55e;font-size:11px;font-weight:700;">Friend</span>':incoming?'<span style="color:#a78bfa;font-size:11px;font-weight:700;">Incoming request</span>':outgoing?'<span style="color:#f59e0b;font-size:11px;font-weight:700;">Request sent</span>':'';
+    let actionHtml='';
+    if(isFriend){
+      actionHtml=`<button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button><button class="btn-ghost" disabled style="font-size:12px;padding:8px 12px">Friends</button>`;
+    } else if(incoming){
+      actionHtml=`<button class="btn-primary" onclick="acceptFriendRequest('${u.username}')">Accept</button><button class="btn-ghost" onclick="declineFriendRequest('${u.username}')">Decline</button><button class="btn-ghost" disabled style="font-size:12px;padding:8px 12px">Chat locked</button>`;
+    } else if(outgoing){
+      actionHtml=`<button class="btn-ghost" onclick="cancelFriendRequest('${u.username}')">Cancel</button><button class="btn-ghost" disabled style="font-size:12px;padding:8px 12px">Chat locked</button>`;
+    } else {
+      actionHtml=`<button class="btn-primary" onclick="sendFriendRequest('${u.username}')">Add Friend</button><button class="btn-ghost" disabled style="font-size:12px;padding:8px 12px">Chat locked</button>`;
+    }
+    return `<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${online?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#FBBF24">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${online?'#22C55E':'#6B7280'}">${online?'● Online':'Offline'}</span>${friendLabel?`<span style="margin-left:8px">${friendLabel}</span>`:''}</div></div></div><div class="user-actions">${actionHtml}</div></div>`;
+  }).join('');
+}
+function renderFriendBanner(){
+  const el=document.getElementById('friend-request-banner');if(!el)return;
+  const incoming=Object.values(friendRequestsIn).filter(r=>r.status==='pending');
+  const outgoing=Object.values(friendRequestsOut).filter(r=>r.status==='pending');
+  if(!incoming.length&&!outgoing.length){el.innerHTML='';return;}
+  const incomingText=incoming.length?`<strong>${incoming.length}</strong> incoming friend request${incoming.length===1?'':'s'}`:'';
+  const outgoingText=outgoing.length?`<strong>${outgoing.length}</strong> pending request${outgoing.length===1?'':'s'}`:'';
+  el.innerHTML=`<div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:14px 16px;border:1px solid rgba(124,58,237,.2);border-radius:14px;background:rgba(124,58,237,.07);color:#e5e7eb;font-size:13px"><div>${incomingText}${incoming.length&&outgoing.length?'<span style="margin:0 8px">·</span>':''}${outgoingText}</div><div style="display:flex;gap:8px;flex-wrap:wrap">${incoming.length?`<button class="btn-primary" style="font-size:12px;padding:7px 12px" onclick="acceptAllFriendRequests()">Accept all</button>`:''}${outgoing.length?`<button class="btn-ghost" style="font-size:12px;padding:7px 12px" onclick="cancelAllFriendRequests()">Cancel all</button>`:''}</div></div>`;
+}
+function syncFriendState(){
+  if(!currentUser)return;
+  Promise.all([
+    db.read(`friendRequests/${currentUser.username}`),
+    db.read(`friendRequestsSent/${currentUser.username}`),
+    db.read(`friends/${currentUser.username}`)
+  ]).then(([incoming,outgoing,friends])=>{
+    friendRequestsIn=incoming||{};friendRequestsOut=outgoing||{};friendsByUsername=friends||{};renderFriendBanner();renderUsers();
+  }).catch(()=>{});
+}
+function listenFriendUpdates(){
+  if(!currentUser||friendRequestSSE)return;
+  syncFriendState();
+  friendRequestSSE=new EventSource(`${FB}/friendRequests/${currentUser.username}.json`);
+  friendRequestSSE.addEventListener('put',e=>{try{friendRequestsIn=JSON.parse(e.data).data||{};renderFriendBanner();renderUsers();}catch(_){} });
+  friendRequestSSE.addEventListener('patch',e=>{try{const data=JSON.parse(e.data).data||{};Object.entries(data).forEach(([k,v])=>{if(v===null){delete friendRequestsIn[k];}else{friendRequestsIn[k]=v;}});renderFriendBanner();renderUsers();}catch(_){} });
+  friendRequestSSE.onerror=()=>{if(friendRequestSSE){friendRequestSSE.close();friendRequestSSE=null;setTimeout(listenFriendUpdates,5000);}};
+  friendOutgoingSSE=new EventSource(`${FB}/friendRequestsSent/${currentUser.username}.json`);
+  friendOutgoingSSE.addEventListener('put',e=>{try{friendRequestsOut=JSON.parse(e.data).data||{};renderFriendBanner();renderUsers();}catch(_){} });
+  friendOutgoingSSE.addEventListener('patch',e=>{try{const data=JSON.parse(e.data).data||{};Object.entries(data).forEach(([k,v])=>{if(v===null){delete friendRequestsOut[k];}else{friendRequestsOut[k]=v;}});renderFriendBanner();renderUsers();}catch(_){} });
+  friendOutgoingSSE.onerror=()=>{if(friendOutgoingSSE){friendOutgoingSSE.close();friendOutgoingSSE=null;setTimeout(listenFriendUpdates,5000);}};
+  friendListSSE=new EventSource(`${FB}/friends/${currentUser.username}.json`);
+  friendListSSE.addEventListener('put',e=>{try{friendsByUsername=JSON.parse(e.data).data||{};renderFriendBanner();renderUsers();}catch(_){} });
+  friendListSSE.addEventListener('patch',e=>{try{const data=JSON.parse(e.data).data||{};Object.entries(data).forEach(([k,v])=>{if(v===null){delete friendsByUsername[k];}else{friendsByUsername[k]=v;}});renderFriendBanner();renderUsers();}catch(_){} });
+  friendListSSE.onerror=()=>{if(friendListSSE){friendListSSE.close();friendListSSE=null;setTimeout(listenFriendUpdates,5000);}};
+}
+function sendFriendRequest(username){
+  if(!currentUser){showPage('login');return;}
+  const to=String(username||'').trim().replace(/^@/,'').toLowerCase();
+  if(!to||to===currentUser.username){showToast('Enter a valid friend username.');return;}
+  const user=getAllUsers().find(u=>u.username.toLowerCase()===to);
+  if(!user){showToast('User not found.');return;}
+  if(friendsByUsername[to]){showToast('You are already friends.');return;}
+  if(friendRequestsOut[to]?.status==='pending'){showToast('Friend request already sent.');return;}
+  const req={from:currentUser.username,to,status:'pending',ts:Date.now()};
+  db.patch(`friendRequests/${to}`,{[currentUser.username]:req}).catch(()=>{});
+  db.patch(`friendRequestsSent/${currentUser.username}`,{[to]:req}).catch(()=>{});
+  friendRequestsOut[to]=req;
+  renderFriendBanner();renderUsers();
+  showToast(`Friend request sent to @${to}.`);
+}
+function acceptFriendRequest(username){
+  if(!currentUser)return;
+  const from=String(username||'').trim().replace(/^@/,'').toLowerCase();
+  if(friendRequestsIn[from]?.status!=='pending'){showToast('No pending request found.');return;}
+  const updated={...friendRequestsIn[from],status:'accepted',respondedAt:Date.now()};
+  db.patch(`friendRequests/${currentUser.username}`,{[from]:updated}).catch(()=>{});
+  db.patch(`friendRequestsSent/${from}`,{[currentUser.username]:updated}).catch(()=>{});
+  db.patch(`friends/${currentUser.username}`,{[from]:true}).catch(()=>{});
+  db.patch(`friends/${from}`,{[currentUser.username]:true}).catch(()=>{});
+  friendsByUsername[from]=true;
+  delete friendRequestsIn[from];
+  friendRequestsOut[from]=updated;
+  renderFriendBanner();renderUsers();
+  showToast(`You are now friends with @${from}.`);
+}
+function declineFriendRequest(username){
+  if(!currentUser)return;
+  const from=String(username||'').trim().replace(/^@/,'').toLowerCase();
+  if(friendRequestsIn[from]?.status!=='pending'){showToast('No request to decline.');return;}
+  const declined={...friendRequestsIn[from],status:'declined',respondedAt:Date.now()};
+  db.patch(`friendRequests/${currentUser.username}`,{[from]:declined}).catch(()=>{});
+  db.patch(`friendRequestsSent/${from}`,{[currentUser.username]:declined}).catch(()=>{});
+  delete friendRequestsIn[from];
+  renderFriendBanner();renderUsers();
+  showToast(`Declined friend request from @${from}.`);
+}
+function cancelFriendRequest(username){
+  if(!currentUser)return;
+  const to=String(username||'').trim().replace(/^@/,'').toLowerCase();
+  if(!friendRequestsOut[to]){showToast('No outgoing request to cancel.');return;}
+  db.patch(`friendRequests/${to}`,{[currentUser.username]:null}).catch(()=>{});
+  db.patch(`friendRequestsSent/${currentUser.username}`,{[to]:null}).catch(()=>{});
+  delete friendRequestsOut[to];
+  renderFriendBanner();renderUsers();
+  showToast(`Cancelled friend request to @${to}.`);
+}
+function acceptAllFriendRequests(){
+  Object.keys(friendRequestsIn).filter(k=>friendRequestsIn[k]?.status==='pending').forEach(acceptFriendRequest);
+}
+function cancelAllFriendRequests(){
+  Object.keys(friendRequestsOut).filter(k=>friendRequestsOut[k]?.status==='pending').forEach(cancelFriendRequest);
 }
 function renderOnline(){const el=document.getElementById('online-list');if(!el)return;const online=getAllUsers().filter(u=>isOnline(u));if(!online.length){el.innerHTML='<div class="online-empty">No one online yet</div>';return;}el.innerHTML=online.map(u=>`<div class="online-user-row"><div class="online-avatar">${u.username.slice(0,2).toUpperCase()}</div><div><div class="online-user-name">@${u.username}</div></div></div>`).join('');}
 function updateLandingOnlineStat(count){
@@ -1586,7 +1801,14 @@ function renderCallMiniGame(type){const root=document.getElementById('call-mini-
 // ------ Chat ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 let activeChatUser=null,chatSSE=null;
 const chatCache={};
-function openChat(username){showPage('chat');renderConvos(username);openConvo(username);}
+function openChat(username){
+  if(!currentUser)return;
+  const target=String(username||'').trim().replace(/^@/,'').toLowerCase();
+  if(!target){showToast('Invalid chat target.');return;}
+  if(target===currentUser.username){showToast('Cannot chat with yourself.');return;}
+  if(!friendsByUsername[target]){showToast('Add them as a friend before chatting.');return;}
+  showPage('chat');renderConvos(target);openConvo(target);
+}
 async function loadAllConvos(){
   if(!currentUser)return;const data=await db.read('chats');if(!data)return;
   const myName=currentUser.username;
@@ -1887,16 +2109,16 @@ const MATCH_STORE_KEY='zidea_idea_matchmaker_submissions';
 let matchStep=0;
 const matchFields=[['match-name','match-email','match-title','match-description'],['match-problem'],['match-industry'],['match-stage'],['match-skills'],['match-collaborator'],['match-commitment'],['match-audience']];
 const MATCH_SEEDS=[
-  {id:'seed-001',createdAt:'2026-04-20T09:00:00.000Z',name:'Maya Chen',email:'maya@example.com',title:'SkillSwap Campus',description:'A peer learning platform where students trade short tutoring sessions and project help.',problem:'Students need affordable academic support and practical project collaborators.',industry:'Education',stage:'Have a plan',skills:'product design, community building, education research',collaborator:'Technical',commitment:'5-10hrs',audience:'university students, tutors, student clubs'},
-  {id:'seed-002',createdAt:'2026-04-21T10:30:00.000Z',name:'Noah Patel',email:'noah@example.com',title:'Clinic Queue Lite',description:'Simple appointment and queue tracking for small neighborhood clinics.',problem:'Patients wait too long because small clinics manage visits manually.',industry:'Health',stage:'Already started',skills:'backend, technical prototyping, operations',collaborator:'Business',commitment:'10+ hrs',audience:'small clinics, nurses, local patients'},
-  {id:'seed-003',createdAt:'2026-04-22T11:15:00.000Z',name:'Aisha Bello',email:'aisha@example.com',title:'MicroBudget Coach',description:'A mobile-first budgeting helper for freelancers with irregular income.',problem:'Freelancers struggle to forecast cash flow between uneven payments.',industry:'Finance',stage:'Just an idea',skills:'finance, copywriting, user interviews',collaborator:'Technical',commitment:'5-10hrs',audience:'freelancers, creators, independent consultants'},
-  {id:'seed-004',createdAt:'2026-04-23T12:45:00.000Z',name:'Lena Torres',email:'lena@example.com',title:'Neighborhood Help Board',description:'A trusted local board for errands, volunteering, and shared neighborhood resources.',problem:'Neighbors want to help each other but lack a safe lightweight coordination tool.',industry:'Social',stage:'Have a plan',skills:'community partnerships, business development, moderation',collaborator:'Technical',commitment:'< 5hrs',audience:'neighbors, local volunteers, community groups'},
-  {id:'seed-005',createdAt:'2026-04-24T14:20:00.000Z',name:'Sam Wilson',email:'sam@example.com',title:'AI Pitch Polisher',description:'A guided workspace that turns rough startup notes into sharper pitch materials.',problem:'Early founders struggle to explain their idea clearly to investors and partners.',industry:'Tech',stage:'Already started',skills:'technical, AI workflows, frontend',collaborator:'Creative',commitment:'10+ hrs',audience:'startup founders, accelerators, solo builders'},
-  {id:'seed-006',createdAt:'2026-04-25T15:00:00.000Z',name:'Priya Nair',email:'priya@example.com',title:'CareCircle Meals',description:'Meal planning and delivery coordination for families caring for recovering relatives.',problem:'Family caregivers need practical support coordinating meals and check-ins.',industry:'Health',stage:'Have a plan',skills:'health operations, partnerships, service design',collaborator:'Technical',commitment:'5-10hrs',audience:'family caregivers, patients, local meal providers'},
-  {id:'seed-007',createdAt:'2026-04-26T16:10:00.000Z',name:'Omar Hassan',email:'omar@example.com',title:'Creator Invoice Shield',description:'Contracts, invoices, and reminder automations for small creative studios.',problem:'Creators lose money and time chasing late payments.',industry:'Finance',stage:'Already started',skills:'business, sales, finance workflows',collaborator:'Technical',commitment:'10+ hrs',audience:'creative studios, freelancers, agencies'},
-  {id:'seed-008',createdAt:'2026-04-27T17:25:00.000Z',name:'Emma Brooks',email:'emma@example.com',title:'StoryLab Kids',description:'Interactive storytelling prompts that help children practice reading and creativity.',problem:'Parents and teachers need engaging tools that make reading practice feel playful.',industry:'Education',stage:'Just an idea',skills:'creative writing, curriculum, illustration',collaborator:'Technical',commitment:'< 5hrs',audience:'children, parents, primary school teachers'},
-  {id:'seed-009',createdAt:'2026-04-28T18:40:00.000Z',name:'Jon Kim',email:'jon@example.com',title:'Local Event Signal',description:'A discovery app that surfaces small community events before they disappear online.',problem:'Local events are scattered across chats, flyers, and social feeds.',industry:'Social',stage:'Have a plan',skills:'technical, data scraping, product analytics',collaborator:'Business',commitment:'5-10hrs',audience:'local organizers, residents, community venues'},
-  {id:'seed-010',createdAt:'2026-04-29T19:55:00.000Z',name:'Grace Miller',email:'grace@example.com',title:'Eco Supply Finder',description:'A searchable directory for small businesses to find sustainable packaging suppliers.',problem:'Small businesses want better packaging options but do not know which suppliers to trust.',industry:'Other',stage:'Just an idea',skills:'research, partnerships, business strategy',collaborator:'Any',commitment:'< 5hrs',audience:'small businesses, ecommerce sellers, sustainable suppliers'}
+  {id:'seed-001',isSeed:true,createdAt:'2026-04-20T09:00:00.000Z',username:'maya_c',name:'Maya Chen',email:'maya@example.com',title:'SkillSwap Campus',description:'A peer learning platform where students trade short tutoring sessions and project help.',problem:'Students need affordable academic support and practical project collaborators.',industry:'Education',stage:'Have a plan',skills:'product design, community building, education research',collaborator:'Technical',commitment:'5-10hrs',audience:'university students, tutors, student clubs'},
+  {id:'seed-002',isSeed:true,createdAt:'2026-04-21T10:30:00.000Z',username:'noah_p',name:'Noah Patel',email:'noah@example.com',title:'Clinic Queue Lite',description:'Simple appointment and queue tracking for small neighborhood clinics.',problem:'Patients wait too long because small clinics manage visits manually.',industry:'Health',stage:'Already started',skills:'backend, technical prototyping, operations',collaborator:'Business',commitment:'10+ hrs',audience:'small clinics, nurses, local patients'},
+  {id:'seed-003',isSeed:true,createdAt:'2026-04-22T11:15:00.000Z',username:'aisha_b',name:'Aisha Bello',email:'aisha@example.com',title:'MicroBudget Coach',description:'A mobile-first budgeting helper for freelancers with irregular income.',problem:'Freelancers struggle to forecast cash flow between uneven payments.',industry:'Finance',stage:'Just an idea',skills:'finance, copywriting, user interviews',collaborator:'Technical',commitment:'5-10hrs',audience:'freelancers, creators, independent consultants'},
+  {id:'seed-004',isSeed:true,createdAt:'2026-04-23T12:45:00.000Z',username:'lena_t',name:'Lena Torres',email:'lena@example.com',title:'Neighborhood Help Board',description:'A trusted local board for errands, volunteering, and shared neighborhood resources.',problem:'Neighbors want to help each other but lack a safe lightweight coordination tool.',industry:'Social',stage:'Have a plan',skills:'community partnerships, business development, moderation',collaborator:'Technical',commitment:'< 5hrs',audience:'neighbors, local volunteers, community groups'},
+  {id:'seed-005',isSeed:true,createdAt:'2026-04-24T14:20:00.000Z',username:'sam_w',name:'Sam Wilson',email:'sam@example.com',title:'AI Pitch Polisher',description:'A guided workspace that turns rough startup notes into sharper pitch materials.',problem:'Early founders struggle to explain their idea clearly to investors and partners.',industry:'Tech',stage:'Already started',skills:'technical, AI workflows, frontend',collaborator:'Creative',commitment:'10+ hrs',audience:'startup founders, accelerators, solo builders'},
+  {id:'seed-006',isSeed:true,createdAt:'2026-04-25T15:00:00.000Z',username:'priya_n',name:'Priya Nair',email:'priya@example.com',title:'CareCircle Meals',description:'Meal planning and delivery coordination for families caring for recovering relatives.',problem:'Family caregivers need practical support coordinating meals and check-ins.',industry:'Health',stage:'Have a plan',skills:'health operations, partnerships, service design',collaborator:'Technical',commitment:'5-10hrs',audience:'family caregivers, patients, local meal providers'},
+  {id:'seed-007',isSeed:true,createdAt:'2026-04-26T16:10:00.000Z',username:'omar_h',name:'Omar Hassan',email:'omar@example.com',title:'Creator Invoice Shield',description:'Contracts, invoices, and reminder automations for small creative studios.',problem:'Creators lose money and time chasing late payments.',industry:'Finance',stage:'Already started',skills:'business, sales, finance workflows',collaborator:'Technical',commitment:'10+ hrs',audience:'creative studios, freelancers, agencies'},
+  {id:'seed-008',isSeed:true,createdAt:'2026-04-27T17:25:00.000Z',username:'emma_b',name:'Emma Brooks',email:'emma@example.com',title:'StoryLab Kids',description:'Interactive storytelling prompts that help children practice reading and creativity.',problem:'Parents and teachers need engaging tools that make reading practice feel playful.',industry:'Education',stage:'Just an idea',skills:'creative writing, curriculum, illustration',collaborator:'Technical',commitment:'< 5hrs',audience:'children, parents, primary school teachers'},
+  {id:'seed-009',isSeed:true,createdAt:'2026-04-28T18:40:00.000Z',username:'jon_k',name:'Jon Kim',email:'jon@example.com',title:'Local Event Signal',description:'A discovery app that surfaces small community events before they disappear online.',problem:'Local events are scattered across chats, flyers, and social feeds.',industry:'Social',stage:'Have a plan',skills:'technical, data scraping, product analytics',collaborator:'Business',commitment:'5-10hrs',audience:'local organizers, residents, community venues'},
+  {id:'seed-010',isSeed:true,createdAt:'2026-04-29T19:55:00.000Z',username:'grace_m',name:'Grace Miller',email:'grace@example.com',title:'Eco Supply Finder',description:'A searchable directory for small businesses to find sustainable packaging suppliers.',problem:'Small businesses want better packaging options but do not know which suppliers to trust.',industry:'Other',stage:'Just an idea',skills:'research, partnerships, business strategy',collaborator:'Any',commitment:'< 5hrs',audience:'small businesses, ecommerce sellers, sustainable suppliers'}
 ];
 function ensureMatchSeeds(){if(!load(MATCH_STORE_KEY))save(MATCH_STORE_KEY,[]);}
 function getRealUsernames(){return new Set(getAllUsers().map(u=>u.username).concat(currentUser?.username||[]).filter(Boolean));}
@@ -1975,7 +2197,9 @@ function submitMatchIdea(){
   saveCreatedIdea(idea);
   setMatchIdeas([idea,...ideas.filter(i=>i.username!==idea.username)]);
   db.write(`matchIdeas/${idea.username}`,idea).catch(()=>{});
-  renderMatchResults(idea,scoreMatchIdeas(idea,ideas).slice(0,3));
+  const seedCandidates=MATCH_SEEDS.filter(s=>s.username!==idea.username);
+  const allCandidates=[...ideas.filter(i=>i.username!==idea.username),...seedCandidates];
+  renderMatchResults(idea,scoreMatchIdeas(idea,allCandidates).slice(0,3));
   showToast('Idea submitted. Matches ready.');
 }
 function resetMatchmaker(){
@@ -1984,13 +2208,13 @@ function resetMatchmaker(){
   const out=document.getElementById('match-output');if(out)out.innerHTML='';
 }
 function scoreMatchIdeas(current,ideas){
-  return ideas.filter(i=>i.id!==current.id&&i.username&&i.username!==current.username&&getRealUsernames().has(i.username)).map(candidate=>{
+  return ideas.filter(i=>i.id!==current.id&&i.username&&i.username!==current.username).map(candidate=>{
     let score=0;const tags=new Set();
     if(eq(current.industry,candidate.industry)){score+=42;tags.add(current.industry);}
     keywordOverlap(current.audience,candidate.audience).slice(0,3).forEach(t=>{score+=8;tags.add(t);});
     collaboratorSkillOverlap(current,candidate).slice(0,3).forEach(t=>{score+=12;tags.add(t);});
     if(eq(current.commitment,candidate.commitment)){score+=10;tags.add(current.commitment);}
-    return {...candidate,matchScore:Math.min(100,score),matchTags:[...tags].slice(0,6)};
+    return {...candidate,matchScore:Math.min(100,Math.round(score)),matchTags:[...tags].slice(0,6)};
   }).filter(i=>i.matchScore>0).sort((a,b)=>b.matchScore-a.matchScore);
 }
 function tokenizer(v){return String(v||'').toLowerCase().replace(/[^a-z0-9\s-]/g,' ').split(/\s+/).map(w=>w.replace(/-+/g,'')).filter(w=>w.length>2&&!['and','the','for','with','from','that','this','are','you'].includes(w));}
@@ -2000,8 +2224,8 @@ function collaboratorSkillOverlap(a,b){const hits=new Set(),as=new Set(tokenizer
 function eq(a,b){return String(a||'').toLowerCase()===String(b||'').toLowerCase();}
 function renderMatchResults(idea,matches){
   const out=document.getElementById('match-output');if(!out)return;
-  if(!matches.length){out.innerHTML='<div class="match-result-card" style="color:#9CA3AF">No real Zidea users have a close submitted idea yet. Your idea is saved, and future users can match with you.</div>';return;}
-  out.innerHTML=`<div style="font-size:14px;font-weight:800;color:#fff;margin-top:4px">Top real Zidea matches for ${esc(idea.title)}</div>`+matches.map(m=>`<div class="match-result-card"><div class="match-result-top"><div><div style="font-size:15px;font-weight:800;color:#fff">@${esc(m.username)}</div><div style="font-size:13px;color:#d1d5db;font-weight:700;margin-top:3px">${esc(m.title)}</div></div><span class="match-score">${m.matchScore}%</span></div><div style="font-size:12px;color:#9CA3AF;line-height:1.6">${esc(m.description)}</div><div class="idea-card-tags">${(m.matchTags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}</div><button class="idea-action-btn" onclick="openChat('${esc(m.username)}')">Connect in Chat</button></div>`).join('');
+  if(!matches.length){out.innerHTML='<div class="match-result-card" style="color:#9CA3AF">No close matches found yet. Your idea is saved, and future users can match with you.</div>';return;}
+  out.innerHTML=`<div style="font-size:14px;font-weight:800;color:#fff;margin-top:4px">Top matches for ${esc(idea.title)}</div>`+matches.map(m=>{const isSeed=!!m.isSeed;const displayName=isSeed?(m.name||('@'+m.username)):('@'+m.username);const pending=friendRequestsOut[m.username]?.status==='pending'||friendRequestsIn[m.username]?.status==='pending';const connectBtn=isSeed?`<button class="idea-action-btn" style="opacity:.55;cursor:default" disabled>Community member</button>`:friendsByUsername[m.username]?`<button class="idea-action-btn" onclick="openChat('${esc(m.username)}')">Connect in Chat</button>`:pending?`<button class="idea-action-btn" style="opacity:.65;cursor:not-allowed" disabled>Friend request pending</button>`:`<button class="idea-action-btn" onclick="sendFriendRequest('${esc(m.username)}')">Add friend to chat</button>`;return`<div class="match-result-card"><div class="match-result-top"><div><div style="font-size:15px;font-weight:800;color:#fff">${esc(displayName)}</div><div style="font-size:13px;color:#d1d5db;font-weight:700;margin-top:3px">${esc(m.title)}</div></div><span class="match-score">${m.matchScore}% compatibility</span></div><div style="font-size:12px;color:#9CA3AF;line-height:1.6">${esc(m.description)}</div><div class="idea-card-tags">${(m.matchTags||[]).map(t=>`<span class="idea-tag">${esc(t)}</span>`).join('')}</div>${connectBtn}</div>`;}).join('');
 }
 function renderMatchAdmin(){
   const ideas=getMatchIdeas(),out=document.getElementById('match-output');if(!out)return;
@@ -2227,7 +2451,9 @@ if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();star
 else{applyTheme();}
 updateLandingAuthUI();
 const pathSeg=window.location.pathname.split('/').filter(Boolean).pop();
-if(!window.location.hash&&pathSeg&&pathSeg!=='index.html'){window.location.hash=pathSeg;}
+const normalizedPath=pathSeg?pathSeg.replace(/\.html?$/i,'').trim().toLowerCase():'';
+const knownRoutes=new Set(['landing','login','signup','dashboard','ideas','library','explore','chat','arcade','zidai','profile','settings','help']);
+if(!window.location.hash&&knownRoutes.has(normalizedPath)){window.location.hash=normalizedPath;}
 if(window.location.hash)handleHashRoute();else showPage(currentUser?'dashboard':'landing');
 </script>
 
@@ -2468,10 +2694,29 @@ function tttClick(i){if(tttBoard[i]||tttOver)return;tttBoard[i]=tttX?'X':'O';ttt
 function tttEnd(r){tttOver=true;renderTTT();document.getElementById('ttt-status').style.display='none';document.getElementById('ttt-result').style.display='flex';const text=r==='draw'?"It's a draw!":r==='X'?'You win!':'Player 2 wins!';document.getElementById('ttt-result-text').textContent=text;showGameResult('tictactoe',text,`Final board: ${tttBoard.map(x=>x||'-').join(' ')}`,r==='draw'?'draw':r==='X'?'win':'loss');}
 function resetTTT(){tttBoard=Array(9).fill(null);tttX=true;tttOver=false;document.getElementById('ttt-status').style.display='block';document.getElementById('ttt-status').textContent='Your turn (X)';document.getElementById('ttt-result-text').textContent='';document.getElementById('ttt-result').style.display='none';renderTTT();}
 // RPS
-let rpsYou=0,rpsBot=0,rpsRound=0;
+let rpsYou=0,rpsBot=0,rpsRound=0,rpsLocked=false;
 const RPS_EMOJI={rock:'✊',paper:'✋',scissors:'✌️'};const RPS_BEATS={rock:'scissors',paper:'rock',scissors:'paper'};
-function rpsPlay(choice){if(rpsRound>=5)return;const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];let res;if(choice===bot)res='Draw!';else if(RPS_BEATS[choice]===bot){res='You win!';rpsYou++;}else{res='Bot wins!';rpsBot++;}rpsRound++;document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} � ${res}`;document.getElementById('rps-score').textContent=`You: ${rpsYou} � Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;if(rpsRound>=5||rpsYou===3||rpsBot===3){const outcome=rpsYou===rpsBot?'draw':rpsYou>rpsBot?'win':'loss';showGameResult('rps',outcome==='win'?'You won the series':outcome==='loss'?'You lost the series':'Series draw',`Final score: You ${rpsYou}, Bot ${rpsBot}.`,outcome);}}
-function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
+function rpsPlay(choice){
+  if(rpsRound>=5||rpsLocked)return;
+  rpsLocked=true;
+  document.getElementById('rps-result').textContent='Bot thinking...';
+  setTimeout(()=>{
+    const bot=['rock','paper','scissors'][Math.floor(Math.random()*3)];
+    let res;
+    if(choice===bot)res='Draw!';
+    else if(RPS_BEATS[choice]===bot){res='You win!';rpsYou++;}
+    else{res='Bot wins!';rpsBot++;}
+    rpsRound++;
+    document.getElementById('rps-result').textContent=`${RPS_EMOJI[choice]} vs ${RPS_EMOJI[bot]} · ${res}`;
+    document.getElementById('rps-score').textContent=`You: ${rpsYou} · Bot: ${rpsBot}${rpsRound>=5?' (Game over!)':''}`;
+    rpsLocked=false;
+    if(rpsRound>=5||rpsYou===3||rpsBot===3){
+      const outcome=rpsYou===rpsBot?'draw':rpsYou>rpsBot?'win':'loss';
+      showGameResult('rps',outcome==='win'?'You won the series':outcome==='loss'?'You lost the series':'Series draw',`Final score: You ${rpsYou}, Bot ${rpsBot}.`,outcome);
+    }
+  },1000);
+}
+function resetRPS(){rpsYou=0;rpsBot=0;rpsRound=0;rpsLocked=false;document.getElementById('rps-result').textContent='Pick your move.';document.getElementById('rps-score').textContent='You: 0 — Bot: 0';}
 // Among Us (lightweight local simulation)
 let auRaf=null,auRole='Crewmate',auPlayers=[],auPos={x:280,y:210},auMeetingOpen=false,auImpostorAlive=true;
 function randomRoom(){return['Cafeteria','Electrical','MedBay','Admin','Navigation'][Math.floor(Math.random()*5)];}
@@ -2547,7 +2792,7 @@ function chessInCheck(b,col,cr,ep){const kp=chessKingPos(b,col);if(!kp)return fa
 function chessMoves(b,r,c,cr,ep){const p=b[r][c];if(!p)return[];const raw=chessRawMoves(b,r,c,cr,ep);const opp=p.col==='w'?'b':'w';return raw.filter(([tr,tc,flag])=>{if(flag==='castle-K'){if(chessInCheck(b,p.col,cr,ep))return false;if(chessIsAttacked(b,tr,5,opp,cr,ep))return false;if(chessIsAttacked(b,tr,6,opp,cr,ep))return false;}if(flag==='castle-Q'){if(chessInCheck(b,p.col,cr,ep))return false;if(chessIsAttacked(b,tr,3,opp,cr,ep))return false;if(chessIsAttacked(b,tr,2,opp,cr,ep))return false;}const res=chessApply(b,r,c,tr,tc,flag,cr,ep,'Q');return!chessInCheck(res.board,p.col,res.cr,res.ep);});}
 function chessHasLegal(b,col,cr,ep){for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]?.col===col&&chessMoves(b,r,c,cr,ep).length>0)return true;return false;}
 function chessCheckResult(b,col,cr,ep){if(chessHasLegal(b,col,cr,ep))return null;return chessInCheck(b,col,cr,ep)?'checkmate':'stalemate';}
-function chessEval(b){let score=0;for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(!p)continue;const sign=p.col==='w'?1:-1;const pstRow=p.col==='w'?r:7-r;const pst=PST[p.t]?.[pstRow]?.[c]||0;score+=sign*(PIECE_VAL[p.t]+pst);}return score;}
+function chessEval(b){let score=0;for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=b[r][c];if(!p)continue;const sign=p.col==='w'?1:-1;const pstRow=p.col==='w'?r:7-r;const pst=PST[p.t]?.[pstRow]?.[c]||0;const materialBonus=p.t==='K'?0:1;score+=sign*(PIECE_VAL[p.t]+pst+materialBonus);}return score;}
 function minimax(b,depth,alpha,beta,maximizing,cr,ep){const col=maximizing?'w':'b';const result=chessCheckResult(b,col,cr,ep);if(result==='checkmate')return maximizing?-100000:100000;if(result==='stalemate')return 0;if(depth===0)return chessEval(b);const moves=[];for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(b[r][c]?.col===col)for(const[tr,tc,flag]of chessMoves(b,r,c,cr,ep))moves.push([r,c,tr,tc,flag]);moves.sort((a,b2)=>{const va=b[a[2]]?.[a[3]]?PIECE_VAL[b[a[2]][a[3]].t]||0:0;const vb=b[b2[2]]?.[b2[3]]?PIECE_VAL[b[b2[2]][b2[3]].t]||0:0;return vb-va;});if(maximizing){let best=-Infinity;for(const[fr,fc,tr,tc,flag]of moves){const res=chessApply(b,fr,fc,tr,tc,flag,cr,ep,'Q');const val=minimax(res.board,depth-1,alpha,beta,false,res.cr,res.ep);best=Math.max(best,val);alpha=Math.max(alpha,val);if(beta<=alpha)break;}return best;}else{let best=Infinity;for(const[fr,fc,tr,tc,flag]of moves){const res=chessApply(b,fr,fc,tr,tc,flag,cr,ep,'Q');const val=minimax(res.board,depth-1,alpha,beta,true,res.cr,res.ep);best=Math.min(best,val);beta=Math.min(beta,val);if(beta<=alpha)break;}return best;}}
 const CHESS_LEVELS={
   1:{depth:1,random:0.75,elo:200},
@@ -2611,11 +2856,31 @@ function chessExecuteMove(fr,fc,tr,tc,flag,promo){
   const opp=chessTurn==='w'?'b':'w';chessSelected=null;chessHighlights=[];pendingPromotion=null;
   if(chessAfterMove(opp))return;
   if(gameMode==='bot'){
-    chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';chessBotMove();
+    chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';setTimeout(()=>{chessBotMove();},1500);
   }else{chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'⚠ Check! ':'')+(opp==='w'?"White's turn":"Black's turn");}
 }
 function showPromoDialog(col){const pieces=['Q','R','B','N'];const existing=document.getElementById('promo-dialog');if(existing)existing.remove();const d=document.createElement('div');d.id='promo-dialog';d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:center;justify-content:center';d.innerHTML=`<div style="background:#1a1a2e;border:1px solid rgba(124,58,237,.4);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center"><p style="color:#fff;font-size:14px;font-weight:700">Choose promotion piece</p><div style="display:flex;gap:10px">${pieces.map(t=>`<button onclick="chessPromote('${t}')" style="width:52px;height:52px;border-radius:12px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center">${CHESS_UNICODE[t][col==='w'?0:1]}</button>`).join('')}</div></div>`;document.body.appendChild(d);}
 function chessPromote(piece){const d=document.getElementById('promo-dialog');if(d)d.remove();if(!pendingPromotion)return;const{fr,fc,tr,tc,flag}=pendingPromotion;pendingPromotion=null;chessExecuteMove(fr,fc,tr,tc,flag,piece);}
+function getChessMaterialTotals(){
+  const counts={w:{P:0,N:0,B:0,R:0,Q:0},b:{P:0,N:0,B:0,R:0,Q:0}};
+  for(let r=0;r<8;r++)for(let c=0;c<8;c++){const p=chessBoard[r][c];if(!p||p.t==='K')continue;counts[p.col][p.t]++;}
+  const sum=col=>counts[col].P*1+counts[col].N*3+counts[col].B*3+counts[col].R*5+counts[col].Q*9;
+  return {counts,white:sum('w'),black:sum('b')};
+}
+function renderChessMaterial(){
+  const el=document.getElementById('chess-material');if(!el)return;
+  const {white,black}=getChessMaterialTotals();
+  const diff=white-black;
+  if(gameMode==='bot'){
+    if(diff===0){el.textContent='Material: Even';return;}
+    const playerAdv=chessPlayerColor==='white'?'You':'AI';
+    const aiAdv=chessPlayerColor==='white'?'AI':'You';
+    if(diff>0){el.textContent=`Material: ${playerAdv} +${diff}`;}else{el.textContent=`Material: ${aiAdv} +${-diff}`;}
+    return;
+  }
+  if(diff===0){el.textContent='Material: Even';return;}
+  el.textContent=`Material: ${diff>0?'White': 'Black'} +${Math.abs(diff)}`;
+}
 function renderChess(){
   const el=document.getElementById('chess-board');if(!el)return;
   const theme=BOARD_THEMES[chessTheme]||BOARD_THEMES.wood;
@@ -2637,6 +2902,7 @@ function renderChess(){
     }
   }
   el.innerHTML=html;
+  renderChessMaterial();
 }
 function chessEndGame(msg,result){
   chessOver=true;
@@ -2665,7 +2931,7 @@ function resetChess(){
     chessTurn='b';
     const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';
     renderChess();
-    chessBotMove();
+    setTimeout(()=>{chessBotMove();},1500);
     return;
   }
   updateChessLevelLabel();
