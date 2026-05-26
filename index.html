@@ -603,6 +603,7 @@ body.app-active #page-landing footer{display:none}
     <div id="game-ttt" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="ttt-status" style="color:#fff;font-weight:800">Your turn</div><div id="ttt-grid" class="ttt-grid"></div><div id="ttt-result" style="display:none;flex-direction:column;align-items:center;gap:8px"><div id="ttt-result-text" style="color:#fff;font-weight:800"></div><button class="btn-primary" onclick="resetTTT()">Play again</button></div></div>
     <div id="game-chess" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center">
       <div id="chess-status" style="color:#fff;font-weight:800">Your turn (White)</div>
+      <div id="chess-capture" style="color:#34d399;font-size:13px;opacity:0;transition:opacity .2s;min-height:18px"></div>
       <div id="chess-material" style="color:#0ae144;font-size:13px">Material: Even</div>
       <div class="chess-clock-row" style="width:100%;max-width:720px;justify-content:center">
         <div class="chess-clock-label" id="chess-clock-white">White: 05:00</div>
@@ -623,7 +624,10 @@ body.app-active #page-landing footer{display:none}
         <div id="chess-result-text" style="color:#fff;font-weight:800"></div>
         <button class="btn-primary" onclick="resetChess()">Play again</button>
       </div>
-      <button class="btn-ghost" onclick="resetChess()">Reset chess</button>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;width:100%;max-width:720px">
+        <button class="btn-ghost" onclick="takebackChessMove()">Take back</button>
+        <button class="btn-ghost" onclick="resetChess()">Reset chess</button>
+      </div>
     </div>
     <div id="game-rps" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="rpsPlay('rock')">✊ Rock</button><button class="btn-primary" onclick="rpsPlay('paper')">✋ Paper</button><button class="btn-primary" onclick="rpsPlay('scissors')">✌️ Scissors</button></div><div id="rps-result" style="color:#fff;font-weight:800">Pick a move</div><div id="rps-score" style="color:#9CA3AF">You: 0 — Bot: 0</div><button class="btn-ghost" onclick="resetRPS()">Reset</button></div>
     <div id="game-amongus" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><canvas id="amongus-canvas" width="640" height="360" style="width:100%;max-width:720px;border-radius:16px;background:#080811"></canvas><div id="au-status" style="color:#9CA3AF;font-size:13px">Move with arrow keys or WASD.</div><button class="btn-ghost" onclick="auMeeting()">🚨 Meeting</button><div id="au-vote-panel" style="display:none;flex-direction:column;gap:8px"></div></div>
@@ -2475,10 +2479,10 @@ function clearZidAi(){zidHistory=[];document.getElementById('zidai-messages').in
 function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!");}
 // ------ Arcade ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const ARCADE_GAMES=[
-  {id:'chess',icon:'??',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},
-  {id:'tictactoe',icon:'?',name:'Tic-Tac-Toe',desc:'First to 3 in a row wins.'},
-  {id:'rps',icon:'?',name:'Rock Paper Scissors',desc:'Best of 3. No luck allowed.'},
-  {id:'amongus',icon:'??',name:'Among Us Mode',desc:"Find the impostor before it's too late."}
+  {id:'chess',icon:'♟️',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},
+  {id:'tictactoe',icon:'⭕❌',name:'Tic-Tac-Toe',desc:'First to 3 in a row wins.'},
+  {id:'rps',icon:'✊',name:'Rock Paper Scissors',desc:'Best of 3. No luck allowed.'},
+  {id:'amongus',icon:'👽',name:'Among Us Mode',desc:"Find the impostor before it's too late."}
 ];
 let pendingChallengeGame='chess',gameInviteSSE=null,currentRoom=null,currentResultGame='tictactoe';
 function gameLabel(type){return ARCADE_GAMES.find(g=>g.id===type)?.name||type;}
@@ -2778,11 +2782,14 @@ function auEnd(text){
 // ------ Chess (full rules + minimax) ------------------------------------------------------------------------------------------------------------------------------
 let chessBoard=[],chessSelected=null,chessTurn='w',chessOver=false,chessHighlights=[];
 let castleRights={w:{K:true,Q:true},b:{K:true,Q:true}},enPassantTarget=null,positionHistory=[],pendingPromotion=null;
-let boardHistory=[],chessScoreWhite=0,chessScoreBlack=0;
+let boardHistory=[],chessScoreWhite=0,chessScoreBlack=0,chessBotTimeoutId=null,chessCaptureMessage='',chessCaptureTimer=null;
 const CHESS_UNICODE={K:['♔','♚'],Q:['♕','♛'],R:['♖','♜'],B:['♗','♝'],N:['♘','♞'],P:['♙','♟']};
 const PIECE_VAL={K:20000,Q:900,R:500,B:330,N:320,P:100};
 const PST={P:[[0,0,0,0,0,0,0,0],[50,50,50,50,50,50,50,50],[10,10,20,30,30,20,10,10],[5,5,10,25,25,10,5,5],[0,0,0,20,20,0,0,0],[5,-5,-10,0,0,-10,-5,5],[5,10,10,-20,-20,10,10,5],[0,0,0,0,0,0,0,0]],N:[[-50,-40,-30,-30,-30,-30,-40,-50],[-40,-20,0,0,0,0,-20,-40],[-30,0,10,15,15,10,0,-30],[-30,5,15,20,20,15,5,-30],[-30,0,15,20,20,15,0,-30],[-30,5,10,15,15,10,5,-30],[-40,-20,0,5,5,0,-20,-40],[-50,-40,-30,-30,-30,-30,-40,-50]],B:[[-20,-10,-10,-10,-10,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,10,10,5,0,-10],[-10,5,5,10,10,5,5,-10],[-10,0,10,10,10,10,0,-10],[-10,10,10,10,10,10,10,-10],[-10,5,0,0,0,0,5,-10],[-20,-10,-10,-10,-10,-10,-10,-20]],R:[[0,0,0,0,0,0,0,0],[5,10,10,10,10,10,10,5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[-5,0,0,0,0,0,0,-5],[0,0,0,5,5,0,0,0]],Q:[[-20,-10,-10,-5,-5,-10,-10,-20],[-10,0,0,0,0,0,0,-10],[-10,0,5,5,5,5,0,-10],[-5,0,5,5,5,5,0,-5],[0,0,5,5,5,5,0,-5],[-10,5,5,5,5,5,0,-10],[-10,0,5,0,0,0,0,-10],[-20,-10,-10,-5,-5,-10,-10,-20]],K:[[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]};
-function chessInit(){const order=['R','N','B','Q','K','B','N','R'];chessBoard=Array(8).fill(null).map(()=>Array(8).fill(null));for(let c=0;c<8;c++){chessBoard[0][c]={t:order[c],col:'b'};chessBoard[1][c]={t:'P',col:'b'};chessBoard[6][c]={t:'P',col:'w'};chessBoard[7][c]={t:order[c],col:'w'};}castleRights={w:{K:true,Q:true},b:{K:true,Q:true}};enPassantTarget=null;positionHistory=[];pendingPromotion=null;boardHistory=[JSON.parse(JSON.stringify(chessBoard))];chessScoreWhite=0;chessScoreBlack=0;}
+function chessInit(){const order=['R','N','B','Q','K','B','N','R'];chessBoard=Array(8).fill(null).map(()=>Array(8).fill(null));for(let c=0;c<8;c++){chessBoard[0][c]={t:order[c],col:'b'};chessBoard[1][c]={t:'P',col:'b'};chessBoard[6][c]={t:'P',col:'w'};chessBoard[7][c]={t:order[c],col:'w'};}castleRights={w:{K:true,Q:true},b:{K:true,Q:true}};enPassantTarget=null;positionHistory=[];pendingPromotion=null;boardHistory=[cloneChessState()];chessScoreWhite=0;chessScoreBlack=0;}
+function cloneChessState(){return {board:chessBoard.map(row=>row.map(cell=>cell?{...cell}:null)),castleRights:{w:{...castleRights.w},b:{...castleRights.b}},enPassantTarget:enPassantTarget? [enPassantTarget[0],enPassantTarget[1]]:null,chessTurn,chessScoreWhite,chessScoreBlack,positionHistory:[...positionHistory],pendingPromotion};}
+function saveChessHistorySnapshot(){boardHistory.push(cloneChessState());if(boardHistory.length>60)boardHistory.shift();}
+function takebackChessMove(){if(boardHistory.length<=1)return;boardHistory.pop();const prev=boardHistory[boardHistory.length-1];if(!prev)return;chessBoard=prev.board.map(row=>row.map(cell=>cell?{...cell}:null));castleRights={w:{...prev.castleRights.w},b:{...prev.castleRights.b}};enPassantTarget=prev.enPassantTarget? [prev.enPassantTarget[0],prev.enPassantTarget[1]]:null;chessTurn=prev.chessTurn;chessScoreWhite=prev.chessScoreWhite;chessScoreBlack=prev.chessScoreBlack;positionHistory=[...prev.positionHistory];pendingPromotion=prev.pendingPromotion;chessOver=false;if(chessTimerInterval){clearInterval(chessTimerInterval);chessTimerInterval=null;}if(chessTimeMinutes>0)startChessTimer();renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Move taken back.';if(gameMode==='bot'&&chessTurn!== (chessPlayerColor==='white'?'w':'b')){const statusEl2=document.getElementById('chess-status');if(statusEl2)statusEl2.textContent='Bot thinking...';clearTimeout(chessBotTimeoutId);chessBotTimeoutId=setTimeout(()=>{chessBotMove();},1500);}}
 function chessFEN(b,turn,cr,ep){let s='';for(let r=0;r<8;r++){let e=0;for(let c=0;c<8;c++){const p=b[r][c];if(!p){e++;}else{if(e){s+=e;e=0;}s+=p.col==='w'?p.t:p.t.toLowerCase();}}if(e)s+=e;if(r<7)s+='/';}s+=' '+turn+' '+(cr.w.K?'K':'')+(cr.w.Q?'Q':'')+(cr.b.K?'k':'')+(cr.b.Q?'q':'');s+=' '+(ep?String.fromCharCode(97+ep[1])+(8-ep[0]):'–');return s;}
 function chessRawMoves(b,r,c,cr,ep){const p=b[r][c];if(!p)return[];const{t,col}=p,moves=[];const inB=(r,c)=>r>=0&&r<8&&c>=0&&c<8;const empty=(r,c)=>!b[r][c];const enemy=(r,c)=>b[r][c]&&b[r][c].col!==col;const slide=(dr,dc)=>{let nr=r+dr,nc=c+dc;while(inB(nr,nc)){if(empty(nr,nc)){moves.push([nr,nc,'']);}else{if(enemy(nr,nc))moves.push([nr,nc,'cap']);break;}nr+=dr;nc+=dc;}};if(t==='P'){const d=col==='w'?-1:1,s=col==='w'?6:1;if(inB(r+d,c)&&empty(r+d,c)){moves.push([r+d,c,r+d===0||r+d===7?'promo':'']);if(r===s&&empty(r+d*2,c))moves.push([r+d*2,c,'double']);}for(const dc of[-1,1]){if(inB(r+d,c+dc)){if(enemy(r+d,c+dc))moves.push([r+d,c+dc,r+d===0||r+d===7?'promo':'cap']);if(ep&&ep[0]===r+d&&ep[1]===c+dc)moves.push([r+d,c+dc,'ep']);}}}if(t==='N'){for(const[dr,dc]of[[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc,'']);}}if(t==='K'){for(const[dr,dc]of[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]){const nr=r+dr,nc=c+dc;if(inB(nr,nc)&&(empty(nr,nc)||enemy(nr,nc)))moves.push([nr,nc,'']);}const row=col==='w'?7:0;if(r===row&&c===4){if(cr[col].K&&empty(row,5)&&empty(row,6)&&b[row][7]?.t==='R'&&b[row][7]?.col===col)moves.push([row,6,'castle-K']);if(cr[col].Q&&empty(row,3)&&empty(row,2)&&empty(row,1)&&b[row][0]?.t==='R'&&b[row][0]?.col===col)moves.push([row,2,'castle-Q']);}}if(t==='R'||t==='Q'){slide(-1,0);slide(1,0);slide(0,-1);slide(0,1);}if(t==='B'||t==='Q'){slide(-1,-1);slide(-1,1);slide(1,-1);slide(1,1);}return moves;}
 function chessApply(b,fr,fc,tr,tc,flag,cr,ep,promo){const next=b.map(row=>[...row]);const p=next[fr][fc];const ncr={w:{...cr.w},b:{...cr.b}};let nep=null;if(flag==='ep')next[fr][tc]=null;next[tr][tc]=p;next[fr][fc]=null;if(flag==='promo'||flag==='promo-cap')next[tr][tc]={t:promo||'Q',col:p.col};if(flag==='double')nep=[fr+(tr-fr)/2,fc];if(flag==='castle-K'){next[tr][5]={t:'R',col:p.col};next[tr][7]=null;}if(flag==='castle-Q'){next[tr][3]={t:'R',col:p.col};next[tr][0]=null;}if(p.t==='K'){ncr[p.col].K=false;ncr[p.col].Q=false;}if(p.t==='R'){if(fc===7)ncr[p.col].K=false;if(fc===0)ncr[p.col].Q=false;}if(tr===7&&tc===7)ncr['w'].K=false;if(tr===7&&tc===0)ncr['w'].Q=false;if(tr===0&&tc===7)ncr['b'].K=false;if(tr===0&&tc===0)ncr['b'].Q=false;return{board:next,cr:ncr,ep:nep};}
@@ -2811,20 +2818,42 @@ function chessBotMove(){
   const botColor=chessPlayerColor==='white'?'b':'w';
   const all=[];
   for(let r=0;r<8;r++)for(let c=0;c<8;c++)if(chessBoard[r][c]?.col===botColor)for(const[tr,tc,flag]of chessMoves(chessBoard,r,c,castleRights,enPassantTarget))all.push([r,c,tr,tc,flag]);
-  if(!all.length)return;let chosen;
-  if(Math.random()<cfg.random){chosen=all[Math.floor(Math.random()*all.length)];}
-  else{let best=Infinity,bestMoves=[];for(const[fr,fc,tr,tc,flag]of all){const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');const val=minimax(res.board,cfg.depth-1,-Infinity,Infinity,true,res.cr,res.ep);if(val<best){best=val;bestMoves=[[fr,fc,tr,tc,flag]];}else if(val===best)bestMoves.push([fr,fc,tr,tc,flag]);}chosen=bestMoves[Math.floor(Math.random()*bestMoves.length)];}
-  const[fr,fc,tr,tc,flag]=chosen;const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');chessBoard=res.board;castleRights=res.cr;enPassantTarget=res.ep;chessTurn=chessPlayerColor==='white'?'w':'b';
-  // award increment to bot after its move
+  if(!all.length)return;
+  let chosen;
+  if(Math.random()<cfg.random){
+    chosen=all[Math.floor(Math.random()*all.length)];
+  }else{
+    let best=Infinity,bestMoves=[];
+    for(const[fr,fc,tr,tc,flag]of all){
+      const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');
+      const val=minimax(res.board,cfg.depth-1,-Infinity,Infinity,true,res.cr,res.ep);
+      if(val<best){best=val;bestMoves=[[fr,fc,tr,tc,flag]];}else if(val===best){bestMoves.push([fr,fc,tr,tc,flag]);}
+    }
+    chosen=bestMoves[Math.floor(Math.random()*bestMoves.length)];
+  }
+  const[fr,fc,tr,tc,flag]=chosen;
+  const capturedPiece=flag==='ep'?chessBoard[fr][tc]:chessBoard[tr][tc];
+  const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,'Q');
+  chessBoard=res.board;castleRights=res.cr;enPassantTarget=res.ep;
+  if(capturedPiece){
+    const value=PIECE_VAL[capturedPiece.t]||0;
+    if(botColor==='w')chessScoreWhite+=value;else chessScoreBlack+=value;
+    chessCaptureMessage=`+${value}`;
+    if(chessCaptureTimer){clearTimeout(chessCaptureTimer);}chessCaptureTimer=setTimeout(()=>{chessCaptureMessage='';renderChessStatus();},1500);
+  }
+  chessTurn=chessPlayerColor==='white'?'w':'b';
   if(chessIncrement>0){
     if(botColor==='w')chessClockWhite+=chessIncrement;else chessClockBlack+=chessIncrement;
     updateChessClockDisplay();
   }
-  const fen=chessFEN(chessBoard,chessTurn,castleRights,enPassantTarget);positionHistory.push(fen);renderChess();
-  if(chessCheckThreefold()){chessEndGame("Draw — threefold repetition!");return;}
-  const result=chessCheckResult(chessBoard,'w',castleRights,enPassantTarget);
-  if(result==='checkmate'){chessEndGame('Black wins by checkmate! ♚');return;}if(result==='stalemate'){chessEndGame("Stalemate — it's a draw!");return;}
-  const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=chessInCheck(chessBoard,'w',castleRights,enPassantTarget)?'⚠ Check! Your turn (White)':'Your turn (White)';
+  const fen=chessFEN(chessBoard,chessTurn,castleRights,enPassantTarget);positionHistory.push(fen);
+  saveChessHistorySnapshot();
+  renderChess();
+  if(chessCheckThreefold()){chessEndGame("Draw — threefold repetition!",'draw');return;}
+  const result=chessCheckResult(chessBoard,chessTurn,castleRights,enPassantTarget);
+  if(result==='checkmate'){const winner = chessTurn==='w' ? 'Black' : 'White';const crown = chessTurn==='w' ? '♚' : '♔';chessEndGame(`${winner} wins by checkmate! ${crown}`, (chessTurn=== (chessPlayerColor==='white'?'w':'b') ? 'loss' : 'win'));return;}
+  if(result==='stalemate'){chessEndGame("Stalemate — it's a draw!",'draw');return;}
+  renderChessStatus();
 }
 function chessCheckThreefold(){const last=positionHistory[positionHistory.length-1];return positionHistory.filter(p=>p===last).length>=3;}
 function chessAfterMove(opp){
@@ -2847,18 +2876,48 @@ function chessSquareClick(r,c){
   if(p&&p.col===myColor&&chessTurn===myColor){const lm=chessMoves(chessBoard,r,c,castleRights,enPassantTarget);if(lm.length>0){chessSelected=[r,c];chessHighlights=lm;}}renderChess();
 }
 function chessExecuteMove(fr,fc,tr,tc,flag,promo){
+  const capturedPiece=flag==='ep'?chessBoard[fr][tc]:chessBoard[tr][tc];
   const res=chessApply(chessBoard,fr,fc,tr,tc,flag,castleRights,enPassantTarget,promo);chessBoard=res.board;castleRights=res.cr;enPassantTarget=res.ep;
-  // apply increment to the player who just moved
+  if(capturedPiece){
+    const value=PIECE_VAL[capturedPiece.t]||0;
+    if(chessTurn==='w')chessScoreWhite+=value;else chessScoreBlack+=value;
+    chessCaptureMessage=`+${value}`;
+    if(chessCaptureTimer){clearTimeout(chessCaptureTimer);}chessCaptureTimer=setTimeout(()=>{chessCaptureMessage='';renderChessStatus();},1500);
+  }
   if(chessIncrement>0){
     if(chessTurn==='w')chessClockWhite+=chessIncrement;else chessClockBlack+=chessIncrement;
     updateChessClockDisplay();
   }
   const opp=chessTurn==='w'?'b':'w';chessSelected=null;chessHighlights=[];pendingPromotion=null;
   if(chessAfterMove(opp))return;
+  chessTurn=opp;
+  saveChessHistorySnapshot();
+  renderChess();
   if(gameMode==='bot'){
-    chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';setTimeout(()=>{chessBotMove();},1500);
-  }else{chessTurn=opp;renderChess();const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'⚠ Check! ':'')+(opp==='w'?"White's turn":"Black's turn");}
+    const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent='Bot thinking...';clearTimeout(chessBotTimeoutId);chessBotTimeoutId=setTimeout(()=>{chessBotMove();},1500);
+  }else{
+    const statusEl=document.getElementById('chess-status');if(statusEl)statusEl.textContent=(chessInCheck(chessBoard,opp,castleRights,enPassantTarget)?'⚠ Check! ':'')+(opp==='w'?"White's turn":"Black's turn");
+  }
 }
+
+function renderChessStatus(){
+  const statusEl=document.getElementById('chess-status');
+  if(statusEl){
+    if(chessOver){statusEl.textContent='Game over';}
+    else if(gameMode==='bot'){
+      if(chessTurn=== (chessPlayerColor==='white'?'w':'b')) statusEl.textContent=`Your turn (${chessPlayerColor==='white'?'White':'Black'})`;
+      else statusEl.textContent='Bot thinking...';
+    } else {
+      statusEl.textContent=(chessInCheck(chessBoard,chessTurn,castleRights,enPassantTarget)?'⚠ Check! ':'')+(chessTurn==='w'?"White's turn":"Black's turn");
+    }
+  }
+  const captureEl=document.getElementById('chess-capture');
+  if(captureEl){
+    captureEl.textContent=chessCaptureMessage||'';
+    captureEl.style.opacity=chessCaptureMessage?'1':'0';
+  }
+}
+
 function showPromoDialog(col){const pieces=['Q','R','B','N'];const existing=document.getElementById('promo-dialog');if(existing)existing.remove();const d=document.createElement('div');d.id='promo-dialog';d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:flex;align-items:center;justify-content:center';d.innerHTML=`<div style="background:#1a1a2e;border:1px solid rgba(124,58,237,.4);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px;align-items:center"><p style="color:#fff;font-size:14px;font-weight:700">Choose promotion piece</p><div style="display:flex;gap:10px">${pieces.map(t=>`<button onclick="chessPromote('${t}')" style="width:52px;height:52px;border-radius:12px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.4);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center">${CHESS_UNICODE[t][col==='w'?0:1]}</button>`).join('')}</div></div>`;document.body.appendChild(d);}
 function chessPromote(piece){const d=document.getElementById('promo-dialog');if(d)d.remove();if(!pendingPromotion)return;const{fr,fc,tr,tc,flag}=pendingPromotion;pendingPromotion=null;chessExecuteMove(fr,fc,tr,tc,flag,piece);}
 function getChessMaterialTotals(){
@@ -2903,10 +2962,13 @@ function renderChess(){
   }
   el.innerHTML=html;
   renderChessMaterial();
+  renderChessStatus();
 }
 function chessEndGame(msg,result){
   chessOver=true;
   if(chessTimerInterval){clearInterval(chessTimerInterval);chessTimerInterval=null;}
+  if(chessBotTimeoutId){clearTimeout(chessBotTimeoutId);chessBotTimeoutId=null;}
+  if(chessCaptureTimer){clearTimeout(chessCaptureTimer);chessCaptureTimer=null;}
   const d=document.getElementById('promo-dialog');if(d)d.remove();
   const s=document.getElementById('chess-status');if(s)s.style.display='none';
   const res=document.getElementById('chess-result');if(res)res.style.display='flex';
