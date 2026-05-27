@@ -5,10 +5,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <meta http-equiv="Cache-Control" content="no-cache,no-store,must-revalidate"/>
-<title>Zidea &mdash; Create ideas, Connect, Play</title>
-<meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
+<title>Zidea — Generate Ideas. Find Collaborators.</title>
+<meta name="description" id="meta-description" content="Generate AI-powered startup and project ideas, match with the right collaborator, and connect with a community of builders on Zidea."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
 <script>
   window.zideaGoogleClientId = '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
 </script>
@@ -24,6 +24,7 @@ body{background:
   radial-gradient(circle at 50% 100%, rgba(14,165,233,.12), transparent 38%),
   linear-gradient(180deg,#080811 0%,#0b0b17 45%,#090914 100%);
 color:#E5E7EB;font-family:'Inter',sans-serif;min-height:100vh}
+h1,h2,h3,.page-title,.logo,.hero h1,.auth-header h2{font-family:'Syne',sans-serif}
 a{text-decoration:none;color:inherit}
 /* Scrollbar */
 ::-webkit-scrollbar{width:6px;height:6px}
@@ -37,7 +38,7 @@ a{text-decoration:none;color:inherit}
 .btn-ghost{display:inline-flex;align-items:center;gap:8px;justify-content:center;background:transparent;color:#D1D5DB;font-weight:500;padding:10px 20px;border-radius:12px;border:1px solid var(--border);cursor:pointer;transition:all .2s;font-family:inherit;font-size:14px}
 .btn-ghost:hover{border-color:var(--brand);color:#fff}
 button{cursor:pointer}
-button:focus-visible{outline:2px solid rgba(167,139,250,.85);outline-offset:2px}
+button:focus-visible, input:focus-visible, textarea:focus-visible{outline:2px solid #7C3AED;outline-offset:2px}
 button:active{transform:scale(.98)}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px}
 .input-field{width:100%;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;color:#fff;font-size:14px;font-family:inherit;outline:none;transition:border-color .2s}
@@ -71,19 +72,26 @@ button:active{transform:scale(.98)}
 /* Landing */
 .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:orbFloat linear infinite}
 #page-landing .nav,#page-landing section,#page-landing>div,#page-landing footer{position:relative;z-index:1}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid rgba(124,58,237,.15);background:rgba(10,10,18,.85);backdrop-filter:blur(20px)}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;background:rgba(10,10,18,0.7);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;border-bottom:1px solid rgba(255,255,255,0.06)}
 .logo{font-size:20px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
-.hero{height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:14px}
-.hero h1{font-size:clamp(32px,7vw,64px);font-weight:800;color:#fff;line-height:1.1}
+.hero{min-height:calc(100vh - 57px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 20px;gap:14px}
+.hero h1{font-size:clamp(28px,5vw,48px);font-weight:800;color:#fff;line-height:1.1}
 .hero h1 em{font-style:normal;background:linear-gradient(135deg,#7C3AED,#c026d3);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .hero p{color:#9CA3AF;font-size:16px;max-width:500px;line-height:1.7}
 .hero-actions{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.hero-mockup{margin-top:12px;background:linear-gradient(135deg,rgba(124,58,237,.08),rgba(192,38,211,.06));border:1px solid rgba(124,58,237,.12);border-radius:14px;padding:14px;max-width:360px;display:flex;flex-direction:column;gap:8px}
+.hero-mockup-header{display:flex;align-items:center;gap:8px;padding-bottom:8px}
+.hero-mockup-header-dot{width:8px;height:8px;border-radius:50%;background:rgba(124,58,237,.45)}
+.hero-mockup-row{background: rgba(124,58,237,0.12); border: 1px solid rgba(124,58,237,0.25); border-radius: 10px; padding: 8px 12px; font-size:11px; color:#d8b4fe; display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hero-mockup-skeleton{background: rgba(255,255,255,0.05); border-radius: 8px; height: 32px; animation: pulse 1.5s ease infinite}
+
+@keyframes pulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
 .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;padding:0 20px 50px;max-width:900px;margin:0 auto;width:100%}
-.feature-card{display:flex;flex-direction:column;gap:10px}
-.feature-icon{width:40px;height:40px;border-radius:10px;background:rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center;color:var(--brand-light)}
+.feature-card{display:flex;flex-direction:column;gap:10px;transition:all .2s}
+.feature-card:hover{box-shadow:0 0 0 1px #7C3AED,0 0 24px rgba(124,58,237,.2);transform:translateY(-3px);transition:all .2s ease}
 .feature-card h3{font-weight:600;color:#fff}
-.feature-card p{color:#9CA3AF;font-size:13px;line-height:1.5}
-footer{text-align:center;color:#4B5563;font-size:12px;padding-bottom:24px;position:relative;z-index:1}
+.feature-card p{color:#9CA3AF;font-size:13px;line-height:1.7}
+footer{text-align:center;color:#4B5563;font-size:12px;padding:20px;border-top:1px solid rgba(255,255,255,0.06);position:relative;z-index:1}
 body.app-active #page-landing footer{display:none}
 /* Auth */
 .auth-page{min-height:100vh;align-items:center;justify-content:center;padding:20px;background:var(--surface)}
@@ -102,13 +110,13 @@ body.app-active #page-landing footer{display:none}
 .auth-link:hover{text-decoration:underline}
 .community-line{font-size:13px;color:#9CA3AF;text-align:center;margin-top:2px}
 /* Sidebar */
-.sidebar{width:220px;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px;gap:16px;flex-shrink:0;background:var(--surface)}
+.sidebar{width:200px;border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px;gap:16px;flex-shrink:0;background:var(--surface)}
 .sidebar-nav{display:flex;flex-direction:column;gap:2px;flex:1;overflow-y:auto}
 .sidebar-label{font-size:10px;color:#4B5563;text-transform:uppercase;letter-spacing:.1em;margin:8px 0 4px;padding:0 4px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:12px;font-size:13px;font-weight:500;color:#9CA3AF;cursor:pointer;transition:all .15s;border:none;background:none;font-family:inherit;width:100%;text-align:left}
 .nav-svg{width:17px;height:17px;flex-shrink:0;color:currentColor}
 .nav-item:hover{background:rgba(124,58,237,.1);color:#fff}
-.nav-item.active{background:rgba(124,58,237,.12);color:#fff;border:1px solid rgba(124,58,237,.25)}
+.nav-item.active{background:rgba(124,58,237,.18);color:#fff;border-left:3px solid #7C3AED;padding-left:9px}
 .sidebar-footer{border-top:1px solid var(--border);padding-top:12px;display:flex;flex-direction:column;gap:8px}
 .sidebar-user{font-size:12px;color:#9CA3AF}
 .main-content{flex:1;padding:20px;display:flex;flex-direction:column;gap:16px;min-width:0;overflow-y:auto;height:100vh}
@@ -179,7 +187,7 @@ body.app-active #page-landing footer{display:none}
 .chess-piece.classic{font-weight:600;text-shadow:none;opacity:.96}
 .chess-piece.bold{font-weight:900;text-shadow:0 1px 2px rgba(0,0,0,.45)}
 .ttt-wrap{display:flex;flex-direction:column;align-items:center;gap:18px}
-.chess-board{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;width:min(460px,90vw);max-width:100%;}
+.chess-board{display:grid;grid-template-columns:repeat(8,1fr);gap:0;width:min(460px,90vw);max-width:100%;}
 .chess-board button{width:100%;aspect-ratio:1;border-radius:10px;border:1px solid rgba(255,255,255,.1);padding:0;}
 .ttt-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:min(260px,90vw)}
 .ttt-cell{aspect-ratio:1;border-radius:12px;border:1px solid var(--border);background:transparent;font-size:28px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit;width:100%}
@@ -240,12 +248,13 @@ body.app-active #page-landing footer{display:none}
 .chat-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#1f2937}
 .chat-empty .btn-primary{margin-top:6px}
 .chat-placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:radial-gradient(ellipse at center,rgba(124,58,237,.06) 0%,transparent 65%),var(--chat-bg)}
-.chat-placeholder p{font-size:14px;font-weight:500;color:#1f2937}
-.chat-input-bar{padding:12px 14px;background:rgba(15,15,30,.98);border-top:1px solid rgba(124,58,237,.2);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;position:relative}
+.chat-placeholder svg{width:48px;height:48px;color:#7C3AED;opacity:.8}
+.chat-placeholder p{font-size:14px;font-weight:500;color:#4B5563}
+.chat-input-bar{padding:12px 14px;background:rgba(15,15,30,.98);border-top:1px solid rgba(124,58,237,.2);display:flex;gap:8px;align-items:flex-end;flex-shrink:0;position:relative;padding-bottom:calc(12px + env(safe-area-inset-bottom, 16px))}
 .chat-input-wrap{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);border-radius:16px;display:flex;align-items:flex-end;padding:8px 12px;transition:all .2s}
 .chat-input-wrap:focus-within{border-color:rgba(124,58,237,.6);background:rgba(124,58,237,.06)}
 .chat-input{flex:1;background:transparent;border:none;color:#f1f5f9;font-size:14px;font-family:inherit;outline:none;resize:none;max-height:120px;line-height:1.5;padding:0}
-.chat-input::placeholder{color:#1f2937}
+.chat-input::placeholder{color:#4B5563}
 .attach-btn{width:36px;height:36px;border-radius:12px;border:1px solid rgba(251,146,60,.3);background:rgba(251,146,60,.08);color:#fb923c;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
 .attach-btn:hover{border-color:#fb923c;background:rgba(251,146,60,.2)}
 .voice-btn{width:36px;height:36px;border-radius:12px;border:1px solid rgba(34,211,160,.3);background:rgba(34,211,160,.08);color:#22d3a0;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s}
@@ -306,8 +315,11 @@ body.app-active #page-landing footer{display:none}
 .zidai-send-btn{width:40px;height:40px;border-radius:12px;background:var(--brand);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
 .zidai-send-btn:hover{background:var(--brand-dark)}
 /* Ideas / Library / Explore */
-.idea-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
+.idea-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s;position:relative;overflow:hidden;min-height:120px}
 .idea-card:hover{border-color:rgba(124,58,237,.4)}
+.idea-card-hover-actions{position:absolute;inset:0;background:rgba(10,10,18,.82);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;opacity:0;pointer-events:none;transition:opacity 0.22s ease;border-radius:16px;padding:16px}
+.idea-card:hover .idea-card-hover-actions{opacity:1;pointer-events:all}
+@media(max-width:768px){.idea-card-hover-actions{opacity:1;pointer-events:all;inset:auto 0 0 0;background:rgba(10,10,18,.92);border-radius:0 0 16px 16px}}
 .idea-card-title{font-size:15px;font-weight:700;color:#fff}
 .idea-card-body{font-size:13px;color:#9CA3AF;line-height:1.6}
 .idea-card-tags{display:flex;gap:6px;flex-wrap:wrap}
@@ -435,6 +447,7 @@ body.app-active #page-landing footer{display:none}
   #page-dashboard,#page-arcade,#page-chat,#page-zidai,#page-ideas,#page-library,#page-explore,#page-profile,#page-settings,#page-help{padding-top:72px;padding-bottom:20px}
   #page-chat .chat-layout{height:calc(100vh - 56px)}
   #page-chat .chat-window{inset:56px 0 0 0}
+  .mob-bottom-bar{display:flex;position:fixed;left:0;right:0;bottom:0;height:66px;background:rgba(10,10,18,.96);border-top:1px solid rgba(124,58,237,.18);backdrop-filter:blur(16px);z-index:95;align-items:center;justify-content:space-around;padding:0 12px;gap:8px}
 }
 @media(max-width:520px){.welcome-grid{grid-template-columns:1fr}.modal-box{padding:22px}}
 </style>
@@ -458,39 +471,80 @@ body.app-active #page-landing footer{display:none}
       <span style="width:7px;height:7px;border-radius:50%;background:#22d3a0;box-shadow:0 0 8px #22d3a0;display:inline-block"></span>
       Live now — join free
     </div>
-    <h1 style="animation:fadeInUp .7s ease .1s both">Connect. Call. <em>Play.</em></h1>
-    <p style="animation:fadeInUp .7s ease .2s both">Find friends by username, jump into voice calls, challenge them to games, and chat with AI — all in one place.</p>
+    <h1 style="animation:fadeInUp .7s ease .1s both">Turn Your Ideas Into Collaborations</h1>
+    <p style="animation:fadeInUp .7s ease .2s both">Generate AI-powered ideas and get matched with the right collaborator to build them — plus chat, play, and connect with your network.</p>
     <div class="hero-actions" style="animation:fadeInUp .7s ease .3s both">
-      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(124,58,237,.4)" onclick="showPage('signup')">Get Started Free →</button>
-      <button class="btn-ghost" style="padding:14px 32px;font-size:15px" onclick="showPage('login')">Log In</button>
+      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(124,58,237,.4)" onclick="showPage('ideas')">Generate an Idea →</button>
+      <button class="btn-ghost" style="padding:14px 32px;font-size:15px" onclick="openMatcher()">Find a Collaborator →</button>
     </div>
-    <div style="display:flex;gap:40px;margin-top:16px;flex-wrap:wrap;justify-content:center;animation:fadeInUp .7s ease .4s both">
-      <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="stat-users">100+</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Users joined</div></div>
-      <div style="text-align:center" id="stat-online-wrap"><div style="font-size:28px;font-weight:800;color:#22d3a0;text-shadow:0 0 20px rgba(34,211,160,.4)" id="stat-online">0</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Online now</div></div>
-      <div class="community-line" id="stat-community-line" style="display:none">Join a growing community of builders.</div>
-      <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#f97316,#ec4899);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">4</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Games</div></div>
+    <div class="hero-mockup" style="animation:fadeInUp .7s ease .35s both">
+      <div class="hero-mockup-header">
+        <div style="font-size:12px;font-weight:800;color:#7C3AED">💡 AI Idea Generator</div>
+      </div>
+      <div class="hero-mockup-row"><div style="font-weight:700">📱 EcoTrack App</div><div style="font-size:11px;color:#d8b4fe;background:rgba(0,0,0,0.08);padding:4px 8px;border-radius:999px;font-weight:700">92% viability</div></div>
+      <div class="hero-mockup-row"><div style="font-weight:700">🌱 Campus SkillSwap</div><div style="font-size:11px;color:#d8b4fe;background:rgba(0,0,0,0.08);padding:4px 8px;border-radius:999px;font-weight:700">88% viability</div></div>
+      <div class="hero-mockup-skeleton" style="width:100%"></div>
+    </div>
+    <div style="display:flex;gap:40px;margin-top:16px;padding-bottom:24px;flex-wrap:wrap;justify-content:center;animation:fadeInUp .7s ease .4s both">
+      <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="stat-users">100+</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Ideas Generated</div></div>
+      <div style="text-align:center" id="stat-online-wrap"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text" id="stat-online">0</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Collaborators Matched</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">500+</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Active Builders</div></div>
+      <div style="text-align:center"><div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#fff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">4</div><div style="font-size:12px;color:#6B7280;margin-top:2px">Game modes</div></div>
     </div>
   </section>
-  <div style="max-width:800px;margin:0 auto 40px;padding:0 20px;position:relative;z-index:1">
+  <div style="max-width:800px;margin:60px auto 40px;padding:0 20px;position:relative;z-index:1">
     <h2 style="text-align:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:28px">How it works</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">🔍<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
+    <div style="display:flex;align-items:flex-start;justify-content:center;flex-wrap:wrap;gap:24px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center;min-width:220px"><div style="width:64px;height:64px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:28px;position:relative">💡<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Generate</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Enter a topic and get fully-scored AI ideas instantly.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center;min-width:220px"><div style="width:64px;height:64px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:28px;position:relative">📌<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Save &amp; Refine</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Star your favourites and build your personal idea library.</p></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center;min-width:220px"><div style="width:64px;height:64px;border-radius:16px;background:rgba(124,58,237,.2);border:1px solid rgba(124,58,237,.3);display:flex;align-items:center;justify-content:center;font-size:28px;position:relative">🤝<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Get Matched</h3><p style="color:#6B7280;font-size:12px;line-height:1.6">Submit your idea and connect with collaborators who complement your skills.</p></div>
     </div>
   </div>
   <div class="features">
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Find Friends</h3><p>Search anyone by @username and connect instantly.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><h3>Voice Calls</h3><p>Real-time voice calls powered by WebRTC.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>Zidea Arcade</h3><p>Chess, Among Us, Tic-Tac-Toe &mdash; vs friends or AI.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Generate Ideas</h3><p>AI-powered idea generator with breakdown &amp; scoring.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Generate Ideas</h3><p>Describe any topic or problem and get multiple AI-scored ideas ranked by viability, market fit, and originality.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M18 8v8M6 8v8M12 5v14"/><path d="M4 12h16"/></svg></div><h3>Collaboration Matcher</h3><p>Submit your idea, answer a few quick questions, and get paired with collaborators whose skills and goals complement yours.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Find Friends</h3><p>Search any @username, send a friend request, and start chatting or collaborating instantly.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><h3>Voice Calls</h3><p>Start a real-time voice call with any friend directly from the chat page — no app download needed.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>Zidea Arcade</h3><p>Challenge friends to Chess, Tic-Tac-Toe, and more — a fun way to bond while you build.</p></div>
   </div>
-  <div style="text-align:center;padding:0 20px 60px;position:relative;z-index:1">
-    <h2 style="font-size:clamp(20px,5vw,32px);font-weight:800;color:#fff;margin-bottom:12px">Ready to connect?</h2>
-    <p style="color:#9CA3AF;font-size:14px;margin-bottom:24px">Join free. No credit card. No download.</p>
-    <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="showPage('signup')">Create your account</button>
+  <div style="text-align:center;padding:0 20px 40px;position:relative;z-index:1;max-width:600px;margin:0 auto">
+    <div style="display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap">
+      <div style="display:flex">
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#c026d3);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;margin-left:-8px">A</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#6366f1);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;margin-left:-8px">B</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ec4899);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;margin-left:-8px">C</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#16a34a,#84cc16);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;margin-left:-8px">D</div>
+        <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#d946ef);border:2px solid var(--card);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;margin-left:-8px">E</div>
+      </div>
+      <div style="font-size:13px;color:#9CA3AF">Join 100+ people already on Zidea</div>
+    </div>
   </div>
-  <footer>&copy; 2026 Zidea. All rights reserved. &middot; <a href="#privacy" onclick="openInfoModal('privacy');return false;">Privacy Policy</a> &middot; <a href="#terms" onclick="openInfoModal('terms');return false;">Terms of Service</a> &middot; <a href="#contact" onclick="openInfoModal('contact');return false;">Contact</a></footer>
+  <!-- Testimonials -->
+  <div style="max-width:860px;margin:0 auto;padding:0 20px 50px;text-align:center">
+    <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:20px">What builders are saying</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px">
+      <div class="card"><p style="color:#d1d5db;font-size:13px;line-height:1.7;font-style:italic">“I generated 12 startup ideas in under 5 minutes. The viability scores actually helped me choose which one to pursue.”</p><div style="display:flex;align-items:center;gap:8px;margin-top:12px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#7C3AED,#c026d3);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">A</div><div style="font-weight:700;color:#fff">A.M. · Product Designer</div></div></div>
+      <div class="card"><p style="color:#d1d5db;font-size:13px;line-height:1.7;font-style:italic">“The matcher connected me with a developer within a day. We've been building together for 3 weeks now.”</p><div style="display:flex;align-items:center;gap:8px;margin-top:12px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#0ea5e9,#6366f1);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">P</div><div style="font-weight:700;color:#fff">P.N. · Entrepreneur</div></div></div>
+      <div class="card"><p style="color:#d1d5db;font-size:13px;line-height:1.7;font-style:italic">“Finally a place where the ideas don't just disappear into a notes app. The library keeps everything organised.”</p><div style="display:flex;align-items:center;gap:8px;margin-top:12px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#f97316,#ec4899);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff">S</div><div style="font-weight:700;color:#fff">S.W. · Solo Builder</div></div></div>
+    </div>
+  </div>
+  <div style="text-align:center;padding:0 20px 60px;position:relative;z-index:1;max-width:620px;margin:0 auto">
+    <div style="background:linear-gradient(135deg,rgba(124,58,237,.2),rgba(192,38,211,.15));border:1px solid rgba(124,58,237,.4);border-radius:24px;padding:40px 32px;display:flex;flex-direction:column;gap:16px;align-items:center">
+      <h2 style="font-size:clamp(20px,5vw,32px);font-weight:800;color:#fff;margin:0">Ready to build your idea?</h2>
+      <p style="color:#9CA3AF;font-size:14px;margin:0">Join free · No credit card · Start generating in 30 seconds.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="showPage('signup')">Create your account</button>
+        <button class="btn-ghost" style="padding:14px 32px;font-size:15px" onclick="showPage('login')">Log In</button>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;color:#fff;font-weight:800">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      <div>Zidea</div>
+    </div>
+    <div>&copy; 2026 Zidea. All rights reserved. &middot; <a href="#privacy" onclick="openInfoModal('privacy');return false;">Privacy Policy</a> &middot; <a href="#terms" onclick="openInfoModal('terms');return false;">Terms of Service</a> &middot; <a href="#contact" onclick="openInfoModal('contact');return false;">Contact</a></div>
+  </footer>
 
 </div>
 
@@ -552,6 +606,16 @@ body.app-active #page-landing footer{display:none}
     <div class="sidebar-footer"><div class="sidebar-user" id="dash-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
   <div class="main-content">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:22px">
+      <div class="card" style="border-top:3px solid #7C3AED;padding:20px;display:flex;flex-direction:column;justify-content:space-between;gap:16px">
+        <div><div style="font-size:16px;font-weight:800;color:#fff">Generate a New Idea</div></div>
+        <button class="btn-primary" style="width:min(100%,220px)" onclick="showPage('ideas')">Go to Ideas →</button>
+      </div>
+      <div class="card" style="border-top:3px solid #7C3AED;padding:20px;display:flex;flex-direction:column;justify-content:space-between;gap:16px">
+        <div><div style="font-size:16px;font-weight:800;color:#fff">Find a Collaborator</div></div>
+        <button class="btn-primary" style="width:min(100%,220px)" onclick="openMatcher()">Go to Matcher →</button>
+      </div>
+    </div>
     <div><div class="page-title">Discover People</div><div class="page-subtitle">Search by username and start a chat or call</div></div>
     <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="search-input" placeholder="Search @username..." oninput="filterUsers()"/></div>
     <div class="dashboard-grid"><div id="user-list" style="display:flex;flex-direction:column;gap:10px"></div><div class="card online-panel"><div class="online-panel-title"><span class="online-dot-green"></span> Online now</div><div id="online-list" style="margin-top:10px"></div></div></div>
@@ -677,7 +741,7 @@ body.app-active #page-landing footer{display:none}
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="zidai-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">➤</button></div></div>
+  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..." onkeydown="zidAiKey(event)"></textarea><button id="zidai-send" class="zidai-send-btn" onclick="sendZidAi()">➤</button></div></div>
 </div>
 
 <!-- GENERATE IDEAS -->
@@ -700,7 +764,10 @@ body.app-active #page-landing footer{display:none}
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="ideas-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content"><div><div class="page-title">💡 Generate Ideas</div><div class="page-subtitle">Profile your idea and match with real Zidea users</div></div>
+  <div class="main-content"><div><div class="page-title">Ideas & Collaboration</div><div class="page-subtitle">Generate ideas with AI, save your favourites, then get matched with a collaborator.</div></div>
+    <div style="margin:22px 0 16px;padding:18px 20px;border:1px solid rgba(124,58,237,.25);border-radius:18px;display:flex;align-items:center;justify-content:center;gap:12px;color:#A78BFA;font-weight:700;font-size:13px;text-align:center">
+      <span>💡 Like one of your ideas? Submit it below to find your perfect collaborator ↓</span>
+    </div>
     <div class="card matchmaker-form" id="idea-matchmaker">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:16px;font-weight:800;color:#fff">Collaboration Matcher</div><div style="font-size:12px;color:#6B7280;margin-top:4px">Submit your idea, answer quick prompts, then see your top near matches.</div></div><button class="btn-ghost" style="font-size:12px;padding:7px 12px" onclick="renderMatchAdmin()">View all submissions</button></div>
       <div class="match-progress"><span id="match-progress-bar"></span></div>
@@ -876,11 +943,14 @@ body.app-active #page-landing footer{display:none}
     <button class="mob-nav-btn" id="mob-ideas" onclick="showPage('ideas');closeMobileDrawer()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Generate Ideas
     </button>
-    <button class="mob-nav-btn" id="mob-library" onclick="showPage('library');closeMobileDrawer()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library
+    <button class="mob-nav-btn" id="mob-matcher" onclick="openMatcher();closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3H8a5 5 0 0 0-5 5v8a5 5 0 0 0 5 5h8a5 5 0 0 0 5-5V8a5 5 0 0 0-5-5Z"/><path d="M9 12h6"/><path d="M12 9v6"/></svg>Matcher
     </button>
     <button class="mob-nav-btn" id="mob-explore" onclick="showPage('explore');closeMobileDrawer()">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>Explore
+    </button>
+    <button class="mob-nav-btn" id="mob-library" onclick="showPage('library');closeMobileDrawer()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Library
     </button>
   </div>
 
@@ -1107,7 +1177,7 @@ let currentUser=null,fbUsers={},fbSSE=null,fbStarted=false,incomingSSE=null,sear
 let friendRequestsIn={},friendRequestsOut={},friendsByUsername={},friendRequestSSE=null,friendOutgoingSSE=null,friendListSSE=null;
 let googleClientId='',googleReady=false,googleTokenClient=null;
 const PAGE_META={
-  landing:{title:'Zidea - Connect, Call, Play',desc:'Connect with friends, generate ideas, chat, call, and play games on Zidea.'},
+  landing:{title:'Zidea — Generate Ideas. Find Collaborators.',desc:'Generate AI-powered startup and project ideas, match with the right collaborator, and connect with a community of builders on Zidea.'},
   login:{title:'Sign In - Zidea',desc:'Sign in to your Zidea account.'},
   signup:{title:'Sign Up - Zidea',desc:'Create your Zidea account and start exploring ideas.'},
   dashboard:{title:'Home - Zidea',desc:'Discover people and start chats and calls.'},
@@ -1188,11 +1258,31 @@ function updateLandingAuthUI(){
   else box.innerHTML='<button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage(\'login\')">Log In</button><button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage(\'signup\')">Sign Up</button>';
 }
 function syncSidebarActive(name){
-  document.querySelectorAll('.sidebar .nav-item').forEach(btn=>{
+  document.querySelectorAll('.sidebar .nav-item, .mob-bottom-btn').forEach(btn=>{
     const click=btn.getAttribute('onclick')||'';
     const match=click.match(/showPage\('([^']+)'\)/);
-    btn.classList.toggle('active',!!match&&match[1]===name);
+    const alt=click.includes('openMatcher')?'ideas':null;
+    btn.classList.toggle('active',(!!match&&match[1]===name)||(alt===name));
   });
+}
+function renderSidebarNav(){
+  const navHtml=`
+    <div class="sidebar-label">Main</div>
+    <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+    <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+    <button class="nav-item" onclick="openMatcher()">🤝 Matcher</button>
+    <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
+    <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+    <div class="sidebar-label">Social</div>
+    <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+    <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+    <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+    <div class="sidebar-label">Account</div>
+    <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+    <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+    <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+  `;
+  document.querySelectorAll('.sidebar-nav').forEach(nav=>{nav.innerHTML=navHtml;});
 }
 function toggleMobileMore(force){}
 function toggleMobileDrawer(){
@@ -1222,6 +1312,10 @@ function openAuthModal(kind,skipHash=false){
   setPageMeta(kind==='signup'?'signup':'login');
   if(!skipHash){suppressHashChange=true;window.location.hash=kind;setTimeout(()=>{suppressHashChange=false;},0);}
 }
+function openMatcher(){
+  showPage('ideas');
+  setTimeout(()=>{document.getElementById('idea-matchmaker')?.scrollIntoView({behavior:'smooth',block:'start'});},260);
+}
 function closeAuthModal(skipHash=false){
   document.getElementById('page-login').classList.remove('show');
   document.getElementById('page-signup').classList.remove('show');
@@ -1241,9 +1335,11 @@ function showPage(name,opts={}){
   setPageMeta(name);
   updateLandingAuthUI();
   syncSidebarActive(name);
-  ['discover','ideas','explore','chat','arcade','profile','library','zidai','settings','help'].forEach(k=>{
-    const b=document.getElementById('mob-'+k);
-    if(b)b.classList.toggle('active',(k==='discover'&&name==='dashboard')||(k===name));
+  document.querySelectorAll('.mob-nav-btn, .mob-bottom-btn').forEach(btn=>{
+    const click=btn.getAttribute('onclick')||'';
+    const match=click.match(/showPage\('([^']+)'\)/);
+    const alt=click.includes('openMatcher')?'ideas':null;
+    btn.classList.toggle('active',((!!match&&((match[1]==='dashboard'&&name==='dashboard')||match[1]===name))||(alt===name)));
   });
   closeMobileDrawer();
   if(!opts.skipHash){suppressHashChange=true;window.location.hash=name;setTimeout(()=>{suppressHashChange=false;},0);}
@@ -1337,10 +1433,10 @@ async function handleLogin(e){
   const accounts=getAccounts();
   let acc=accounts[email];
   if(!acc){acc=await findRemoteAccount(email);if(acc)saveAccount(email,acc);}
-  if(!acc){err.textContent='No account found.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  if(acc.password!==pw){err.textContent='Wrong password.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
+  if(!acc){err.textContent='No account found.';err.classList.add('show');if(btn){btn.classList.remove('btn-loading');btn.disabled=false;}return;}
+  if(acc.password!==pw){err.textContent='Wrong password.';err.classList.add('show');if(btn){btn.classList.remove('btn-loading');btn.disabled=false;}return;}
   err.classList.remove('show');
-  if(btn)btn.classList.remove('btn-loading');
+  if(btn){btn.classList.remove('btn-loading');btn.disabled=false;}
   syncAccountOnline(email,acc);
   loginSuccess({email,username:acc.username});
 }
@@ -1353,9 +1449,9 @@ function handleSignup(e){
   const err=document.getElementById('signup-error');
   try{
     const accounts=getAccounts();
-    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent='Use 3-20 letters, numbers, or underscores for username.';err.classList.add('show');return;}
-    if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');return;}
-    if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');return;}
+    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent='Use 3-20 letters, numbers, or underscores for username.';err.classList.add('show');if(btn)btn.disabled=false;return;}
+    if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');if(btn)btn.disabled=false;return;}
+    if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');if(btn)btn.disabled=false;return;}
     err.classList.remove('show');
     const account={email,username,password:pw,wins:0,losses:0,createdAt:Date.now()};
     saveAccount(email,account);
@@ -1528,7 +1624,13 @@ setInterval(touchPresence,15000);
 setInterval(()=>{renderOnline();renderUsers();},10000);
 setInterval(updateStats,12000);
 function getAllUsers(){const fb=Object.values(fbUsers);if(fb.length)return fb;const accounts=load('zidea_accounts')||{};return Object.entries(accounts).filter(([e])=>e!==currentUser?.email).map(([,a])=>({username:a.username,wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0}));}
-function filterUsers(){searchQuery=document.getElementById('search-input').value;const list=document.getElementById('user-list');if(searchQuery&&!Object.keys(fbUsers).length&&list)list.innerHTML=skeletonUserCards(3);renderUsers();}
+function filterUsers(){
+  const rawQuery=document.getElementById('search-input').value||'';
+  searchQuery=rawQuery.trim().replace(/^@+/,'');
+  const list=document.getElementById('user-list');
+  if(searchQuery&&!Object.keys(fbUsers).length&&list)list.innerHTML=skeletonUserCards(3);
+  renderUsers();
+}
 function renderUsers(){
   const list=document.getElementById('user-list');if(!list)return;
   if(!searchQuery){list.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center"><div style="width:64px;height:64px;border-radius:20px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.2);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div><p style="color:#e2e8f0;font-size:15px;font-weight:700;margin-bottom:6px">Find someone</p><p style="color:#4b5563;font-size:13px;line-height:1.6">Search by @username to find people</p></div></div>`;return;}
@@ -2240,7 +2342,7 @@ function pushIdeaUnique(list,idea){const id=ideaUid(idea);if(list.some(x=>ideaUi
 function createIdeaCardHTML(idea,ctx='ideas'){
   const id=ideaUid(idea),saved=getSavedIdeas().some(x=>ideaUid(x)===id),starred=getStarredIdeas().some(x=>ideaUid(x)===id);
   const canCall=!!idea.author&&idea.author!==currentUser?.username;
-  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap"><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">💾 ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">⭐ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">👁 Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">📤 Share</button></div>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">📞 Call @${esc(idea.author)}</button>`:''}</div></div>`;
+  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px"><div><div style="font-size:15px;font-weight:700;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#6B7280;margin-top:4px">${esc(idea.description||'')}</div>${idea.score?`<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><span class="idea-tag">Impact ${idea.score.impact}</span><span class="idea-tag">Feasibility ${idea.score.feasibility}</span><span class="idea-tag">Profit ${idea.score.profit}</span></div>`:''}</div><button class="idea-tag">${esc(CAT_LABEL[idea.category]||idea.category||'Idea')}</button></div><div class="idea-card-hover-actions"><div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center"><button class="idea-action-btn${saved?' active':''}" onclick="toggleSaveIdea('${id}','${ctx}')">💾 ${saved?'Saved':'Save'}</button><button class="idea-action-btn${starred?' active':''}" onclick="toggleStarIdea('${id}','${ctx}')">⭐ ${starred?'Starred':'Star'}</button><button class="idea-action-btn" onclick="openIdeaDetails('${id}','${ctx}')">👁 Details</button><button class="idea-action-btn" onclick="shareIdea('${id}','${ctx}')">📤 Share</button>${canCall?`<button class="call-btn" style="padding:6px 12px;font-size:11px" onclick="callIdeaAuthor('${esc(idea.author)}')">📞 Call @${esc(idea.author)}</button>`:''}</div></div></div>`;
 }
 function getCurrentGeneratedIdeas(){return load(ideaStoreKey('generated_now'))||[];}
 function setCurrentGeneratedIdeas(v){save(ideaStoreKey('generated_now'),v);}
@@ -2453,6 +2555,7 @@ document.getElementById('incoming-toast').style.display='none';
 updateStats();
 if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
 else{applyTheme();}
+renderSidebarNav();
 updateLandingAuthUI();
 const pathSeg=window.location.pathname.split('/').filter(Boolean).pop();
 const normalizedPath=pathSeg?pathSeg.replace(/\.html?$/i,'').trim().toLowerCase():'';
