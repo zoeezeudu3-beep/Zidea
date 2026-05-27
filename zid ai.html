@@ -1,0 +1,670 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Zid AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script>
+      tailwind = {
+        config: {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ["Inter", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
+                mono: ["JetBrains Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+                display: ["Space Grotesk", "sans-serif"]
+              }
+            }
+          }
+        }
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root { color-scheme: dark; }
+      html { scroll-behavior: smooth; }
+      body { margin: 0; min-height: 100vh; background: #020617; color: #cbd5e1; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+      #root { min-height: 100vh; }
+      ::-webkit-scrollbar { width: 6px; height: 6px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.15); border-radius: 9999px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.3); }
+      @keyframes typing-pulse { 0%, 100% { opacity: 0.3; transform: translateY(0px); } 50% { opacity: 1; transform: translateY(-4px); } }
+      .animate-typing-1 { animation: typing-pulse 1.2s infinite; animation-delay: 0s; }
+      .animate-typing-2 { animation: typing-pulse 1.2s infinite; animation-delay: 0.2s; }
+      .animate-typing-3 { animation: typing-pulse 1.2s infinite; animation-delay: 0.4s; }
+      .markdown-body { line-height: 1.625; }
+      .markdown-body h1 { font-family: Space Grotesk, sans-serif; font-size: 1.5rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #f8fafc; }
+      .markdown-body h2 { font-family: Space Grotesk, sans-serif; font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #f1f5f9; }
+      .markdown-body h3 { font-family: Space Grotesk, sans-serif; font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; color: #e2e8f0; }
+      .markdown-body p { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+      .markdown-body ul, .markdown-body ol { padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
+      .markdown-body li { margin-top: 0.25rem; margin-bottom: 0.25rem; }
+      .markdown-body pre { background-color: #0f172a; border: 1px solid #1e293b; border-radius: 0.375rem; padding: 0.75rem 1rem; margin-top: 0.75rem; margin-bottom: 0.75rem; overflow-x: auto; font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; color: #e2e8f0; }
+      .markdown-body code { color: #a5b4fc; font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875rem; border-radius: 0.25rem; }
+      .markdown-body pre code { color: #e2e8f0; background-color: transparent; padding: 0; border-radius: 0; }
+      .markdown-body blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; color: #94a3b8; margin-top: 0.75rem; margin-bottom: 0.75rem; font-style: italic; }
+      .bg-slate-850 { background-color: #111827; }
+      .border-slate-805 { border-color: #1f2937; }
+      .text-slate-405 { color: #cbd5e1; }
+      .text-slate-450 { color: #94a3b8; }
+      .border-slate-705 { border-color: #475569; }
+      .bg-red-650\/15 { background-color: rgba(185, 28, 28, 0.15); }
+      .border-red-550\/20 { border-color: rgba(244, 63, 94, 0.2); }
+      .text-emerald-405 { color: #67e8f9; }
+      .bg-slate-900\/40 { background-color: rgba(15, 23, 42, 0.4); }
+    </style>
+  </head>
+  <body class="bg-slate-950 text-slate-200">
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@19/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/babel" data-presets="react,typescript">
+      const { StrictMode, useState, useEffect, useRef } = React;
+
+      function Icon({ label, className = "", ...props }) {
+        return (
+          <span {...props} className={"inline-flex items-center justify-center " + className}>
+            {label}
+          </span>
+        );
+      }
+
+      const Compass = (props) => <Icon label="🧭" {...props} />;
+      const MessageSquare = (props) => <Icon label="💬" {...props} />;
+      const Settings = (props) => <Icon label="⚙️" {...props} />;
+      const Info = (props) => <Icon label="ℹ️" {...props} />;
+      const LogOut = (props) => <Icon label="🚪" {...props} />;
+      const Menu = (props) => <Icon label="☰" {...props} />;
+      const Sparkles = (props) => <Icon label="✨" {...props} />;
+      const LogIn = (props) => <Icon label="🔑" {...props} />;
+      const Plus = (props) => <Icon label="+" {...props} />;
+      const Trash2 = (props) => <Icon label="🗑️" {...props} />;
+      const Edit2 = (props) => <Icon label="✏️" {...props} />;
+      const Check = (props) => <Icon label="✔️" {...props} />;
+      const X = (props) => <Icon label="✖️" {...props} />;
+      const ArrowLeft = (props) => <Icon label="←" {...props} />;
+      const ArrowRight = (props) => <Icon label="→" {...props} />;
+      const Zap = (props) => <Icon label="⚡" {...props} />;
+      const RefreshCw = (props) => <Icon label="⟳" {...props} />;
+      const Send = (props) => <Icon label="➤" {...props} />;
+      const AlertCircle = (props) => <Icon label="⚠️" {...props} />;
+      const Copy = (props) => <Icon label="📋" {...props} />;
+      const Terminal = (props) => <Icon label="⌨️" {...props} />;
+      const GraduationCap = (props) => <Icon label="🎓" {...props} />;
+      const Code = (props) => <Icon label="</>" {...props} />;
+      const FileText = (props) => <Icon label="📄" {...props} />;
+      const Mail = (props) => <Icon label="✉️" {...props} />;
+      const Lock = (props) => <Icon label="🔒" {...props} />;
+      const Moon = (props) => <Icon label="🌙" {...props} />;
+      const Sun = (props) => <Icon label="☀️" {...props} />;
+      const Monitor = (props) => <Icon label="🖥️" {...props} />;
+      const ShieldCheck = (props) => <Icon label="🛡️" {...props} />;
+      const UserCheck = (props) => <Icon label="👤" {...props} />;
+      const CheckCircle = (props) => <Icon label="✅" {...props} />;
+      const Heart = (props) => <Icon label="❤️" {...props} />;
+
+      function App() {
+        const [currentView, setCurrentView] = useState("landing");
+        const [isAuthenticated, setIsAuthenticated] = useState(false);
+        const [token, setToken] = useState(null);
+        const [userEmail, setUserEmail] = useState(null);
+        const [theme, setTheme] = useState("dark");
+        const [sidebarOpen, setSidebarOpen] = useState(false);
+        const [chats, setChats] = useState([]);
+        const [activeChatId, setActiveChatId] = useState(null);
+        const [activeChat, setActiveChat] = useState(null);
+        const [loading, setLoading] = useState(false);
+        const [guestChat, setGuestChat] = useState({
+          id: "guest-canvas",
+          userId: "guest",
+          title: "Guest Session",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          messages: []
+        });
+
+        useEffect(() => {
+          const savedTheme = localStorage.getItem("zid_ai_theme");
+          if (savedTheme) setTheme(savedTheme);
+          const savedToken = localStorage.getItem("zid_ai_token");
+          const savedEmail = localStorage.getItem("zid_ai_email");
+          if (savedToken && savedEmail) {
+            setToken(savedToken);
+            setUserEmail(savedEmail);
+            setIsAuthenticated(true);
+            validateSession(savedToken);
+          }
+        }, []);
+
+        useEffect(() => {
+          if (isAuthenticated && token) {
+            fetchChats();
+          } else {
+            setChats([]);
+            setActiveChat(null);
+            setActiveChatId(null);
+          }
+        }, [isAuthenticated, token]);
+
+        useEffect(() => {
+          if (!activeChatId) {
+            setActiveChat(null);
+            return;
+          }
+          if (activeChatId === "guest-canvas") {
+            setActiveChat(guestChat);
+            return;
+          }
+          if (isAuthenticated && token) {
+            loadChatMessages(activeChatId);
+          }
+        }, [activeChatId, token, guestChat]);
+
+        const validateSession = async (sessionToken) => {
+          try {
+            const res = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${sessionToken}` } });
+            if (!res.ok) handleLogout();
+          } catch (err) {
+            console.error(err);
+          }
+        };
+
+        const fetchChats = async () => {
+          if (!token) return;
+          try {
+            const res = await fetch("/api/chats", { headers: { Authorization: `Bearer ${token}` } });
+            if (res.ok) {
+              const data = await res.json();
+              setChats(data);
+            }
+          } catch (err) {
+            console.error("Failed to load user chats", err);
+          }
+        };
+
+        const loadChatMessages = async (chatId) => {
+          if (!token) return;
+          try {
+            const res = await fetch(`/api/chats/${chatId}`, { headers: { Authorization: `Bearer ${token}` } });
+            if (res.ok) {
+              const data = await res.json();
+              setActiveChat(data);
+            }
+          } catch (err) {
+            console.error("Failed to load database messages", err);
+          }
+        };
+
+        const handleLoginSuccess = (userToken, email) => {
+          localStorage.setItem("zid_ai_token", userToken);
+          localStorage.setItem("zid_ai_email", email);
+          setToken(userToken);
+          setUserEmail(email);
+          setIsAuthenticated(true);
+          setCurrentView("chat");
+        };
+
+        const handleLogout = () => {
+          localStorage.removeItem("zid_ai_token");
+          localStorage.removeItem("zid_ai_email");
+          setToken(null);
+          setUserEmail(null);
+          setIsAuthenticated(false);
+          setChats([]);
+          setActiveChatId(null);
+          setActiveChat(null);
+          setCurrentView("landing");
+        };
+
+        const handleThemeToggle = (newTheme) => {
+          setTheme(newTheme);
+          localStorage.setItem("zid_ai_theme", newTheme);
+        };
+
+        const handleSendMessage = async (text) => {
+          if (loading) return;
+          setLoading(true);
+          if (!isAuthenticated) {
+            const updatedMessages = [
+              ...guestChat.messages,
+              { id: Math.random().toString(36).substring(7), role: "user", content: text, createdAt: new Date().toISOString() }
+            ];
+            const newGuestChatState = { ...guestChat, messages: updatedMessages, updatedAt: new Date().toISOString() };
+            setGuestChat(newGuestChatState);
+            setActiveChat(newGuestChatState);
+            try {
+              const res = await fetch("/api/auth/guest/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ messages: updatedMessages }) });
+              if (!res.ok) {
+                let errMsg = "Failed to generate AI response.";
+                try {
+                  const errData = await res.json();
+                  errMsg = errData.error || errMsg;
+                } catch {
+                  const fallbackText = await res.text().catch(() => "");
+                  errMsg = fallbackText || `Request failed with status ${res.status}`;
+                }
+                throw new Error(errMsg);
+              }
+              const data = await res.json();
+              const modelMessage = { id: Math.random().toString(36).substring(7), role: "model", content: data.content, createdAt: new Date().toISOString() };
+              const finalizedGuestChat = { ...newGuestChatState, messages: [...updatedMessages, modelMessage] };
+              setGuestChat(finalizedGuestChat);
+              setActiveChat(finalizedGuestChat);
+            } catch (err) {
+              setGuestChat(guestChat);
+              setActiveChat(guestChat);
+              setLoading(false);
+              throw err;
+            } finally {
+              setLoading(false);
+            }
+            return;
+          }
+          let targetChatId = activeChatId;
+          try {
+            if (!targetChatId || targetChatId === "guest-canvas") {
+              const resCreate = await fetch("/api/chats", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ title: text.length > 25 ? text.substring(0, 25) + "..." : text }) });
+              if (!resCreate.ok) throw new Error("Failed to initialize conversation room.");
+              const newChat = await resCreate.json();
+              targetChatId = newChat.id;
+              setActiveChatId(newChat.id);
+            }
+            const resMessage = await fetch(`/api/chats/${targetChatId}/messages`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ content: text }) });
+            if (!resMessage.ok) {
+              let errMsg = "Failed to generate AI response.";
+              try {
+                const errData = await resMessage.json();
+                errMsg = errData.error || errMsg;
+              } catch {
+                const fallbackText = await resMessage.text().catch(() => "");
+                errMsg = fallbackText || `Request failed with status ${resMessage.status}`;
+              }
+              throw new Error(errMsg);
+            }
+            const dataResult = await resMessage.json();
+            await loadChatMessages(targetChatId);
+            await fetchChats();
+          } catch (err) {
+            setLoading(false);
+            throw err;
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        const handleNewChat = async () => {
+          if (!isAuthenticated) {
+            const guest = { id: "guest-canvas", userId: "guest", title: "Guest Session", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), messages: [] };
+            setGuestChat(guest);
+            setActiveChatId("guest-canvas");
+            setActiveChat(guest);
+            setCurrentView("chat");
+            return;
+          }
+          try {
+            const res = await fetch("/api/chats", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ title: "New Chat" }) });
+            if (res.ok) {
+              const data = await res.json();
+              await fetchChats();
+              setActiveChatId(data.id);
+              setCurrentView("chat");
+            }
+          } catch (err) {
+            console.error("Failed to seed a new conversation", err);
+          }
+        };
+
+        const handleRenameChat = async (id, newTitle) => {
+          if (!isAuthenticated || !token) return;
+          try {
+            const res = await fetch(`/api/chats/${id}`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ title: newTitle }) });
+            if (res.ok) {
+              await fetchChats();
+              if (activeChatId === id) await loadChatMessages(id);
+            }
+          } catch (err) {
+            console.error("Failed to rename conversation details", err);
+          }
+        };
+
+        const handleDeleteChat = async (id) => {
+          if (!isAuthenticated || !token) {
+            const guest = { id: "guest-canvas", userId: "guest", title: "Guest Session", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(), messages: [] };
+            setGuestChat(guest);
+            setActiveChatId(null);
+            setActiveChat(null);
+            return;
+          }
+          try {
+            const res = await fetch(`/api/chats/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+            if (res.ok) {
+              await fetchChats();
+              if (activeChatId === id) {
+                setActiveChatId(null);
+                setActiveChat(null);
+              }
+            }
+          } catch (err) {
+            console.error("Failed to delete chat session", err);
+          }
+        };
+
+        const handleClearHistory = async () => {
+          if (!token) return;
+          const res = await fetch("/api/chats/clear", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+          if (!res.ok) throw new Error("Purge failed. Server communication issues.");
+          await fetchChats();
+          setActiveChatId(null);
+          setActiveChat(null);
+        };
+
+        const handleNewConversationWithPrompt = async (promptText) => {
+          try {
+            const res = await fetch("/api/chats", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify({ title: "New Chat" }) });
+            if (res.ok) {
+              const data = await res.json();
+              await fetchChats();
+              setActiveChatId(data.id);
+              setCurrentView("chat");
+              setTimeout(() => { handleSendMessage(promptText); }, 80);
+            }
+          } catch (err) {
+            console.error("Failed to auto start prompt conversation", err);
+          }
+        };
+
+        const handleSelectPrompt = (promptText) => {
+          if (!isAuthenticated) {
+            setGuestChat((prev) => ({ ...prev, messages: [] }));
+            setActiveChatId("guest-canvas");
+            setCurrentView("chat");
+            setTimeout(() => { handleSendMessage(promptText); }, 50);
+          } else {
+            handleNewConversationWithPrompt(promptText);
+          }
+        };
+
+        const handleSelectHistoryChat = (chatId) => {
+          setActiveChatId(chatId);
+          setCurrentView("chat");
+        };
+
+        return (
+          <div className={`h-screen w-screen flex overflow-hidden transition-colors duration-200 font-sans selection:bg-sky-500/30 selection:text-white ${theme === "dark" ? "bg-slate-950 text-slate-100" : "bg-white text-slate-900"}`}>
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} chats={chats} activeChatId={activeChatId} onSelectChat={handleSelectHistoryChat} onNewChat={handleNewChat} onRenameChat={handleRenameChat} onDeleteChat={handleDeleteChat} currentView={currentView} onNavigate={setCurrentView} isAuthenticated={isAuthenticated} userEmail={userEmail} onLogout={handleLogout} />
+            <main className="flex-1 flex flex-col min-w-0 relative">
+              <div className="flex h-16 items-center justify-between border-b border-slate-800 px-6 shrink-0 md:hidden bg-slate-900">
+                <div onClick={() => setCurrentView("landing")} className="flex items-center gap-2.5 cursor-pointer">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500 font-display text-base font-bold text-white shadow-lg shadow-sky-500/20">Z</div>
+                  <span className="font-display text-base font-bold tracking-tight text-white">Zid ai</span>
+                </div>
+                <button onClick={() => setSidebarOpen(true)} className="rounded-xl border border-slate-800 p-2 text-slate-400 hover:bg-slate-850 hover:text-white"><Menu className="h-4.5 w-4.5" /></button>
+              </div>
+              {currentView === "landing" && (
+                <div className="flex-1 flex flex-col overflow-y-auto">
+                  <header className="hidden md:flex h-16 items-center justify-between border-b border-slate-800 px-8 shrink-0 bg-slate-900">
+                    <div />
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setCurrentView("about")} className="text-sm font-semibold text-slate-400 hover:text-white px-2">About Project</button>
+                      <div className="h-4 w-px bg-slate-800" />
+                      {isAuthenticated ? (
+                        <>
+                          <button onClick={() => setCurrentView("chat")} className="rounded-xl bg-sky-500 px-4 py-2 text-xs md:text-sm font-semibold text-slate-950 shadow-md transition-all hover:bg-sky-400 hover:scale-[1.01]">Workspace</button>
+                          <button onClick={handleLogout} className="rounded-xl border border-slate-850 bg-slate-900/40 hover:text-white px-3 py-2 text-xs md:text-sm text-slate-400">Sign Out</button>
+                        </>
+                      ) : (
+                        <>
+                          <button onClick={() => setCurrentView("login")} className="text-sm font-semibold text-slate-400 hover:text-white px-3">Log In</button>
+                          <button onClick={() => setCurrentView("signup")} className="rounded-xl bg-sky-500 px-4 py-2 text-xs md:text-sm font-semibold text-slate-950 shadow-md transition-all hover:bg-sky-400 hover:scale-[1.01]">Get Started Free</button>
+                        </>
+                      )}
+                    </div>
+                  </header>
+                  <LandingView isAuthenticated={isAuthenticated} onNavigate={setCurrentView} onSelectPrompt={handleSelectPrompt} />
+                </div>
+              )}
+              {currentView === "chat" && (<ChatView chat={activeChat} loading={loading} onSendMessage={handleSendMessage} onRenameChat={handleRenameChat} onDeleteChat={handleDeleteChat} onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} isAuthenticated={isAuthenticated} />)}
+              {(currentView === "login" || currentView === "signup") && (
+                <div className="flex-1 flex flex-col overflow-y-auto bg-slate-950">
+                  <header className="flex h-16 items-center justify-between border-b border-slate-800 px-6 md:px-8 shrink-0 bg-slate-900/40 backdrop-blur-sm z-30"><button onClick={() => setCurrentView("landing")} className="text-xs md:text-sm font-semibold text-slate-400 hover:text-white">← Back to Discover Hub</button></header>
+                  <LoginView onLoginSuccess={handleLoginSuccess} onNavigate={setCurrentView} initialMode={currentView} />
+                </div>
+              )}
+              {currentView === "settings" && (
+                <div className="flex-1 flex flex-col overflow-y-auto bg-slate-950">
+                  <header className="flex h-16 items-center px-6 md:px-8 border-b border-slate-800 bg-slate-900/40 backdrop-blur-sm"><button onClick={() => setCurrentView(isAuthenticated ? "chat" : "landing")} className="text-xs md:text-sm font-semibold text-slate-400 hover:text-white">← Exit Settings</button></header>
+                  <SettingsView theme={theme} onThemeToggle={handleThemeToggle} onClearHistory={handleClearHistory} isAuthenticated={isAuthenticated} userEmail={userEmail} />
+                </div>
+              )}
+              {currentView === "about" && (
+                <div className="flex-1 flex flex-col overflow-y-auto bg-slate-950">
+                  <header className="flex h-16 items-center px-6 md:px-8 border-b border-slate-800 bg-slate-900/40 backdrop-blur-sm"><button onClick={() => setCurrentView(isAuthenticated ? "chat" : "landing")} className="text-xs md:text-sm font-semibold text-slate-400 hover:text-white">← Exit About</button></header>
+                  <AboutView />
+                </div>
+              )}
+            </main>
+          </div>
+        );
+      }
+
+      function Sidebar({ isOpen, onClose, chats, activeChatId, onSelectChat, onNewChat, onRenameChat, onDeleteChat, currentView, onNavigate, isAuthenticated, userEmail, onLogout }) {
+        const [editingChatId, setEditingChatId] = useState(null);
+        const [editingTitle, setEditingTitle] = useState("");
+        const [loadingRename, setLoadingRename] = useState(false);
+
+        const startRename = (chat, e) => { e.stopPropagation(); setEditingChatId(chat.id); setEditingTitle(chat.title); };
+        const cancelRename = (e) => { e.stopPropagation(); setEditingChatId(null); };
+        const submitRename = async (chatId, e) => {
+          e.stopPropagation();
+          if (!editingTitle.trim() || loadingRename) return;
+          setLoadingRename(true);
+          try { await onRenameChat(chatId, editingTitle.trim()); setEditingChatId(null); } catch (err) { console.error(err); } finally { setLoadingRename(false); }
+        };
+        const handleDelete = async (chatId, e) => { e.stopPropagation(); if (confirm("Are you sure you want to delete this conversation? This cannot be undone.")) { await onDeleteChat(chatId); } };
+
+        return (
+          <>
+            {isOpen && <div onClick={onClose} className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm md:hidden transition-opacity" />}
+            <aside className={`fixed inset-y-0 left-0 z-40 flex w-76 flex-col border-r border-slate-800 bg-slate-900 transition-transform duration-300 md:static md:translate-x-0 ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
+              <div className="flex h-16 items-center justify-between px-6 border-b border-slate-800">
+                <div onClick={() => onNavigate("landing")} className="flex items-center gap-2.5 cursor-pointer group">
+                  <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-sky-500 font-display text-base font-bold text-white shadow-lg shadow-sky-500/20 group-hover:bg-sky-400 transition-all">Z</div>
+                  <span className="font-display text-lg font-bold tracking-tight text-white group-hover:text-sky-400 transition-colors">Zid ai</span>
+                </div>
+                <button onClick={onClose} className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white md:hidden"><ArrowLeft className="h-5 w-5" /></button>
+              </div>
+              {isAuthenticated && (
+                <div className="px-4 pt-4"><button onClick={() => { onNewChat(); onClose(); }} className="flex w-full items-center justify-center gap-2 rounded-xl bg-slate-850 hover:bg-slate-800 border border-slate-700 hover:border-slate-600 px-4 py-3 text-sm font-semibold text-slate-200 hover:text-white transition-all duration-200 active:scale-[0.98]"><Plus className="h-4 w-4 text-sky-400" /><span>New Conversation</span></button></div>
+              )}
+              <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+                {!isAuthenticated ? (
+                  <div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 text-center mx-2 my-2"><MessageSquare className="h-6 w-6 text-slate-500 mx-auto mb-2" /><p className="text-xs text-slate-400 leading-relaxed">Sign in to save and browse your past conversations with Zid ai.</p><button onClick={() => { onNavigate("login"); onClose(); }} className="mt-3 flex items-center justify-center gap-1.5 w-full rounded-lg bg-sky-600 px-2.5 py-1.5 text-xs font-semibold text-white hover:bg-sky-500"><LogIn className="h-3 w-3" /><span>Log In Now</span></button></div>
+                ) : chats.length === 0 ? (
+                  <div className="text-center py-8 text-slate-500 font-medium text-xs"><Compass className="h-5 w-5 mx-auto mb-2 text-slate-600" /><span>No past chats found</span></div>
+                ) : (
+                  <>
+                    <div className="px-3 mb-2 flex items-center justify-between text-[11px] font-bold text-slate-500 uppercase tracking-widest"><span>Recent History</span><span className="rounded-full bg-slate-950 px-1.5 py-0.5 text-[9px] text-slate-400 border border-slate-800">{chats.length}</span></div>
+                    <div className="space-y-1">
+                      {chats.map((chat) => {
+                        const isActive = activeChatId === chat.id && currentView === "chat";
+                        const isEditing = editingChatId === chat.id;
+                        return (
+                          <div key={chat.id} onClick={() => { onSelectChat(chat.id); onClose(); }} className={`group relative flex items-center justify-between rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-all duration-200 ${isActive ? "bg-sky-500/10 text-sky-400 font-medium border border-sky-500/20" : "text-slate-400 hover:bg-slate-850 hover:text-slate-200"}`}>
+                            <div className="flex flex-1 items-center gap-2.5 overflow-hidden pr-2"><MessageSquare className={`h-4.5 w-4.5 shrink-0 ${isActive ? "text-sky-400" : "text-slate-500"}`} />{isEditing ? (<input type="text" value={editingTitle} onChange={(e) => setEditingTitle(e.target.value)} onClick={(e) => e.stopPropagation()} onKeyDown={(e) => { if (e.key === "Enter") submitRename(chat.id, e); if (e.key === "Escape") cancelRename(e); }} autoFocus disabled={loadingRename} className="w-full rounded border border-slate-700 bg-slate-950 px-1.5 py-0.5 text-xs text-white focus:outline-none focus:border-sky-500" />) : (<span className="truncate text-xs md:text-sm">{chat.title}</span>)}</div>
+                            {isEditing ? (<div className="flex items-center gap-1 shrink-0"><button onClick={(e) => submitRename(chat.id, e)} disabled={loadingRename} className="rounded p-0.5 text-emerald-400 hover:bg-emerald-950"><Check className="h-3.5 w-3.5" /></button><button onClick={cancelRename} disabled={loadingRename} className="rounded p-0.5 text-rose-400 hover:bg-rose-950"><X className="h-3.5 w-3.5" /></button></div>) : (<div className="flex items-center gap-1 opacity-0 hover:opacity-100 group-hover:opacity-100 transition-opacity shrink-0"><button onClick={(e) => startRename(chat, e)} className="rounded p-1 text-slate-500 hover:bg-slate-950 hover:text-sky-450" title="Rename chat"><Edit2 className="h-3 w-3" /></button><button onClick={(e) => handleDelete(chat.id, e)} className="rounded p-1 text-slate-500 hover:bg-slate-950 hover:text-red-450" title="Delete conversation"><Trash2 className="h-3 w-3" /></button></div>)}</div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="border-t border-slate-800 pl-4 pr-4 py-4 space-y-1.5 bg-slate-950">
+                <button onClick={() => { onNavigate("landing"); onClose(); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs md:text-sm font-medium transition-colors ${currentView === "landing" ? "bg-slate-900 text-white" : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"}`}><Compass className="h-4.5 w-4.5 shrink-0" /><span>Discover Hub</span></button>
+                <button onClick={() => { onNavigate("settings"); onClose(); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs md:text-sm font-medium transition-colors ${currentView === "settings" ? "bg-slate-900 text-white" : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"}`}><Settings className="h-4.5 w-4.5 shrink-0" /><span>Settings</span></button>
+                <button onClick={() => { onNavigate("about"); onClose(); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs md:text-sm font-medium transition-colors ${currentView === "about" ? "bg-slate-900 text-white" : "text-slate-400 hover:bg-slate-900/60 hover:text-slate-200"}`}><Info className="h-4.5 w-4.5 shrink-0" /><span>About</span></button>
+                <div className="border-t border-slate-800 pt-4 text-sm text-slate-400"><div className="mb-2 text-xs uppercase tracking-wider text-slate-500">Account</div><div className="rounded-2xl border border-slate-800 bg-slate-950/40 p-4 text-xs text-slate-300">{isAuthenticated ? `Signed in as ${userEmail}` : "Guest mode"}</div>{isAuthenticated && <button onClick={onLogout} className="mt-3 w-full rounded-xl bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-300 hover:bg-red-500/20">Sign out</button>}</div>
+              </div>
+            </aside>
+          </>
+        );
+      }
+
+      function LandingView({ isAuthenticated, onNavigate, onSelectPrompt }) {
+        const suggestions = [
+          { icon: GraduationCap, label: "Explain a topic simply", description: "Break down quantum physics or complex history into simple analogies.", prompt: "Explain this topic simply: Quantum mechanics and its core principles, styled as a simple analogy.", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
+          { icon: Code, label: "Help me write code", description: "Generate clean, annotated starter code or find sneaky bugs in your script.", prompt: "Help me write code: Generate a simple clean binary search tree in TypeScript with neat explanations.", color: "text-sky-400 bg-sky-500/10 border-sky-500/20" },
+          { icon: FileText, label: "Summarize this text", description: "Paste long articles, essays, or code comments and get key summaries.", prompt: "Summarize this text: Convert a classic thesis argument format into three brief digestible takeaways.", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" }
+        ];
+        return (
+          <div className="flex-1 flex flex-col justify-between overflow-y-auto px-4 md:px-8 py-10 md:py-16">
+            <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[350px] md:w-[600px] h-[350px] bg-sky-500/5 blur-[80px] rounded-full pointer-events-none" />
+            <div className="max-w-4xl mx-auto text-center mt-6 md:mt-10 relative z-10">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs text-slate-350 shadow-sm backdrop-blur-sm"><Sparkles className="h-3.5 w-3.5 text-sky-400" /><span>Next-generation learning companion</span></div>
+              <h1 className="mt-6 font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.1] md:leading-[1.05]">Supercharge your learning with <span className="bg-gradient-to-r from-sky-400 via-slate-200 to-sky-300 bg-clip-text text-transparent">Zid ai</span></h1>
+              <p className="mt-6 text-base sm:text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto">The friendly, polite, and ultra-fast AI assistant designed specifically for students and everyday users. Get clear logic, clean code, and simple step-by-step breakdowns.</p>
+              <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+                {isAuthenticated ? (<button onClick={() => onNavigate("chat")} className="group flex items-center gap-2 rounded-xl bg-sky-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/20 transition-all hover:bg-sky-400 hover:shadow-sky-500/30">Start Chatting Now<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 text-slate-950" /></button>) : (<><button onClick={() => onNavigate("login")} className="group flex items-center gap-2 rounded-xl bg-sky-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-lg shadow-sky-500/20 transition-all hover:bg-sky-400 hover:shadow-sky-500/30">Get Started Free<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1 text-slate-950" /></button><button onClick={() => onNavigate("about")} className="flex items-center gap-2 rounded-xl border border-slate-800 bg-slate-900/40 px-6 py-3.5 text-sm font-semibold text-slate-300 transition-all hover:bg-slate-800 hover:text-white">Learn More</button></>)}</div>
+            </div>
+            <div className="max-w-4xl mx-auto mt-20 relative z-10 w-full">
+              <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-6"><div className="flex items-center gap-2"><Zap className="h-5 w-5 text-sky-400 animate-pulse" /><h2 className="font-display text-lg font-semibold text-slate-100">Click a Prompt to try Zid AI instantly</h2></div><span className="text-xs text-slate-450 uppercase tracking-widest font-semibold hidden sm:inline">Featured Prompts</span></div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">{suggestions.map((item, idx) => { const IconComp = item.icon; return (<button key={idx} onClick={() => onSelectPrompt(item.prompt)} className="group flex flex-col justify-between text-left rounded-2xl border border-slate-800 bg-slate-900/25 p-5 shadow-sm transition-all duration-300 hover:scale-[1.02] hover:border-slate-700 hover:bg-slate-900/60"><div><div className={`inline-flex items-center justify-center rounded-xl p-2.5 border ${item.color}`}><IconComp className="h-5 w-5" /></div><h3 className="mt-4 font-display font-medium text-slate-200 group-hover:text-sky-400 transition-colors">{item.label}</h3><p className="mt-2 text-xs md:text-sm text-slate-400 leading-relaxed">{item.description}</p></div><div className="mt-5 flex items-center gap-1 text-xs text-slate-405 group-hover:text-white font-medium"><span>Try prompt</span><ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" /></div></button>); })}</div>
+            </div>
+            <div className="mt-16 text-center text-xs text-slate-650 tracking-wide font-medium relative z-10"><p>⚡ High Performance • Persistent Chat History • Secure Auth Protocol</p></div>
+          </div>
+        );
+      }
+
+      function ChatView({ chat, loading, onSendMessage, onRenameChat, onDeleteChat, onToggleSidebar, isAuthenticated }) {
+        const [inputText, setInputText] = useState("");
+        const [editingTitle, setEditingTitle] = useState(false);
+        const [newTitleVal, setNewTitleVal] = useState("");
+        const [renaming, setRenaming] = useState(false);
+        const [localErr, setLocalErr] = useState(null);
+        const messagesEndRef = useRef(null);
+
+        useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chat?.messages, loading]);
+
+        const handleSubmit = async (e) => { e.preventDefault(); if (!inputText.trim() || loading) return; const textToSend = inputText.trim(); setInputText(""); setLocalErr(null); try { await onSendMessage(textToSend); } catch (err) { setLocalErr(err?.message || "Something went wrong sending prompt."); setInputText(textToSend); } };
+        const handleKeyDown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(e); } };
+        const handlePromptClick = (prompt) => { if (loading) return; setInputText(prompt); };
+        const handleHeaderRenameSubmit = async () => { if (!chat || !newTitleVal.trim() || renaming) return; setRenaming(true); try { await onRenameChat(chat.id, newTitleVal.trim()); setEditingTitle(false); } catch (err) { console.error(err); } finally { setRenaming(false); } };
+        const startHeaderRename = () => { if (!chat) return; setNewTitleVal(chat.title); setEditingTitle(true); };
+        const prompts = [ { icon: GraduationCap, label: "Explain this topic simply.", prompt: "Explain this topic simply: Photosynthesis and the Calvin Cycle, using a high school analogy.", color: "text-amber-400 group-hover:bg-amber-500/10 border-amber-500/10" }, { icon: Code, label: "Help me write code.", prompt: "Help me write code: Write a clean, annotated TypeScript function to merge two sorted arrays without duplicates.", color: "text-sky-400 group-hover:bg-sky-500/10 border-sky-500/10" }, { icon: FileText, label: "Summarize this text.", prompt: "Summarize this text: Convert a classic three-paragraph explanation of block scheduling into standard bullet points.", color: "text-emerald-400 group-hover:bg-emerald-500/10 border-emerald-500/10" } ];
+
+        return (
+          <div className="flex-1 flex flex-col h-full bg-slate-950 relative overflow-hidden">
+            <div className="absolute top-10 right-10 w-[300px] h-[300px] bg-sky-500/[0.03] blur-[80px] rounded-full pointer-events-none" />
+            <div className="absolute bottom-10 left-10 w-[300px] h-[300px] bg-sky-450/[0.03] blur-[80px] rounded-full pointer-events-none" />
+            <header className="flex h-16 items-center justify-between border-b border-slate-800 bg-slate-900/90 px-4 md:px-6 backdrop-blur-sm shrink-0 z-30 relative">
+              <div className="flex items-center gap-3 overflow-hidden mr-2"><button onClick={onToggleSidebar} className="rounded-xl border border-slate-805 p-2 text-slate-450 hover:bg-slate-850 hover:text-white transition-all duration-200 active:scale-95" title="Toggle Sidebar"><Menu className="h-4.5 w-4.5" /></button>{chat ? (editingTitle ? (<div className="flex items-center gap-1.5 max-w-sm"><input type="text" value={newTitleVal} onChange={(e) => setNewTitleVal(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") handleHeaderRenameSubmit(); if (e.key === "Escape") setEditingTitle(false); }} autoFocus disabled={renaming} className="rounded-xl border border-slate-705 bg-slate-950 px-3 py-1 text-xs md:text-sm text-white focus:outline-none focus:border-sky-500 w-32 sm:w-48" /><button onClick={handleHeaderRenameSubmit} disabled={renaming} className="rounded-lg bg-sky-500 px-2 py-1 text-[11px] font-semibold text-slate-950 hover:bg-sky-400">Save</button><button onClick={() => setEditingTitle(false)} disabled={renaming} className="rounded-lg border border-slate-800 bg-slate-900 px-2 py-1 text-[11px] text-slate-450 hover:text-white">Cancel</button></div>) : (<><h2 className="font-display font-bold text-sm md:text-base text-white truncate max-w-40 sm:max-w-xs">{chat.title}</h2><button onClick={startHeaderRename} className="rounded p-1 text-slate-500 hover:bg-slate-900 hover:text-sky-400 transition-colors" title="Rename chat"><Edit2 className="h-3 w-3" /></button></>) ) : (<div className="flex items-center gap-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-400 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider"><Sparkles className="h-3 w-3 animate-spin" /><span>Workspace Guest Canvas</span></div>)}</div>
+              {chat && (<button onClick={() => onDeleteChat(chat.id)} className="flex items-center gap-1.5 rounded-xl border border-red-500/10 hover:border-red-500 bg-red-500/5 hover:bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-400 transition-all duration-200"><Trash2 className="h-3.5 w-3.5" /><span className="hidden sm:inline">Delete Thread</span></button>)}
+            </header>
+            <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
+              {localErr && (<div className="flex items-start gap-2.5 rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-3 text-sm text-red-450 mx-auto max-w-3xl"><AlertCircle className="h-5 w-5 shrink-0 text-red-505 mt-0.5" /><div className="flex-1"><p className="font-semibold text-red-400">Request Error</p><p className="text-xs text-red-450 mt-0.5">{localErr}</p></div></div>)}
+              {(!chat || !chat.messages || chat.messages.length === 0) ? (<div className="max-w-2xl mx-auto text-center py-10 md:py-16"><div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-sky-500 font-display text-xl font-bold text-slate-950 shadow-xl shadow-sky-500/20 mb-6">Z</div><h1 className="font-display text-2xl md:text-3xl font-bold text-white tracking-tight">Welcome to Zid ai</h1><p className="mt-2 text-sm md:text-base text-slate-400 leading-relaxed max-w-md mx-auto">{isAuthenticated ? "Start a typing dialog to ask questions, explain topics simply, or debug programming blocks." : "You are currently chatting as Guest. Sign up to save past sessions permanently."}</p><div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-3">{prompts.map((item, idx) => { const IconComp = item.icon; return (<button key={idx} onClick={() => handlePromptClick(item.prompt)} className="group flex flex-col justify-between text-left rounded-xl border border-slate-800 bg-slate-900/40 hover:bg-slate-900/70 p-4 transition-all duration-200 hover:scale-[1.01]"><div><div className={`inline-flex rounded-lg p-1.5 border ${item.color}`}><IconComp className="h-4 w-4" /></div><p className="mt-3 text-xs md:text-sm font-semibold text-slate-300 group-hover:text-sky-400">{item.label}</p></div><span className="mt-4 text-[11px] text-slate-500 leading-normal block group-hover:text-slate-400 line-clamp-2">"{item.prompt}"</span></button>); })}</div></div>) : (<div className="max-w-3xl mx-auto space-y-6 pb-2">{chat.messages.map((msg) => (<div key={msg.id}><MessageBubble msg={msg} /></div>))}{loading && (<div className="flex items-start gap-4"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400"><Sparkles className="h-4.5 w-4.5 animate-spin" /></div><div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-4 shadow-sm backdrop-blur-md"><div className="flex items-center gap-1 py-1.5 px-1 bg-transparent"><span className="h-2 w-2 rounded-full bg-sky-400 animate-typing-1" /><span className="h-2 w-2 rounded-full bg-sky-400 animate-typing-2" /><span className="h-2 w-2 rounded-full bg-sky-400 animate-typing-3" /></div></div></div>)}</div>)}
+              <div ref={messagesEndRef} />
+            </div>
+            <footer className="border-t border-slate-800 bg-slate-900/95 px-4 py-4 md:px-6 backdrop-blur-sm shrink-0 z-30"><div className="max-w-3xl mx-auto"><form onSubmit={handleSubmit} className="relative rounded-2xl border border-slate-700 bg-slate-950 p-1.5 flex items-end focus-within:border-sky-500/40 transition-colors"><textarea value={inputText} onChange={(e) => setInputText(e.target.value)} onKeyDown={handleKeyDown} placeholder="Ask Zid ai a question... (Shift+Enter for multi-line)" rows={Math.min(6, inputText.split("\n").length || 1)} required disabled={loading} className="flex-1 resize-none bg-transparent px-3 py-2 text-xs md:text-sm text-white placeholder-slate-500 focus:outline-none min-h-[40px] max-h-[160px] disabled:opacity-40" /><button type="submit" disabled={loading || !inputText.trim()} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-500 text-slate-950 transition-all hover:bg-sky-400 hover:shadow-lg disabled:opacity-30 disabled:hover:bg-sky-500 active:scale-95"><Send className="h-4.5 w-4.5 text-slate-950" /></button></form><div className="mt-2.5 text-center text-[10.5px] text-slate-500 flex items-center justify-center gap-1 font-medium"><span>Powered by Gemini 3.5 Flash • Responses styled in student markdown code structure</span></div></div></footer>
+          </div>
+        );
+      }
+
+      function MessageBubble({ msg }) {
+        const [copied, setCopied] = useState(false);
+        const isModel = msg.role === "model";
+        const handleCopy = async () => { try { await navigator.clipboard.writeText(msg.content); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch (err) { console.error("Failed to copy text", err); } };
+        if (!isModel) return (<div className="flex items-start gap-4 justify-end"><div className="max-w-[85%] rounded-2xl bg-slate-800 border border-slate-700 px-4 py-3 text-slate-100 shadow-sm"><p className="text-xs md:text-sm whitespace-pre-wrap leading-relaxed">{msg.content}</p></div></div>);
+        return (<div className="flex items-start gap-4 animate-fade-in group"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-sky-500/10 border border-sky-500/20 text-sky-400"><Sparkles className="h-4 w-4" /></div><div className="flex-1 overflow-hidden min-w-0"><div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 shadow-sm relative"><MarkdownRenderer content={msg.content} /><div className="mt-3.5 pt-3 border-t border-slate-800 flex items-center justify-between"><span className="text-[10px] text-slate-500 font-mono">Zid AI Response</span><button onClick={handleCopy} className="opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity flex items-center gap-1 rounded-lg border border-slate-800 bg-slate-900/50 px-2.5 py-1 text-xs text-slate-300 hover:bg-slate-800 hover:text-white" title="Copy response body">{copied ? (<><Check className="h-3 w-3 text-emerald-400" /><span className="text-emerald-400 font-sans font-medium text-[11px]">Copied</span></>) : (<><Copy className="h-3 w-3" /><span className="font-sans text-[11px]">Copy response</span></>)}</button></div></div></div></div>);
+      }
+
+      function LoginView({ onLoginSuccess, onNavigate, initialMode = "login" }) {
+        const [isLogin, setIsLogin] = useState(initialMode === "login");
+        const [email, setEmail] = useState("ideamanager333@gmail.com");
+        const [password, setPassword] = useState("");
+        const [loading, setLoading] = useState(false);
+        const [error, setError] = useState(null);
+        const handleSubmit = async (e) => { e.preventDefault(); if (!email || !password) { setError("Please fill out all fields"); return; } setError(null); setLoading(true); const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register"; try { const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) }); if (!response.ok) { let errMsg = "Authentication failed. Please verify credentials."; try { const errData = await response.json(); errMsg = errData.error || errMsg; } catch { const fallbackText = await response.text().catch(() => ""); errMsg = fallbackText || `Request failed with status ${response.status}`; } throw new Error(errMsg); } const data = await response.json(); onLoginSuccess(data.token, data.user.email); } catch (err) { setError(err?.message || "An internet connection or server error occurred"); } finally { setLoading(false); } };
+        return (<div className="flex-1 flex flex-col justify-center items-center px-4 md:px-6 py-12 relative"><div className="absolute w-[300px] h-[300px] bg-sky-500/5 blur-[90px] rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" /><div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/40 p-6 md:p-8 backdrop-blur-md shadow-2xl relative z-10"><div className="text-center pb-4 mb-6 border-b border-slate-800"><div className="inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-3 py-1 text-xs text-sky-400"><Sparkles className="h-3 w-3" /><span>Zid ai Gateway</span></div><h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-white">{isLogin ? "Welcome back!" : "Create your account"}</h1><p className="mt-2 text-sm text-slate-400">{isLogin ? "Sign in to access your saved chat history" : "Join Zid ai and save past summaries"}</p></div>{error && (<div className="mb-5 flex items-start gap-2.5 rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-3 text-sm text-red-400"><AlertCircle className="h-5 w-5 shrink-0 text-red-450 mt-0.5" /><span>{error}</span></div>)}<form onSubmit={handleSubmit} className="space-y-4"><div><label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email Address</label><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><Mail className="h-4.5 w-4.5" /></span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@school.edu" required disabled={loading} className="w-full rounded-xl border border-slate-800 bg-slate-950/60 py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50" /></div></div><div><label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><Lock className="h-4.5 w-4.5" /></span><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required disabled={loading} className="w-full rounded-xl border border-slate-800 bg-slate-950/60 py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50" /></div>{!isLogin && (<p className="mt-2 text-xs text-slate-500">Must be at least 6 characters.</p>)}</div><button type="submit" disabled={loading} className="w-full mt-6 flex items-center justify-center gap-2 rounded-xl bg-sky-500 px-4 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-sky-500/10 transition-all hover:bg-sky-400 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100">{loading ? (<><RefreshCw className="h-4 w-4 animate-spin" /><span>Loading gateway...</span></>) : (<span>{isLogin ? "Sign In" : "Register and Continue"}</span>)}</button></form><div className="mt-6 text-center text-sm"><span className="text-slate-400">{isLogin ? "Don't have an account?" : "Already have an account?"} </span><button onClick={() => { setIsLogin(!isLogin); setError(null); }} disabled={loading} className="font-medium text-sky-400 transition-colors hover:text-sky-300 disabled:opacity-50">{isLogin ? "Sign up free" : "Log in"}</button></div></div></div>);
+      }
+
+      function SettingsView({ theme, onThemeToggle, onClearHistory, isAuthenticated, userEmail }) {
+        const [clearing, setClearing] = useState(false);
+        const [success, setSuccess] = useState(null);
+        const [error, setError] = useState(null);
+        const handleClear = async () => { if (!isAuthenticated) return; const confirmClear = confirm("Are you absolutely sure you want to clear your entire chat history? This action is irreversible."); if (!confirmClear) return; setClearing(true); setSuccess(null); setError(null); try { await onClearHistory(); setSuccess("Your conversation history was successfully deleted"); setTimeout(() => setSuccess(null), 4000); } catch (err) { setError(err?.message || "Failed to clear conversations. Please check server connection."); } finally { setClearing(false); } };
+        return (<div className="flex-1 overflow-y-auto px-4 md:px-8 py-10 md:py-16 max-w-4xl mx-auto w-full relative"><div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[350px] h-[350px] bg-sky-500/5 blur-[90px] rounded-full pointer-events-none" /><div className="border-b border-slate-800 pb-6 mb-8 relative z-10"><h1 className="font-display text-2xl md:text-3xl font-bold text-white">Settings Panel</h1><p className="mt-1.5 text-xs md:text-sm text-slate-400">Configure Zid AI's system preferences, display adjustments, and database history.</p></div><div className="space-y-6 relative z-10"><div className="rounded-2xl border border-slate-800 bg-slate-900/15 p-6 shadow-sm"><h2 className="font-display text-sm md:text-base font-semibold text-white mb-2">Display Theme</h2><p className="text-xs md:text-sm text-slate-400 mb-5">Adjust the color scheme of the Zid AI app interface. Choose between dark and light screens.</p><div className="grid grid-cols-2 gap-3.5 max-w-sm"><button onClick={() => onThemeToggle("dark")} className={`flex items-center gap-2.5 rounded-xl border px-4 py-3 text-xs md:text-sm font-semibold transition-all ${theme === "dark" ? "border-sky-500 bg-sky-500/10 text-sky-400 shadow-md shadow-sky-500/5" : "border-slate-800 bg-slate-950/20 text-slate-400 hover:text-white hover:border-slate-700"}`}><Moon className="h-4.5 w-4.5 text-sky-450" /><span>Sleek Dark (Default)</span></button><button onClick={() => onThemeToggle("light")} className={`flex items-center gap-2.5 rounded-xl border px-4 py-3 text-xs md:text-sm font-semibold transition-all ${theme === "light" ? "border-sky-500 bg-sky-500/10 text-sky-405 shadow-md shadow-sky-500/5" : "border-slate-800 bg-slate-950/20 text-slate-400 hover:text-white hover:border-slate-700"}`}><Sun className="h-4.5 w-4.5 text-amber-400" /><span>Elegant Light</span></button></div></div><div className="rounded-2xl border border-slate-800 bg-slate-900/15 p-6 shadow-sm"><h2 className="font-display text-sm md:text-base font-semibold text-white mb-2">User Credentials</h2><p className="text-xs md:text-sm text-slate-400 mb-4">Security status of your encrypted account on the Zid AI server platform.</p>{isAuthenticated ? (<div className="flex items-start gap-3.5 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3"><UserCheck className="h-6 w-6 text-emerald-400 mt-0.5 shrink-0" /><div><p className="text-xs md:text-sm font-semibold text-white">Authenticated Session</p><p className="text-xs text-slate-404 mt-0.5">Logged in as {userEmail}</p><div className="inline-flex items-center gap-1.5 mt-2 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[9px] font-bold text-emerald-400 uppercase tracking-widest"><ShieldCheck className="h-2.5 w-2.5" /><span>Secure Local Database Connection</span></div></div></div>) : (<div className="rounded-xl border border-dashed border-slate-800 p-5 text-center bg-slate-950/10"><p className="text-xs md:text-sm text-slate-400">You are currently using Zid AI in Guest mode.</p><p className="text-xs text-slate-500 mt-1">Logged summaries or chat histories cannot be saved across devices.</p></div>)}</div>{isAuthenticated && (<div className="rounded-2xl border border-red-500/10 bg-red-650/15 p-6 shadow-sm"><h2 className="font-display text-sm md:text-base font-semibold text-red-400 mb-2 flex items-center gap-2"><Trash2 className="h-4.5 w-4.5" /><span>Danger Zone</span></h2><p className="text-xs md:text-sm text-slate-400 mb-5">Permanently clear your past conversation history stored in the backend database. This is irreversible.</p>{success && (<div className="mb-4 flex items-center gap-2.5 rounded-xl border border-emerald-500/15 bg-emerald-500/5 px-4 py-3 text-xs md:text-sm text-emerald-400"><CheckCircle className="h-4.5 w-4.5 shrink-0" /><span>{success}</span></div>)}{error && (<div className="mb-4 flex items-center gap-2.5 rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-3 text-xs md:text-sm text-red-400"><AlertCircle className="h-4.5 w-4.5 shrink-0" /><span>{error}</span></div>)}<button onClick={handleClear} disabled={clearing} className="flex items-center gap-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 px-4 py-3 text-xs md:text-sm font-semibold text-red-300 hover:text-white transition-all active:scale-[0.98] disabled:opacity-50">{clearing ? (<><RefreshCw className="h-4.5 w-4.5 animate-spin" /><span>Purging saved history...</span></>) : (<><Trash2 className="h-4.5 w-4.5" /><span>Clear All Past Chats</span></>)}</button></div>)}</div></div>);
+      }
+
+      function AboutView() {
+        const highlights = [
+          { icon: GraduationCap, title: "Step-by-Step Simplifiers", desc: "Perfect for students. Complex definitions, quantum physics theories, or historical events are broken down into clear, digestible, logical steps with simple analogies." },
+          { icon: Code, title: "Clean Annotated Code", desc: "Generates clean, beginner-friendly programming scripts with exhaustive in-line comments. Ideal for computer science students and code hobbyists." },
+          { icon: Sparkles, title: "Sleek Startup UX", desc: "Designed with a premium dark slate canvas, highly legible typography, collapsing sidebar control options, copyable response elements, and zero distracting advertisements." }
+        ];
+        return (<div className="flex-1 overflow-y-auto px-4 md:px-8 py-10 md:py-16 max-w-4xl mx-auto w-full relative"><div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-sky-500/5 blur-[90px] rounded-full pointer-events-none" /><div className="border-b border-slate-800 pb-8 mb-10 text-center relative z-10"><div className="inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-3 py-1 text-xs text-sky-400"><Sparkles className="h-3.5 w-3.5" /><span>Crafted for clarity</span></div><h1 className="mt-4 font-display text-3xl md:text-4xl font-bold tracking-tight text-white">About Zid ai</h1><p className="mt-3 text-sm md:text-base text-slate-400 max-w-xl mx-auto leading-relaxed">An AI assistant focused on simplicity, politeness, and pedagogical utility. Created for students, programmers, and anyone seeking brief, fluff-free explanations.</p></div><div className="rounded-2xl border border-slate-800 bg-slate-900/15 p-6 md:p-8 mb-10 relative z-10 shadow-lg"><h2 className="font-display text-lg md:text-xl font-semibold text-white mb-3">Our Core Philosophy</h2><p className="text-sm md:text-base text-slate-400 leading-relaxed">Traditional chatbots often overwhelm users with bloated paragraphs, technical jargon, and unnecessary commentary. Zid ai is conceptualized to solve this bottleneck. By enforcing structured list layouts, beginner-friendly code principles, and conversational politeness, Zid AI acts less like a cold engine and more like an experienced, highly helpful tutor standing by your side.</p></div><div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 relative z-10">{highlights.map((item, idx) => { const IconComp = item.icon; return (<div key={idx} className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-sm"><div className="inline-flex items-center justify-center rounded-xl bg-sky-500/10 p-2.5 text-sky-400 border border-sky-500/20"><IconComp className="h-5 w-5" /></div><h3 className="mt-4 font-display font-semibold text-slate-100">{item.title}</h3><p className="mt-2 text-xs md:text-sm text-slate-400 leading-relaxed">{item.desc}</p></div>); })}</div><div className="space-y-4 mb-12 relative z-10"><h2 className="font-display text-lg font-semibold text-white">Product Guidelines Enforced</h2><div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">{["Polite and humble interactive dialog", "Beginner-friendly annotated computer code block formatting", "Persistent histories tied securely to user accounts", "Step-by-step layout structure for complex instructions", "Zero bloated paragraphs or conversational spam"].map((text, idx) => (<div key={idx} className="flex items-center gap-2.5 text-xs md:text-sm text-slate-300 bg-slate-900/20 p-4 rounded-xl border border-slate-800"><CheckCircle className="h-4.5 w-4.5 shrink-0 text-sky-400" /><span>{text}</span></div>))}</div></div><div className="border-t border-slate-800 pt-8 text-center text-xs text-slate-500 flex items-center justify-center gap-1.5 font-medium relative z-10"><span>Zid ai is built with</span><Heart className="h-3.5 w-3.5 text-rose-500" /><span>to benefit learners worldwide. Version 1.0.0</span></div></div>);
+      }
+
+      function MarkdownRenderer({ content }) {
+        if (!content) return null;
+        const parts = content.split(/(```[\s\S]*?```)/g);
+        return (<div className="markdown-body text-slate-200 text-sm md:text-base selection:bg-sky-500/30">{parts.map((part, partIdx) => { if (part.startsWith("```") && part.endsWith("```")) { const match = part.match(/```(\w*)\n([\s\S]*?)```/); const lang = match ? match[1] : ""; const code = match ? match[2] : part.slice(3, -3); return <div key={partIdx}><CodeBlock code={code.trim()} language={lang} /></div>; } return <div key={partIdx}><TextBlocks text={part} /></div>; })}</div>);
+      }
+
+      function CodeBlock({ code, language }) {
+        const [copied, setCopied] = useState(false);
+        const handleCopy = async () => { try { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch (err) { console.error("Failed to copy code to clipboard", err); } };
+        return (<div className="relative my-4 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-950 shadow-lg"><div className="flex items-center justify-between border-b border-slate-900 bg-slate-900/40 px-4 py-2 text-slate-400"><div className="flex items-center gap-2 font-mono text-xs"><Terminal className="h-3.5 w-3.5 text-sky-450" /><span>{language || "code"}</span></div><button onClick={handleCopy} className="flex items-center gap-1.5 rounded-lg border border-slate-800 bg-slate-900 px-2.5 py-1 text-xs font-medium text-slate-300 transition-colors hover:bg-slate-800 hover:text-white" title="Copy block">{copied ? (<><Check className="h-3 w-3 text-emerald-405" /><span className="text-emerald-405 font-sans font-medium text-[11px]">Copied</span></>) : (<><Copy className="h-3 w-3" /><span className="font-sans text-[11px]">Copy code</span></>)}</button></div><div className="overflow-x-auto p-4"><pre className="m-0 bg-transparent p-0 border-0"><code className="block select-text font-mono text-[12.5px] leading-relaxed text-slate-350 font-normal">{code}</code></pre></div></div>);
+      }
+
+      function TextBlocks({ text }) {
+        const lines = text.split("\n");
+        const parsedNodes = [];
+        let currentListItems = [];
+        let currentListType = null;
+        const pushCurrentList = (key) => {
+          if (currentListItems.length > 0) {
+            if (currentListType === "ul") parsedNodes.push(<ul key={`ul-${key}`} className="my-3 list-disc pl-6 space-y-1.5 text-slate-300 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80">{currentListItems}</ul>);
+            else if (currentListType === "ol") parsedNodes.push(<ol key={`ol-${key}`} className="my-3 list-decimal pl-6 space-y-1.5 text-slate-300 bg-slate-950/40 p-4 rounded-xl border border-slate-800/80 marker:text-sky-400 marker:font-bold">{currentListItems}</ol>);
+            currentListItems = [];
+            currentListType = null;
+          }
+        };
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          if (line.trim() === "") { pushCurrentList(i); continue; }
+          const headerMatch = line.match(/^(#{1,6})\s+(.*)/);
+          if (headerMatch) { pushCurrentList(i); const level = headerMatch[1].length; const content = parseInlineMarkdown(headerMatch[2]); if (level === 1) parsedNodes.push(<h1 key={i} className="font-display font-semibold text-xl tracking-tight text-white mt-6 mb-2">{content}</h1>); else if (level === 2) parsedNodes.push(<h2 key={i} className="font-display font-medium text-lg tracking-tight text-slate-100 mt-5 mb-2">{content}</h2>); else parsedNodes.push(<h3 key={i} className="font-display font-medium text-base text-slate-200 mt-4 mb-1.5">{content}</h3>); continue; }
+          const blockquoteMatch = line.match(/^\s*>\s+(.*)/);
+          if (blockquoteMatch) { pushCurrentList(i); parsedNodes.push(<blockquote key={i} className="my-3 border-l-4 border-sky-500 pl-4 py-0.5 italic text-slate-400">{parseInlineMarkdown(blockquoteMatch[1])}</blockquote>); continue; }
+          const bulletMatch = line.match(/^\s*[-*]\s+(.*)/);
+          if (bulletMatch) { if (currentListType !== "ul") { pushCurrentList(i); currentListType = "ul"; } currentListItems.push(<li key={`li-${i}`} className="py-0.5 text-xs md:text-sm">{parseInlineMarkdown(bulletMatch[1])}</li>); continue; }
+          const activeNumberMatch = line.match(/^\s*(\d+)\.\s+(.*)/);
+          if (activeNumberMatch) { if (currentListType !== "ol") { pushCurrentList(i); currentListType = "ol"; } currentListItems.push(<li key={`li-${i}`} className="py-0.5 text-xs md:text-sm">{parseInlineMarkdown(activeNumberMatch[2])}</li>); continue; }
+          pushCurrentList(i); parsedNodes.push(<p key={i} className="my-2 leading-relaxed text-slate-300 text-xs md:text-sm">{parseInlineMarkdown(line)}</p>);
+        }
+        pushCurrentList("final");
+        return <>{parsedNodes}</>;
+      }
+
+      function parseInlineMarkdown(text) {
+        const pattern = /(\*\*[\s\S]+?\*\*|\*[\s\S]+?\*|`[\s\S]+?`|_[\s\S]+?_)/g;
+        const parts = text.split(pattern);
+        if (parts.length === 1) return text;
+        return parts.map((part, index) => {
+          if (part.startsWith("**") && part.endsWith("**")) return <strong key={index} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+          if ((part.startsWith("*") && part.endsWith("*")) || (part.startsWith("_") && part.endsWith("_"))) return <em key={index} className="text-slate-100 italic">{part.slice(1, -1)}</em>;
+          if (part.startsWith("`") && part.endsWith("`")) return <code key={index} className="rounded border border-slate-800 bg-slate-900 px-1.5 py-0.5 font-mono text-xs font-semibold text-sky-350">{part.slice(1, -1)}</code>;
+          return part;
+        });
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<StrictMode><App /></StrictMode>);
+    </script>
+  </body>
+</html>
+
