@@ -26,40 +26,58 @@
     <style>
       :root { color-scheme: dark; }
       html { scroll-behavior: smooth; }
-      body { margin: 0; min-height: 100vh; background: #020617; color: #cbd5e1; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
+      body { margin: 0; min-height: 100vh; background: linear-gradient(180deg,#0a0a0a,#111111); color: #e0e0e0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; }
       #root { min-height: 100vh; }
       ::-webkit-scrollbar { width: 6px; height: 6px; }
       ::-webkit-scrollbar-track { background: transparent; }
-      ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.15); border-radius: 9999px; }
-      ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.3); }
+      ::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.23); border-radius: 9999px; }
+      ::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.45); }
       @keyframes typing-pulse { 0%, 100% { opacity: 0.3; transform: translateY(0px); } 50% { opacity: 1; transform: translateY(-4px); } }
       .animate-typing-1 { animation: typing-pulse 1.2s infinite; animation-delay: 0s; }
       .animate-typing-2 { animation: typing-pulse 1.2s infinite; animation-delay: 0.2s; }
       .animate-typing-3 { animation: typing-pulse 1.2s infinite; animation-delay: 0.4s; }
       .markdown-body { line-height: 1.625; }
-      .markdown-body h1 { font-family: Space Grotesk, sans-serif; font-size: 1.5rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #f8fafc; }
-      .markdown-body h2 { font-family: Space Grotesk, sans-serif; font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #f1f5f9; }
-      .markdown-body h3 { font-family: Space Grotesk, sans-serif; font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; color: #e2e8f0; }
+      .markdown-body h1 { font-family: Space Grotesk, sans-serif; font-size: 1.5rem; font-weight: 700; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #f8f8f4; }
+      .markdown-body h2 { font-family: Space Grotesk, sans-serif; font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: #f1e6b0; }
+      .markdown-body h3 { font-family: Space Grotesk, sans-serif; font-size: 1.1rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.25rem; color: #e7ddbe; }
       .markdown-body p { margin-top: 0.5rem; margin-bottom: 0.5rem; }
       .markdown-body ul, .markdown-body ol { padding-left: 1.5rem; margin-top: 0.5rem; margin-bottom: 0.5rem; }
       .markdown-body li { margin-top: 0.25rem; margin-bottom: 0.25rem; }
-      .markdown-body pre { background-color: #0f172a; border: 1px solid #1e293b; border-radius: 0.375rem; padding: 0.75rem 1rem; margin-top: 0.75rem; margin-bottom: 0.75rem; overflow-x: auto; font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; color: #e2e8f0; }
-      .markdown-body code { color: #a5b4fc; font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875rem; border-radius: 0.25rem; }
-      .markdown-body pre code { color: #e2e8f0; background-color: transparent; padding: 0; border-radius: 0; }
-      .markdown-body blockquote { border-left: 4px solid #4f46e5; padding-left: 1rem; color: #94a3b8; margin-top: 0.75rem; margin-bottom: 0.75rem; font-style: italic; }
-      .bg-slate-850 { background-color: #111827; }
-      .border-slate-805 { border-color: #1f2937; }
-      .text-slate-405 { color: #cbd5e1; }
-      .text-slate-450 { color: #94a3b8; }
-      .border-slate-705 { border-color: #475569; }
-      .bg-red-650\/15 { background-color: rgba(185, 28, 28, 0.15); }
-      .border-red-550\/20 { border-color: rgba(244, 63, 94, 0.2); }
-      .text-emerald-405 { color: #67e8f9; }
-      .bg-slate-900\/40 { background-color: rgba(15, 23, 42, 0.4); }
+      .markdown-body pre { background-color: #111111; border: 1px solid #111111; border-radius: 0.375rem; padding: 0.75rem 1rem; margin-top: 0.75rem; margin-bottom: 0.75rem; overflow-x: auto; font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8125rem; color: #e0e0e0; }
+      .markdown-body code { color: #e2c36f; font-family: JetBrains Mono, ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.875rem; border-radius: 0.25rem; }
+      .markdown-body pre code { color: #e0e0e0; background-color: transparent; padding: 0; border-radius: 0; }
+      .markdown-body blockquote { border-left: 4px solid #C9A84C; padding-left: 1rem; color: #c4b89b; margin-top: 0.75rem; margin-bottom: 0.75rem; font-style: italic; }
+      .bg-slate-850 { background-color: #111111; }
+      .border-slate-805 { border-color: rgba(201, 168, 76, 0.22); }
+      .text-slate-405 { color: #e0e0e0; }
+      .text-slate-450 { color: #bfb399; }
+      .border-slate-705 { border-color: rgba(201, 168, 76, 0.18); }
+      .bg-red-650\/15 { background-color: rgba(201, 168, 76, 0.08); }
+      .border-red-550\/20 { border-color: rgba(201, 168, 76, 0.2); }
+      .text-emerald-405 { color: #C9A84C; }
+      .bg-slate-900\/40 { background-color: rgba(17, 17, 17, 0.45); }
     </style>
   </head>
-  <body class="bg-slate-950 text-slate-200">
-    <div id="root"></div>
+  <body class="bg-[#0a0a0a] text-[#e0e0e0]">
+    <div id="root" style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; text-align:center; color:#f8f8f4; background:#0a0a0a; font-family:Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;">
+      <div style="max-width:36rem;">
+        <div style="font-size:1.1rem; font-weight:700; margin-bottom:0.75rem; color:#f8f8f4;">Loading Zid ai…</div>
+        <div style="font-size:0.95rem; line-height:1.6; color:#d8d4c0;">If the screen stays black, open your browser console to inspect JavaScript or network errors. The app should appear shortly.</div>
+      </div>
+    </div>
+    <script>
+      window.__zidAiRoot = document.getElementById('root');
+      function zidAiShowError(message) {
+        if (!window.__zidAiRoot) return;
+        window.__zidAiRoot.innerHTML = `<div style="min-height:100vh; display:flex; align-items:center; justify-content:center; padding:2rem; text-align:center; color:#fff; background:#0a0a0a; font-family:Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;"><div style="max-width:40rem;"><div style="font-size:1.1rem; font-weight:700; margin-bottom:0.75rem; color:#f8f8f4;">Zid ai failed to load</div><pre style="white-space:pre-wrap; word-break:break-word; text-align:left; background:#111; border:1px solid #333; border-radius:12px; padding:1rem; color:#f8f8f4;">${message}</pre><div style="margin-top:0.75rem; color:#d8d4c0;">Open the browser console for more details.</div></div></div>`;
+      }
+      window.addEventListener('error', function (event) {
+        zidAiShowError(event.message || 'Unknown script error');
+      });
+      window.addEventListener('unhandledrejection', function (event) {
+        zidAiShowError(event.reason ? (event.reason.message || String(event.reason)) : 'Unhandled promise rejection');
+      });
+    </script>
     <script src="https://unpkg.com/react@19/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -663,7 +681,12 @@
         });
       }
 
-      ReactDOM.createRoot(document.getElementById("root")).render(<StrictMode><App /></StrictMode>);
+      try {
+        ReactDOM.createRoot(document.getElementById("root")).render(<StrictMode><App /></StrictMode>);
+      } catch (error) {
+        zidAiShowError(error?.message || String(error));
+        console.error(error);
+      }
     </script>
   </body>
 </html>
