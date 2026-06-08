@@ -1351,7 +1351,7 @@ const load=(key)=>{try{return JSON.parse(localStorage.getItem(key));}catch(e){re
 const removeStored=(key)=>localStorage.removeItem(key);
 
 // ------ Firebase Setup --------------------------------
-let fbUsers={},fbSSE=null,friendRequestSSE=null,friendOutgoingSSE=null,friendListSSE=null,friendRequestsIn={},friendRequestsOut={},friendsByUsername={},fbStarted=false;
+let fbUsers={},remoteAccountUsers={},fbSSE=null,friendRequestSSE=null,friendOutgoingSSE=null,friendListSSE=null,friendRequestsIn={},friendRequestsOut={},friendsByUsername={},fbStarted=false;
 const FB='https://zidea-default-rtdb.firebaseio.com';
 const onlineReady=()=>typeof fetch!=='undefined';
 const withTimeout=(promise,ms)=>Promise.race([promise, new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')),ms))]);
@@ -1367,7 +1367,12 @@ const db={
 function startFirebase(){
   if(!currentUser||fbStarted)return;fbStarted=true;
   db.write('users/'+currentUser.username,{username:currentUser.username,lastSeen:Date.now(),online:true});
-  db.read('users').then(data=>{if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser.username)fbUsers[k]=u;});renderUsers();renderOnline();updateStats();});
+  Promise.all([db.read('users'),db.read('accounts')]).then(([users,accounts])=>{
+    fbUsers={};remoteAccountUsers={};
+    if(users)Object.entries(users).forEach(([k,u])=>{if(u?.username&&u.username!==currentUser.username)fbUsers[k]=u;});
+    if(accounts)Object.values(accounts).forEach(a=>{if(a?.username&&a.username!==currentUser.username)remoteAccountUsers[a.username.toLowerCase()]={username:a.username.toLowerCase(),wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0,online:false};});
+    renderUsers();renderOnline();updateStats();
+  });
   const sse=new EventSource(`${FB}/users.json`);fbSSE=sse;
   sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]=u;});renderUsers();renderOnline();updateStats();}catch(_){}});
   sse.addEventListener('patch',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]={...(fbUsers[k]||{}),...u};});renderUsers();renderOnline();updateStats();}catch(_){}});
@@ -1380,7 +1385,26 @@ function touchPresence(){if(!currentUser||!fbStarted)return;db.patch('users/'+cu
 setInterval(touchPresence,15000);
 setInterval(()=>{renderOnline();renderUsers();},10000);
 setInterval(updateStats,12000);
-function getAllUsers(){const fb=Object.values(fbUsers);if(fb.length)return fb;const accounts=load('zidea_accounts')||{};return Object.entries(accounts).filter(([e])=>e!==currentUser?.email).map(([,a])=>({username:a.username,wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0}));}
+function normalizeUserRecord(u){
+  if(!u?.username)return null;
+  return {...u,username:String(u.username).trim().replace(/^@+/,'').toLowerCase(),wins:u.wins||0,losses:u.losses||0,lastSeen:u.lastSeen||0};
+}
+function mergeUserRecords(...lists){
+  const byName={};
+  lists.flat().forEach(raw=>{
+    const u=normalizeUserRecord(raw);if(!u||u.username===currentUser?.username)return;
+    byName[u.username]={...(byName[u.username]||{}),...u};
+  });
+  return Object.values(byName);
+}
+function getLocalAccountUsers(){
+  const accounts=load('zidea_accounts')||{};
+  return Object.values(accounts).map(a=>({username:a.username,wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0,online:false}));
+}
+function getRelationshipUsers(){
+  return [...Object.keys(friendsByUsername||{}),...Object.keys(friendRequestsIn||{}),...Object.keys(friendRequestsOut||{}),...Object.keys(chatCache||{})].map(username=>({username,online:false}));
+}
+function getAllUsers(){return mergeUserRecords(Object.values(remoteAccountUsers),getLocalAccountUsers(),Object.values(fbUsers),getRelationshipUsers());}
 function filterUsers(){
   const rawQuery=document.getElementById('search-input')?.value||'';
   searchQuery=rawQuery.trim().replace(/^@+/,'').toLowerCase();
@@ -1673,14 +1697,21 @@ function openChat(username){
   showPage('chat');renderConvos(target);openConvo(target);
 }
 async function loadAllConvos(){
-  if(!currentUser)return;const data=await db.read('chats');if(!data)return;
+  if(!currentUser)return;
   const myName=currentUser.username;
+  Object.keys(localStorage).filter(k=>k.startsWith('chat_')&&k.includes(myName)).forEach(k=>{
+    const parts=k.replace(/^chat_/,'').split('__');if(!parts.includes(myName))return;
+    const otherUser=parts.find(p=>p!==myName);if(!otherUser)return;
+    const msgs=load(k)||[];if(msgs.length&&!chatCache[otherUser])chatCache[otherUser]=msgs;
+  });
+  const data=await db.read('chats');if(!data)return;
   for(const[key,val]of Object.entries(data)){const parts=key.split('__');if(!parts.includes(myName))continue;const otherUser=parts.find(p=>p!==myName);if(!otherUser)continue;const msgs=val?.messages?Object.values(val.messages).sort((a,b)=>a.ts-b.ts):[];chatCache[otherUser]=msgs;}
 }
 function renderConvos(active){
   const el=document.getElementById('convo-items');if(!el)return;
-  const users=getAllUsers();const chatted=Object.keys(chatCache).filter(u=>!users.find(x=>x.username===u));
-  const allUsers=[...users,...chatted.map(u=>({username:u,wins:0,losses:0,lastSeen:0}))];
+  const users=getAllUsers();
+  const convoNames=new Set([...Object.keys(friendsByUsername||{}),...Object.keys(chatCache||{})]);
+  const allUsers=[...users,...[...convoNames].map(username=>({username,wins:0,losses:0,lastSeen:0}))].reduce((acc,u)=>{const name=String(u.username||'').toLowerCase();if(name&&name!==currentUser?.username&&!acc.some(x=>x.username===name))acc.push({...u,username:name});return acc;},[]);
   if(!allUsers.length){el.innerHTML=emptyStateHTML('??','No messages yet','Find someone by @username and start a conversation.','Find People',"showPage('dashboard')");return;}
   allUsers.sort((a,b)=>{const ma=chatCache[a.username]||[],mb=chatCache[b.username]||[];return(mb[mb.length-1]?.ts||0)-(ma[ma.length-1]?.ts||0);});
   el.innerHTML=allUsers.map(u=>{
@@ -1728,9 +1759,10 @@ function openConvo(username){
     let changed=false;entries.forEach(m=>{if(!m||!m.ts||!m.from)return;const existing=chatCache[username].find(x=>x.ts===m.ts&&x.from===m.from);if(!existing){chatCache[username].push(m);changed=true;}else if(existing._pending&&!m._pending){Object.assign(existing,m);changed=true;}});
     if(changed){chatCache[username].sort((a,b)=>a.ts-b.ts);markRead(username);save('chat_'+key,chatCache[username].slice(-200));renderMsgs();renderConvos(username);}
   }
-  sse.addEventListener('put',e=>{try{const{data:d}=JSON.parse(e.data);if(!seeded){seeded=true;if(d){chatCache[username]=Object.values(d).filter(m=>m&&m.ts&&m.from);chatCache[username].sort((a,b)=>a.ts-b.ts);markRead(username);save('chat_'+key,chatCache[username].slice(-200));renderMsgs();renderConvos(username);}}else{mergeMessages(d);}}catch(_){}});
+  sse.addEventListener('put',e=>{try{const{data:d}=JSON.parse(e.data);if(!seeded){seeded=true;chatCache[username]=d?Object.values(d).filter(m=>m&&m.ts&&m.from):chatCache[username]||[];chatCache[username].sort((a,b)=>a.ts-b.ts);markRead(username);save('chat_'+key,chatCache[username].slice(-200));renderMsgs();renderConvos(username);}else{mergeMessages(d);}}catch(_){renderMsgs();}});
   sse.addEventListener('patch',e=>{try{mergeMessages(JSON.parse(e.data).data);}catch(_){}});
-  sse.onerror=()=>{sse.close();chatSSE=null;};
+  sse.onerror=()=>{if(!seeded){seeded=true;chatCache[username]=chatCache[username]||[];renderMsgs();renderConvos(username);}sse.close();chatSSE=null;};
+  setTimeout(()=>{if(activeChatUser===username&&!seeded){chatCache[username]=chatCache[username]||[];renderMsgs();}},2200);
   setTimeout(()=>{const i=document.getElementById('chat-input');if(i)i.focus();},50);
 }
 function markRead(username){if(!chatCache[username])return;chatCache[username].forEach(m=>{if(m.from!==currentUser?.username)m.read=true;});}
