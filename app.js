@@ -1,3 +1,5 @@
+let currentUser = null;
+
 const authState = {
   submitLocks: new Map(),
   activeModal: null,
