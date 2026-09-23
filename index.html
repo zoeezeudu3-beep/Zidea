@@ -717,8 +717,51 @@ body.app-active #page-landing footer{display:none}
 </div>
 
 <!-- EXPLORE -->
-<div id="page-explore" class="page">
-  <div class="explore-video-feed" id="explore-list"></div>
+<div id="page-explore" class="page"><aside class="sidebar">
+    <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-label">Main</div>
+      <button class="nav-item" onclick="showPage('dashboard')">🏠 Home</button>
+      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
+      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
+      <button class="nav-item active" onclick="showPage('explore')">🔥 Explore</button>
+      <div class="sidebar-label">Social</div>
+      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
+      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
+      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
+      <div class="sidebar-label">Account</div>
+      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
+      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
+      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
+    </nav>
+    <div class="sidebar-footer"><div class="sidebar-user" id="explore-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
+  </aside>
+  <div class="main-content">
+    <div class="explore-shell">
+      <div class="explore-topbar">
+        <div>
+          <div class="page-title">🔥 Explore</div>
+          <div class="page-subtitle">Idea-first videos from the community</div>
+        </div>
+        <label class="explore-upload-label">
+          <input id="explore-upload-input" type="file" accept="video/*" onchange="handleExploreVideoUpload(event)" />
+          + Post idea video
+        </label>
+      </div>
+      <div class="explore-actions">
+        <button class="explore-cat-btn active" onclick="filterExplore('all')">All</button>
+        <button class="explore-cat-btn" onclick="filterExplore('startup')">🚀 Startup</button>
+        <button class="explore-cat-btn" onclick="filterExplore('app')">📱 App</button>
+        <button class="explore-cat-btn" onclick="filterExplore('finance')">💰 Finance</button>
+        <button class="explore-cat-btn" onclick="filterExplore('health')">🏥 Health</button>
+      </div>
+      <div class="explore-upload-box">
+        <div class="explore-avatar" style="width:32px;height:32px">@</div>
+        <div class="explore-post-hint">This feed is dedicated to idea videos only. No unrelated posts — just product explanations, demos, founder stories, and concept pitches.</div>
+      </div>
+      <div id="explore-list" class="explore-video-feed"></div>
+    </div>
+  </div>
 </div>
 
 <!-- PROFILE -->
