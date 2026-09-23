@@ -337,6 +337,69 @@ body.app-active #page-landing footer{display:none}
 .lib-tab-btn.active{background:rgba(201,168,76,.15);border-color:var(--brand);color:#E6CE8B}
 .explore-cat-btn{padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:transparent;color:#bfb399;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s}
 .explore-cat-btn.active{background:rgba(201,168,76,.15);border-color:var(--brand);color:#E6CE8B}
+/* ── Explore reels feed ── */
+.explore-shell{display:flex;flex-direction:column;height:100dvh;overflow:hidden;width:100%}
+.explore-topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.explore-actions{display:flex;gap:8px;flex-wrap:wrap;padding:10px 16px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.explore-upload-box{display:flex;align-items:center;gap:10px;padding:8px 16px;flex-shrink:0;border-bottom:1px solid rgba(201,168,76,.1)}
+.explore-post-hint{font-size:11px;color:#bfb399;line-height:1.5}
+.explore-upload-label{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:10px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);color:#E6CE8B;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.explore-upload-label input{display:none}
+.explore-upload-label:hover{background:rgba(201,168,76,.25)}
+.copyright-confirm{display:flex;align-items:flex-start;gap:8px;color:#bfb399;font-size:11px;line-height:1.4;padding:2px 0}
+.copyright-confirm input{accent-color:#C9A84C;width:14px;height:14px;margin-top:2px;flex-shrink:0}
+/* Feed container — full remaining height, scroll-snap */
+.explore-video-feed{height:100dvh;flex:1;overflow-y:auto;scroll-snap-type:y mandatory;scroll-padding:0;-webkit-overflow-scrolling:touch;scrollbar-width:none;position:relative;overscroll-behavior-y:contain;background:#000}
+.explore-video-feed::-webkit-scrollbar{display:none}
+/* Each reel card fills exactly the feed viewport */
+.explore-video-card{scroll-snap-align:start;scroll-snap-stop:always;height:100dvh;min-height:100dvh;position:relative;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+/* Video fills card */
+.reel-video{width:100%;height:100%;object-fit:cover;display:block}
+/* Gradient overlays */
+.reel-overlay-top{position:absolute;top:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,rgba(0,0,0,.55),transparent);pointer-events:none;z-index:2}
+.reel-overlay-bottom{position:absolute;bottom:0;left:0;right:0;height:200px;background:linear-gradient(to top,rgba(0,0,0,.75),transparent);pointer-events:none;z-index:2}
+/* Bottom-left: avatar + username + caption */
+.reel-info{position:absolute;bottom:24px;left:16px;right:72px;z-index:3;display:flex;flex-direction:column;gap:6px}
+.reel-user-row{display:flex;align-items:center;gap:10px}
+.reel-avatar{width:38px;height:38px;border-radius:50%;border:2px solid rgba(201,168,76,.7);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;cursor:pointer;background:linear-gradient(135deg,#C9A84C,#A38738);overflow:hidden}
+.reel-avatar img{width:100%;height:100%;object-fit:cover}
+.reel-username{font-size:14px;font-weight:700;color:#fff;cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.reel-username:hover{text-decoration:underline;color:#E6CE8B}
+.reel-follow-btn{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;cursor:pointer;transition:all .2s;margin-left:6px}
+.reel-follow-btn:hover{background:rgba(201,168,76,.3);border-color:#E6CE8B;color:#E6CE8B}
+.reel-title{font-size:15px;font-weight:800;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.7);line-height:1.3}
+.reel-caption{font-size:13px;color:rgba(255,255,255,.85);text-shadow:0 1px 4px rgba(0,0,0,.6);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.reel-chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.4);color:#E6CE8B;align-self:flex-start}
+/* Right side: action buttons */
+.reel-actions{position:absolute;bottom:24px;right:12px;z-index:3;display:flex;flex-direction:column;align-items:center;gap:18px}
+.reel-btn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:#fff;font-size:24px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));transition:transform .15s}
+.reel-btn:hover{transform:scale(1.15)}
+.reel-btn span{font-size:11px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.reel-btn.liked{color:#ff4466}
+/* Mute toggle */
+.reel-mute-btn{position:absolute;top:16px;right:16px;z-index:4;background:rgba(0,0,0,.45);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px;transition:background .2s}
+.reel-mute-btn:hover{background:rgba(0,0,0,.7)}
+/* Category chip top-right */
+.reel-category{position:absolute;top:16px;left:16px;z-index:4}
+/* Profile page video grid */
+.profile-video-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.profile-video-card{border-radius:12px;overflow:hidden;background:#111;border:1px solid var(--border);display:flex;flex-direction:column}
+.profile-video-wrap{aspect-ratio:9/16;background:#000;overflow:hidden}
+.profile-video-wrap video{width:100%;height:100%;object-fit:cover}
+.profile-video-info{padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.profile-video-title{font-size:13px;font-weight:700;color:#fff}
+.profile-video-meta{font-size:11px;color:#bfb399}
+.profile-video-caption{font-size:11px;color:#bfb399;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.profile-empty-video{color:#bfb399;font-size:13px;text-align:center;padding:32px 16px;grid-column:1/-1}
+.profile-upload-banner{display:flex;flex-direction:column;gap:10px}
+.profile-banner-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.profile-copyright-note{font-size:12px;color:#bfb399;padding:10px 14px;background:rgba(201,168,76,.06);border:1px solid rgba(201,168,76,.18);border-radius:10px;line-height:1.5}
+/* Copyright modal */
+.copyright-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center;padding:20px}
+.copyright-modal.show{display:flex}
+.copyright-modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;max-width:420px;width:100%;display:flex;flex-direction:column;gap:16px}
+.copyright-confirm-row{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:rgba(201,168,76,.07);border:1px solid rgba(201,168,76,.2);border-radius:12px;cursor:pointer}
+.copyright-confirm-row input[type=checkbox]{width:18px;height:18px;accent-color:#C9A84C;flex-shrink:0;margin-top:2px;cursor:pointer}
 /* Groups */
 .group-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:150;align-items:center;justify-content:center;padding:20px}
 .group-modal-overlay.show{display:flex}
@@ -717,7 +780,8 @@ body.app-active #page-landing footer{display:none}
 </div>
 
 <!-- EXPLORE -->
-<div id="page-explore" class="page"><aside class="sidebar">
+<div id="page-explore" class="page" style="overflow:hidden;height:100dvh">
+  <aside class="sidebar">
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
       <div class="sidebar-label">Main</div>
@@ -736,35 +800,41 @@ body.app-active #page-landing footer{display:none}
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="explore-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content">
-    <div class="explore-shell">
-      <div class="explore-topbar">
-        <div>
-          <div class="page-title">🔥 Explore</div>
-          <div class="page-subtitle">Idea-first videos from the community</div>
+  <!-- Feed area: takes remaining width, full height, no extra padding -->
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;position:relative">
+    <!-- Fixed top bar: title + upload + category filters -->
+    <div style="position:absolute;top:0;left:0;right:0;background:rgba(10,10,10,.78);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);z-index:10">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:18px;font-weight:800;color:#fff">🔥 Explore</div>
+          <div style="font-size:12px;color:#bfb399">Idea-first videos</div>
         </div>
-        <label class="explore-upload-label">
-          <input id="explore-upload-input" type="file" accept="video/*" onchange="handleExploreVideoUpload(event)" />
-          + Post idea video
-        </label>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+          <label class="explore-upload-label">
+            <input id="explore-upload-input" type="file" accept="video/*" onchange="handleExploreVideoUpload(event)" />
+            + Post idea video
+          </label>
+          <div class="profile-copyright-note" style="max-width:360px;padding:8px 10px;font-size:11px">Only upload your own short videos or royalty-cleared footage. No copyrighted reposts or reused creator clips.</div>
+          <label class="copyright-confirm" style="font-size:11px;line-height:1.4;max-width:310px">
+            <input type="checkbox" id="explore-rights-confirm" /> This is my own content or I have the rights to post it.
+          </label>
+        </div>
       </div>
-      <div class="explore-actions">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding:6px 16px 10px">
         <button class="explore-cat-btn active" onclick="filterExplore('all')">All</button>
         <button class="explore-cat-btn" onclick="filterExplore('startup')">🚀 Startup</button>
         <button class="explore-cat-btn" onclick="filterExplore('app')">📱 App</button>
         <button class="explore-cat-btn" onclick="filterExplore('finance')">💰 Finance</button>
         <button class="explore-cat-btn" onclick="filterExplore('health')">🏥 Health</button>
       </div>
-      <div class="explore-upload-box">
-        <div class="explore-avatar" style="width:32px;height:32px">@</div>
-        <div class="explore-post-hint">This feed is dedicated to idea videos only. No unrelated posts — just product explanations, demos, founder stories, and concept pitches.</div>
-      </div>
-      <div id="explore-list" class="explore-video-feed"></div>
     </div>
+    <!-- Snap-scroll feed: fills rest of height -->
+    <div id="explore-list" class="explore-video-feed"></div>
   </div>
 </div>
 
 <!-- PROFILE -->
+
 <div id="page-profile" class="page"><aside class="sidebar">
     <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
     <nav class="sidebar-nav">
@@ -818,15 +888,10 @@ body.app-active #page-landing footer{display:none}
         <label class="btn-primary" style="display:inline-flex;font-size:12px;padding:9px 14px"><input type="file" accept="video/*" style="display:none" onchange="handleProfileVideoUpload(event)"/>+ Upload</label>
       </div>
       <div class="profile-copyright-note">Only upload your own short videos or royalty-cleared footage. No copyrighted reposts or reused creator clips.</div>
-    </div>
-
-    <div class="card">
-      <div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:12px">Your idea videos</div>
-      <div id="profile-video-grid" class="profile-video-grid"></div>
-    </div>
-
-    <div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Game stats</div><div id="profile-game-stats"></div></div>
-    <div class="card"><div style="font-size:15px;font-weight:800;color:#fff;margin-bottom:10px">Recent ideas</div><div id="profile-recent-ideas"></div></div>
+      <label class="copyright-confirm" style="font-size:12px;line-height:1.5;display:flex;align-items:flex-start;gap:8px">
+        <input type="checkbox" id="profile-rights-confirm" />
+        <span>This is my own content or I have the rights to post it.</span>
+      </label>
   </div>
 </div>
 
@@ -2196,11 +2261,20 @@ function filterExplore(cat){
   });
   renderExplore();
 }
+function requireUploadRights(checkId){
+  const box=document.getElementById(checkId);
+  if(!box || !box.checked){
+    showToast('Please confirm: this is your own content or you have the rights to post it.');
+    return false;
+  }
+  return true;
+}
 function handleExploreVideoUpload(event){
   const file=event.target.files&&event.target.files[0];
   if(!file){return;}
   if(!currentUser){showPage('login');event.target.value='';return;}
   if(!file.type.startsWith('video/')){showToast('Please upload a video file.');event.target.value='';return;}
+  if(!requireUploadRights('explore-rights-confirm')){event.target.value='';return;}
   const videoUrl=URL.createObjectURL(file);
   const newPost={
     id:`user_video_${Date.now()}`,
@@ -2215,7 +2289,8 @@ function handleExploreVideoUpload(event){
     description:'Quick idea video explaining the problem, the target user, and why this concept matters right now. Published only with original or royalty-cleared footage.',
     videoUrl,
     poster:'',
-    original:true
+    original:true,
+    rightsConfirmed:true
   };
   EXPLORE_MOCK.unshift(newPost);
   saveAccountVideos([{
@@ -2223,18 +2298,26 @@ function handleExploreVideoUpload(event){
     title:newPost.title,
     category:newPost.category,
     author:currentUser.username,
+    handle:`@${currentUser.username}`,
     videoUrl,
     createdAt:Date.now(),
     description:newPost.description,
-    source:'user-upload'
-  }, ...getAccountVideos()]);
+    source:'user-upload',
+    original:true,
+    rightsConfirmed:true
+  }, ...getStoredAccountVideos()]);
   renderExplore();
   renderProfile();
   event.target.value='';
+  const rightsBox=document.getElementById('explore-rights-confirm'); if(rightsBox) rightsBox.checked=false;
   showToast('Your short-form idea video is now live in Explore.');
 }
-function getAccountVideos(){
+function getStoredAccountVideos(){
   const stored=load(ideaStoreKey('account_videos'));
+  return Array.isArray(stored)?stored:[];
+}
+function getAccountVideos(){
+  const stored=getStoredAccountVideos();
   if(Array.isArray(stored)&&stored.length) return stored;
   return [{
     id:'profile-demo-1',
@@ -2244,7 +2327,8 @@ function getAccountVideos(){
     videoUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
     createdAt:Date.now()-86400000,
     description:'Original idea video demo created for the account profile. Use your own or royalty-cleared footage.',
-    source:'demo'
+    source:'demo',
+    rightsConfirmed:true
   }, {
     id:'profile-demo-2',
     title:'Fitness challenge app teaser',
@@ -2253,86 +2337,173 @@ function getAccountVideos(){
     videoUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.webm',
     createdAt:Date.now()-172800000,
     description:'Short-form pitch for a habit and challenge-based wellness product.',
-    source:'demo'
+    source:'demo',
+    rightsConfirmed:true
   }];
 }
 function saveAccountVideos(videos){
   save(ideaStoreKey('account_videos'), videos);
+}
+function profileVideoToExplorePost(video){
+  const author=video.author||currentUser?.username||'you';
+  return {
+    id:video.id,
+    title:video.title||'Idea reel',
+    category:video.category||'startup',
+    author,
+    handle:video.handle||`@${author}`,
+    likes:Number(video.likes||0),
+    comments:Number(video.comments||0),
+    shares:Number(video.shares||0),
+    views:Number(video.views||1),
+    description:video.description||'Short-form idea video.',
+    videoUrl:video.videoUrl||'',
+    poster:video.poster||'',
+    source:video.source||'user-upload',
+    original:video.original!==false,
+    rightsConfirmed:video.rightsConfirmed===true
+  };
+}
+function getExploreVideos(){
+  const stored=getStoredAccountVideos();
+  const accountPosts=Array.isArray(stored)
+    ? stored.filter(v=>v&&v.videoUrl&&v.rightsConfirmed===true).map(profileVideoToExplorePost)
+    : [];
+  const byId={};
+  [...accountPosts,...EXPLORE_MOCK].forEach(post=>{
+    if(post&&post.id&&!byId[post.id])byId[post.id]=post;
+  });
+  return Object.values(byId);
 }
 function handleProfileVideoUpload(event){
   const file=event.target.files&&event.target.files[0];
   if(!file){return;}
   if(!currentUser){showPage('login');event.target.value='';return;}
   if(!file.type.startsWith('video/')){showToast('Please upload a video file.');event.target.value='';return;}
+  if(!requireUploadRights('profile-rights-confirm')){event.target.value='';return;}
   const videoUrl=URL.createObjectURL(file);
-  const videos=[{
-    id:`profile_video_${Date.now()}`,
+  const videoId=`profile_video_${Date.now()}`;
+  const videoRecord={
+    id:videoId,
     title:`Idea reel: ${file.name.replace(/\.[^.]+$/, '')}`,
     category:exploreCategory==='all'?'startup':exploreCategory,
     author:currentUser.username,
+    handle:`@${currentUser.username}`,
     videoUrl,
     createdAt:Date.now(),
     description:'Short-form idea video for my account profile. Original or royalty-cleared footage only.',
-    source:'user-upload'
-  }, ...getAccountVideos()];
+    source:'user-upload',
+    original:true,
+    rightsConfirmed:true
+  };
+  const videos=[{
+    ...videoRecord
+  }, ...getStoredAccountVideos()];
   saveAccountVideos(videos);
+  EXPLORE_MOCK.unshift(profileVideoToExplorePost(videoRecord));
   renderProfile();
+  renderExplore();
   event.target.value='';
-  showToast('Your video was added to your account profile.');
+  const rightsBox=document.getElementById('profile-rights-confirm'); if(rightsBox) rightsBox.checked=false;
+  showToast('Your video was added to your account profile and Explore.');
+}
+function reelGoToProfile(username){
+  const user = String(username||'').trim();
+  showPage('profile');
+  if(user){ showToast('Viewing @'+user+' profile'); }
+}
+function reelFollow(button,username){
+  const isFollowing = (button.textContent||'').trim().toLowerCase()==='following';
+  button.textContent = isFollowing ? 'Follow' : 'Following';
+  button.style.background = isFollowing ? 'transparent' : 'rgba(201,168,76,.15)';
+  button.style.borderColor = isFollowing ? 'rgba(255,255,255,.6)' : 'rgba(201,168,76,.5)';
+  button.style.color = isFollowing ? '#fff' : '#E6CE8B';
+  showToast(isFollowing ? 'Follow request cleared for @'+username : 'You are following @'+username);
+}
+function reelLike(button,count){
+  const isLiked = button.classList.toggle('liked');
+  const valueEl = button.querySelector('span');
+  const current = Number(count||0);
+  const next = isLiked ? current + 1 : Math.max(0, current - 1);
+  if(valueEl) valueEl.textContent = next.toLocaleString();
+  button.setAttribute('data-liked', isLiked ? 'true' : 'false');
+}
+function reelComment(id){
+  showToast('Comments are enabled for this video.');
+}
+function reelShare(title){
+  const text = title ? `Check this idea: ${title}` : 'Check out this Zidea idea.';
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('Idea link copied to clipboard.')).catch(()=>showToast(text));
+  } else {
+    showToast(text);
+  }
+}
+function reelToggleMute(button){
+  const card = button.closest('.explore-video-card');
+  const video = card && card.querySelector('video');
+  if(!video) return;
+  video.muted = !video.muted;
+  button.textContent = video.muted ? '🔇' : '🔊';
 }
 function renderExplore(){
   const el=document.getElementById('explore-list');if(!el)return;
-  const ideas=EXPLORE_MOCK.filter(i=>exploreCategory==='all'||i.category===exploreCategory);
-  if(!ideas.length){el.innerHTML=emptyStateHTML('??','No trending ideas here','Try another category or generate a new idea to get the momentum started.','Generate an idea',"showPage('ideas')");return;}
-  el.innerHTML=ideas.map(i=>`
-    <article class="explore-video-card">
-      <div class="phone-bezel">
-        <div class="phone-statusbar">
-          <span>9:41</span>
-          <div class="status-icons">
-            <span>◔</span>
-            <span>📶</span>
-            <span>🔋</span>
-          </div>
+  const ideas=getExploreVideos().filter(i=>exploreCategory==='all'||i.category===exploreCategory);
+  if(!ideas.length){
+    el.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#bfb399;font-size:14px;text-align:center;padding:40px">
+      No videos in this category yet.<br><a onclick="showPage('ideas')" style="color:#E6CE8B;cursor:pointer;text-decoration:underline;margin-top:8px;display:block">Generate an idea →</a>
+    </div>`;
+    return;
+  }
+  el.innerHTML=ideas.map((i,idx)=>{
+    const initials=esc((i.author||'U').slice(0,2).toUpperCase());
+    const likes=Number(i.likes||0);
+    const comments=Number(i.comments||0);
+    const shares=Number(i.shares||0);
+    const cat=esc(CAT_LABEL[i.category]||i.category||'Idea');
+    return`<article class="explore-video-card" data-id="${esc(i.id)}" data-idx="${idx}">
+      <video class="reel-video" autoplay muted loop playsinline preload="metadata" poster="${esc(i.poster||'')}">
+        <source src="${esc(i.videoUrl||'')}" type="video/mp4"/>
+      </video>
+      <div class="reel-overlay-top"></div>
+      <div class="reel-overlay-bottom"></div>
+      <button class="reel-mute-btn" aria-label="Toggle mute" onclick="reelToggleMute(this)">🔇</button>
+      <div class="reel-category"><span class="reel-chip">${cat}</span></div>
+      <div class="reel-info">
+        <div class="reel-user-row">
+          <div class="reel-avatar" role="button" tabindex="0" onclick="reelGoToProfile('${esc(i.author||'')}')" title="View @${esc(i.author||'')} profile">${initials}</div>
+          <span class="reel-username" onclick="reelGoToProfile('${esc(i.author||'')}')" role="button" tabindex="0">@${esc(i.author||'unknown')}</span>
+          <button class="reel-follow-btn" onclick="reelFollow(this,'${esc(i.author||'')}')">Follow</button>
         </div>
-        <div class="explore-video-head">
-          <div class="explore-user-meta">
-            <div class="explore-avatar">${esc((i.author||'U').slice(0,2).toUpperCase())}</div>
-            <div class="explore-user-copy">
-              <strong>${esc(i.author||'Unknown')}</strong>
-              <small>${esc(i.handle||'@unknown')}</small>
-            </div>
-          </div>
-          <span class="explore-chip">${esc(CAT_LABEL[i.category]||i.category||'Idea')}</span>
-        </div>
-        <div class="explore-video-row">
-          <div class="explore-media">
-            <video autoplay muted loop playsinline preload="metadata" poster="${esc(i.poster||'')}" controls>
-              <source src="${esc(i.videoUrl||'')}" type="video/mp4" />
-              Your browser does not support video playback.
-            </video>
-            <div class="reel-caption">
-              <div class="reel-caption-name">${esc(i.author||'Unknown')}</div>
-              <div class="reel-caption-text">${esc(i.description||'')}</div>
-            </div>
-          </div>
-          <div class="explore-side-actions">
-            <button class="explore-side-btn" aria-label="Like video">❤<span>${Number(i.likes||0).toLocaleString()}</span></button>
-            <button class="explore-side-btn" aria-label="Comment on video">💬<span>${Number(i.comments||0).toLocaleString()}</span></button>
-            <button class="explore-side-btn" aria-label="Share video">📤<span>${Number(i.shares||0).toLocaleString()}</span></button>
-            <button class="explore-side-btn build" aria-label="Build this idea" onclick="showPage('ideas')">💡</button>
-          </div>
-        </div>
-        <div class="reel-bottom-nav">
-          <span>🏠</span>
-          <span>🔍</span>
-          <span>＋</span>
-          <span>❤</span>
-          <span>👤</span>
-        </div>
+        <div class="reel-title">${esc(i.title||'')}</div>
+        <div class="reel-caption">${esc(i.description||'')}</div>
       </div>
-    </article>
-  `).join('');
+      <div class="reel-actions">
+        <button class="reel-btn" aria-label="Like" onclick="reelLike(this,${likes})" data-liked="false">
+          ❤️<span>${likes.toLocaleString()}</span>
+        </button>
+        <button class="reel-btn" aria-label="Comment" onclick="reelComment('${esc(i.id)}')">
+          💬<span>${comments.toLocaleString()}</span>
+        </button>
+        <button class="reel-btn" aria-label="Share" onclick="reelShare('${esc(i.title||'')}')">
+          📤<span>${shares.toLocaleString()}</span>
+        </button>
+        <button class="reel-btn" aria-label="Build this idea" onclick="showPage('ideas')" title="Build this idea">
+          💡<span>Build</span>
+        </button>
+      </div>
+    </article>`;
+  }).join('');
+
+  const observer=new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      const video=entry.target.querySelector('video');
+      if(!video)return;
+      if(entry.isIntersecting){video.play().catch(()=>{});}
+      else{video.pause();}
+    });
+  },{threshold:0.6});
+  el.querySelectorAll('.explore-video-card').forEach(card=>observer.observe(card));
 }
 function callIdeaAuthor(username){
   if(!currentUser){showPage('login');return;}
