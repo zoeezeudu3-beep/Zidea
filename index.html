@@ -1,4 +1,5 @@
 ﻿
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
 <script>
   window.zideaGoogleClientId = '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
 </script>
+<script src="./zidea-kb.js"></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>try{const s=window.localStorage;if(s&&JSON.parse(s.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
 <style>html.has-session #page-landing{display:none!important}</style>
@@ -282,17 +284,35 @@ body.app-active #page-landing footer{display:none}
 </style>
 <style>
 /* ZiD AI */
+.zidai-shell{display:flex;flex:1;min-width:0;height:100vh;background:var(--bg);border-left:1px solid var(--border)}
+.zidai-sidebar{width:270px;background:rgba(10,12,20,.78);border-right:1px solid var(--border);padding:14px 10px;display:flex;flex-direction:column;gap:12px;flex-shrink:0}
+.zidai-list-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.zidai-new-chat-btn,.zidai-chat-toggle,.zidai-back-btn,.zidai-edit-btn,.zidai-edit-save,.zidai-edit-cancel{font-family:inherit;cursor:pointer;border-radius:10px;transition:all .2s}
+.zidai-new-chat-btn,.zidai-chat-toggle,.zidai-back-btn{background:rgba(201,168,76,.12);border:1px solid rgba(201,168,76,.24);color:#E6CE8B;font-size:12px;padding:8px 10px;font-weight:700}
+.zidai-new-chat-btn:hover,.zidai-chat-toggle:hover,.zidai-back-btn:hover{background:rgba(201,168,76,.18)}
+.zidai-chat-items{display:flex;flex-direction:column;gap:8px;overflow-y:auto;padding-right:4px}
+.zidai-chat-item{display:flex;flex-direction:column;gap:4px;width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--border);background:transparent;color:#fff;text-align:left;cursor:pointer;transition:all .2s}
+.zidai-chat-item:hover{border-color:rgba(201,168,76,.3);background:rgba(255,255,255,.02)}
+.zidai-chat-item.active{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.28)}
+.zidai-chat-item-title{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.zidai-chat-item-meta{font-size:11px;color:#bfb399}
+.zidai-thread{flex:1;display:flex;flex-direction:column;min-width:0}
 .zidai-layout{flex:1;display:flex;flex-direction:column;height:100vh;min-width:0}
-.zidai-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.zidai-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px}
 .zidai-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
 .zidai-msg{display:flex;gap:10px;align-items:flex-end}
 .zidai-msg.user{flex-direction:row-reverse}
 .zidai-msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
 .zidai-msg.ai .zidai-msg-avatar{background:rgba(201,168,76,.2);color:var(--brand)}
 .zidai-msg.user .zidai-msg-avatar{background:rgba(255,255,255,.1);color:#fff}
-.zidai-bubble{max-width:72%;padding:10px 15px;border-radius:18px;font-size:13px;line-height:1.6}
+.zidai-bubble-wrap{display:flex;flex-direction:column;gap:6px;max-width:72%}
+.zidai-msg.user .zidai-bubble-wrap{align-items:flex-end}
+.zidai-bubble{padding:10px 15px;border-radius:18px;font-size:13px;line-height:1.6;word-break:break-word}
 .zidai-msg.ai .zidai-bubble{background:var(--card);border:1px solid var(--border);color:#e0e0e0;border-bottom-left-radius:4px}
 .zidai-msg.user .zidai-bubble{background:var(--brand);color:#fff;border-bottom-right-radius:4px}
+.zidai-message-tools{display:flex;gap:6px;justify-content:flex-end}
+.zidai-edit-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);color:#d9d9d9;padding:5px 8px;font-size:11px}
+.zidai-edit-btn:hover{background:rgba(255,255,255,.1)}
 .zidai-typing{display:flex;gap:5px;align-items:center;padding:12px 15px}
 .zidai-dot{width:7px;height:7px;border-radius:50%;background:#bfb399;animation:zidaiDot 1.2s infinite ease-in-out}
 .zidai-dot:nth-child(2){animation-delay:.2s}
@@ -304,6 +324,21 @@ body.app-active #page-landing footer{display:none}
 .zidai-input:focus{border-color:var(--brand)}
 .zidai-send-btn{width:40px;height:40px;border-radius:12px;background:var(--brand);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
 .zidai-send-btn:hover{background:var(--brand-dark)}
+.zidai-edit-area{display:flex;flex-direction:column;gap:8px;max-width:100%}
+.zidai-edit-input{width:min(420px,72vw);background:rgba(10,12,20,.9);border:1px solid rgba(201,168,76,.3);border-radius:12px;padding:10px 12px;color:#fff;font:inherit;resize:vertical;min-height:80px;max-height:180px}
+.zidai-edit-actions{display:flex;gap:8px;justify-content:flex-end}
+.zidai-edit-save,.zidai-edit-cancel{padding:6px 10px;border:1px solid var(--border);background:transparent;color:#fff;font-size:11px}
+.zidai-edit-save{background:rgba(201,168,76,.16);border-color:rgba(201,168,76,.28);color:#E6CE8B}
+.zidai-edit-cancel:hover,.zidai-edit-save:hover{filter:brightness(1.06)}
+.idea-media-dropzone{margin-top:10px;border:1.5px dashed rgba(201,168,76,.4);background:rgba(201,168,76,.04);border-radius:14px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:10px;justify-content:center;min-height:96px;text-align:center;transition:border-color .2s,background .2s,transform .2s}
+.idea-media-dropzone.dragover{border-color:var(--brand);background:rgba(201,168,76,.08);transform:translateY(-1px)}
+.idea-media-upload-copy{font-size:12px;color:#bfb399;line-height:1.5}
+.idea-media-preview{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.idea-media-item{position:relative;width:112px;height:112px;border-radius:12px;overflow:hidden;border:1px solid var(--border);background:rgba(255,255,255,.02)}
+.idea-media-item img,.idea-media-item video{width:100%;height:100%;object-fit:cover;display:block}
+.idea-media-remove{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.7);color:#fff;border:none;border-radius:50%;width:22px;height:22px;cursor:pointer;font-size:13px}
+@media(max-width:940px){.zidai-sidebar{display:none}.zidai-shell.zidai-sidebar-open .zidai-sidebar{display:flex;position:absolute;inset:0 auto 0 0;width:min(82vw,300px);z-index:20;background:rgba(8,10,18,.96)}.zidai-shell{position:relative}.zidai-chat-toggle{display:inline-flex}#zidai-back-btn{display:none}}
+@media(min-width:941px){.zidai-chat-toggle{display:none}#zidai-back-btn{display:none}}
 /* Ideas / Library / Explore */
 .idea-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s}
 .idea-card:hover{border-color:rgba(201,168,76,.4)}
@@ -370,7 +405,7 @@ body.app-active #page-landing footer{display:none}
 .reel-follow-btn{font-size:11px;font-weight:700;padding:3px 12px;border-radius:999px;border:1.5px solid rgba(255,255,255,.7);background:transparent;color:#fff;cursor:pointer;transition:all .2s}
 .reel-follow-btn:hover,.reel-follow-btn.following{background:rgba(201,168,76,.25);border-color:#E6CE8B;color:#E6CE8B}
 .reel-title{font-size:15px;font-weight:800;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);line-height:1.3}
-.reel-caption{font-size:13px;color:rgba(255,255,255,.88);text-shadow:0 1px 4px rgba(0,0,0,.7);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.reel-caption{font-size:13px;color:rgba(255,255,255,.88);text-shadow:0 1px 4px rgba(0,0,0,.7);line-height:1.5;display:-webkit-box;display:-webkit-box;line-clamp:2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .reel-chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:rgba(201,168,76,.25);border:1px solid rgba(201,168,76,.4);color:#E6CE8B;align-self:flex-start}
 /* RIGHT-SIDE action column — YouTube Shorts / TikTok style */
 .reel-actions{position:absolute;top:50%;right:12px;transform:translateY(-50%);z-index:4;display:flex;flex-direction:column;align-items:center;gap:18px;padding:6px}
@@ -379,6 +414,30 @@ body.app-active #page-landing footer{display:none}
 .reel-btn:hover .reel-btn-icon{transform:scale(1.12);background:rgba(0,0,0,.7)}
 .reel-btn-label{font-size:12px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8)}
 .reel-btn.liked .reel-btn-icon{color:#ff4466}
+.comment-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.74);backdrop-filter:blur(8px);z-index:220;align-items:stretch;justify-content:flex-end;padding:0}
+.comment-modal-overlay.show{display:flex}
+.comment-modal{width:min(420px,90vw);height:100vh;max-height:100vh;background:#121212;border-left:1px solid rgba(201,168,76,.28);box-shadow:-20px 0 60px rgba(0,0,0,.5);display:flex;flex-direction:column;overflow:hidden}
+.comment-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 18px 12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.comment-header h3{font-size:16px;font-weight:800;color:#fff;margin:0}
+.comment-video-title{font-size:11px;color:#bfb399;line-height:1.5;margin-top:4px}
+.comment-close{width:32px;height:32px;border:none;border-radius:50%;background:rgba(255,255,255,.07);color:#fff;font-size:22px;cursor:pointer}
+.comment-list{padding:14px 18px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;min-height:120px;flex:1}
+.comment-item{display:flex;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.03);border:1px solid rgba(201,168,76,.12)}
+.comment-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#C9A84C,#A38738);display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800}
+.comment-body{min-width:0;display:flex;flex-direction:column;gap:4px}
+.comment-user{font-size:12px;font-weight:800;color:#E6CE8B}
+.comment-text{color:#edf0f4;font-size:13px;line-height:1.5;word-break:break-word}
+.comment-empty{padding:18px 18px 10px;color:#bfb399;font-size:13px;text-align:center}
+.comment-form{display:flex;gap:10px;padding:14px 18px 18px;border-top:1px solid rgba(255,255,255,.08)}
+.comment-input{flex:1;min-width:0;border:1px solid rgba(201,168,76,.25);background:rgba(255,255,255,.02);color:#fff;border-radius:12px;padding:10px 12px;font-size:13px;outline:none}
+.comment-input:focus{border-color:rgba(201,168,76,.8);box-shadow:0 0 0 3px rgba(201,168,76,.12)}
+.comment-submit{border:none;border-radius:12px;background:linear-gradient(135deg,#C9A84C,#A38738);color:#fff;font-weight:800;padding:0 14px;cursor:pointer}
+.share-people-list{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto}
+.share-person{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid rgba(201,168,76,.18);border-radius:12px;background:rgba(255,255,255,.02);color:#fff;cursor:pointer;transition:all .15s}
+.share-person:hover{background:rgba(201,168,76,.12);border-color:rgba(201,168,76,.4)}
+.share-person .meta{display:flex;align-items:center;gap:10px;min-width:0}
+.share-person .avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#C9A84C,#A38738);font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.share-preview{color:#fff;font-size:13px;line-height:1.6;padding:12px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(201,168,76,.12);border-radius:12px}
 /* Mute button — top-right of frame */
 .reel-mute-btn{position:absolute;top:14px;right:14px;z-index:6;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:18px;transition:background .2s}
 .reel-mute-btn:hover{background:rgba(0,0,0,.75)}
@@ -392,7 +451,7 @@ body.app-active #page-landing footer{display:none}
 .profile-video-info{padding:10px 12px;display:flex;flex-direction:column;gap:4px}
 .profile-video-title{font-size:13px;font-weight:700;color:#fff}
 .profile-video-meta{font-size:11px;color:#bfb399}
-.profile-video-caption{font-size:11px;color:#bfb399;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.profile-video-caption{font-size:11px;color:#bfb399;line-height:1.5;display:-webkit-box;line-clamp:2;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .profile-empty-video{color:#bfb399;font-size:13px;text-align:center;padding:32px 16px;grid-column:1/-1}
 .profile-upload-banner{display:flex;flex-direction:column;gap:10px}
 .profile-banner-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
@@ -828,7 +887,7 @@ body.app-active #page-landing footer{display:none}
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="zidai-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">➤</button></div></div>
+  <div class="zidai-shell" id="zidai-shell"><aside class="zidai-sidebar"><div class="zidai-list-header"><button class="zidai-new-chat-btn" onclick="newZidAiChat()">+ New chat</button></div><div class="zidai-chat-items" id="zidai-chat-items"></div></aside><div class="zidai-thread"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div><button class="zidai-chat-toggle" id="zidai-chat-toggle" onclick="toggleZidAiSidebar()">Chats</button></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..." onkeydown="zidAiKey(event)"></textarea><button class="zidai-send-btn" id="zidai-send" onclick="sendZidAi()">➤</button></div></div></div>
 </div>
 
 <!-- GENERATE IDEAS -->
@@ -855,7 +914,7 @@ body.app-active #page-landing footer{display:none}
     <div class="card matchmaker-form" id="idea-matchmaker">
       <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:16px;font-weight:800;color:#fff">Collaboration Matcher</div><div style="font-size:12px;color:#bfb399;margin-top:4px">Submit your idea, answer quick prompts, then see your top near matches.</div></div><button class="btn-ghost" style="font-size:12px;padding:7px 12px" onclick="renderMatchAdmin()">View all submissions</button></div>
       <div class="match-progress"><span id="match-progress-bar"></span></div>
-      <div id="match-step-0" class="matchmaker-step active"><div class="matchmaker-grid"><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Your name</label><input class="input-field" id="match-name" placeholder="Alex Morgan"/></div><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Email</label><input class="input-field" id="match-email" type="email" placeholder="alex@example.com"/></div></div><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Idea title</label><input class="input-field" id="match-title" placeholder="e.g. Campus SkillSwap"/></div><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Short description</label><textarea class="input-field" id="match-description" rows="2" placeholder="e.g. A peer learning app for students to trade tutoring sessions." style="resize:vertical"></textarea></div></div>
+      <div id="match-step-0" class="matchmaker-step active"><div class="matchmaker-grid"><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Your name</label><input class="input-field" id="match-name" placeholder="Alex Morgan"/></div><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Email</label><input class="input-field" id="match-email" type="email" placeholder="alex@example.com"/></div></div><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Idea title</label><input class="input-field" id="match-title" placeholder="e.g. Campus SkillSwap"/></div><div><label style="font-size:12px;color:#bfb399;display:block;margin-bottom:6px">Short description</label><textarea class="input-field" id="match-description" rows="2" placeholder="e.g. A peer learning app for students to trade tutoring sessions." style="resize:vertical"></textarea><div class="idea-media-dropzone" id="idea-media-dropzone" tabindex="0"><input id="idea-media-input" type="file" accept="image/*,video/*" multiple hidden /><div class="idea-media-upload-copy">Drag and drop an image or video here<br>or use the upload button below<br><strong style="color:#E6CE8B">Up to 200MB per file</strong></div><button class="btn-ghost" type="button" style="font-size:12px;padding:7px 12px" onclick="document.getElementById('idea-media-input').click()">Upload media</button></div><div class="idea-media-preview" id="idea-media-preview"></div></div></div>
       <div id="match-step-1" class="matchmaker-step"><label style="font-size:12px;color:#bfb399">What problem does your idea solve?</label><textarea class="input-field" id="match-problem" rows="3" placeholder="e.g. Students need affordable help outside class."></textarea></div>
       <div id="match-step-2" class="matchmaker-step"><label style="font-size:12px;color:#bfb399">What industry or category does it fall under?</label><select class="input-field" id="match-industry"><option>Tech</option><option>Health</option><option>Education</option><option>Finance</option><option>Social</option><option>Other</option></select></div>
       <div id="match-step-3" class="matchmaker-step"><label style="font-size:12px;color:#bfb399">What stage is the idea at?</label><select class="input-field" id="match-stage"><option>Just an idea</option><option>Have a plan</option><option>Already started</option></select></div>
@@ -943,6 +1002,52 @@ body.app-active #page-landing footer{display:none}
     </div>
     <!-- Snap-scroll feed: fills rest of height -->
     <div id="explore-list" class="explore-video-feed"></div>
+  </div>
+</div>
+
+<div id="share-modal-overlay" class="modal-overlay">
+  <div class="modal-box" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div>
+        <div style="font-size:11px;color:#E6CE8B;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Share</div>
+        <div style="font-size:18px;font-weight:800;color:#fff;margin-top:4px">Send this idea</div>
+      </div>
+      <button class="comment-close" type="button" aria-label="Close share" onclick="closeShareModal()">×</button>
+    </div>
+    <div id="share-preview" class="share-preview"></div>
+    <div style="font-size:12px;color:#bfb399;font-weight:700">Send directly to someone</div>
+    <div id="share-people-list" class="share-people-list"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-primary" style="font-size:12px" onclick="copyShareText()">Copy text</button>
+      <button class="btn-ghost" style="font-size:12px" onclick="closeShareModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div id="user-profile-modal" class="modal-overlay">
+  <div class="modal-box" style="max-width:440px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="font-size:11px;color:#E6CE8B;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Profile</div>
+      <button class="comment-close" type="button" aria-label="Close profile" onclick="closeUserProfile()">×</button>
+    </div>
+    <div id="user-profile-content"></div>
+  </div>
+</div>
+
+<div id="explore-comment-modal" class="comment-modal-overlay" aria-modal="true" role="dialog">
+  <div class="comment-modal">
+    <div class="comment-header">
+      <div>
+        <h3>Comments</h3>
+        <div id="comment-video-title" class="comment-video-title">Video comments</div>
+      </div>
+      <button class="comment-close" type="button" aria-label="Close comments" onclick="closeExploreComments()">×</button>
+    </div>
+    <div id="explore-comment-list" class="comment-list"></div>
+    <form id="explore-comment-form" class="comment-form" onsubmit="submitExploreComment(event)">
+      <input id="explore-comment-input" class="comment-input" type="text" maxlength="220" placeholder="Add a comment..." />
+      <button class="comment-submit" type="submit">Post</button>
+    </form>
   </div>
 </div>
 
@@ -1411,6 +1516,7 @@ function handleHashRoute(){
   const route=(window.location.hash||'#landing').replace('#','');
   if(route==='login'||route==='signup'){openAuthModal(route,true);if(!currentUser)showPage('landing',{skipHash:true});return;}
   if(route.startsWith('arcade-')){
+
     if(!currentUser){showPage('landing',{skipHash:true});openAuthModal('login',true);return;}
     const game=route.replace('arcade-','');
     showPage('arcade',{skipHash:true});
@@ -2085,7 +2191,7 @@ async function endGroupCall(){if(gcallGroupId&&currentUser)await db.del(`groupca
 
 <script>
 // ------ Ideas / Library / Explore / Profile / Settings ------------------------------------------------------------------------
-let libTab='saved',exploreCategory='all',activeIdeaModal=null;
+let libTab='saved',exploreCategory='all',activeIdeaModal=null,selectedProfileUser=null,activeShareIdea=null;
 const CAT_LABEL={
   business:'Business',app:'App',startup:'Startup',ai:'AI',content:'Content',
   finance:'Finance',health:'Health',school:'Education',creative:'Creative',social:'Social',weird:'Weird'
@@ -2118,14 +2224,14 @@ const EXPLORE_MEDIA = {
   default: {videoUrl:'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4', poster:'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80'}
 };
 const EXPLORE_MOCK=[
-  {id:'ex1',title:'AI Pitch Deck Coach',category:'startup',author:'nova',handle:'@nova',likes:42,comments:18,shares:7,views:942,description:'Upload your deck, get instant storytelling + market-fit feedback with scorecards.',videoUrl:EXPLORE_MEDIA.startup.videoUrl,poster:EXPLORE_MEDIA.startup.poster},
-  {id:'ex2',title:'FitQuest PvP',category:'health',author:'pixel',handle:'@pixel',likes:36,comments:11,shares:5,views:721,description:'Fitness streak battles where friends can challenge each other weekly.',videoUrl:EXPLORE_MEDIA.health.videoUrl,poster:EXPLORE_MEDIA.health.poster},
-  {id:'ex3',title:'ClipForge',category:'content',author:'jamie',handle:'@jamie',likes:51,comments:21,shares:12,views:1180,description:'Turn one long video into platform-ready short clips with hooks and captions.',videoUrl:EXPLORE_MEDIA.content.videoUrl,poster:EXPLORE_MEDIA.content.poster},
-  {id:'ex4',title:'Budget Buddy for Students',category:'finance',author:'amira',handle:'@amira',likes:29,comments:9,shares:4,views:540,description:'Track spending and get weekly saving missions for student life.',videoUrl:EXPLORE_MEDIA.finance.videoUrl,poster:EXPLORE_MEDIA.finance.poster},
-  {id:'ex5',title:'Dungeon Study',category:'app',author:'milo',handle:'@milo',likes:25,comments:8,shares:3,views:412,description:'Gamified study planner where tasks become quests and bosses.',videoUrl:EXPLORE_MEDIA.app.videoUrl,poster:EXPLORE_MEDIA.app.poster},
-  {id:'ex6',title:'Roast My Startup',category:'weird',author:'bytecat',handle:'@bytecat',likes:47,comments:20,shares:9,views:876,description:'A playful simulator where AI investors roast your startup idea before users do.',videoUrl:EXPLORE_MEDIA.weird.videoUrl,poster:EXPLORE_MEDIA.weird.poster},
-  {id:'ex7',title:'Clinic Queue Radar',category:'health',author:'sana',handle:'@sana',likes:33,comments:16,shares:6,views:698,description:'Community-based wait-time intel to help users pick faster clinics.',videoUrl:EXPLORE_MEDIA.health.videoUrl,poster:EXPLORE_MEDIA.health.poster},
-  {id:'ex8',title:'AI Product Names Lab',category:'ai',author:'zeph',handle:'@zeph',likes:40,comments:17,shares:8,views:853,description:'Generate product names, slogans, and domains scored by memorability.',videoUrl:EXPLORE_MEDIA.ai.videoUrl,poster:EXPLORE_MEDIA.ai.poster}
+  {id:'ex1',title:'AI Pitch Deck Coach',category:'startup',author:'nova',handle:'@nova',likes:0,comments:0,shares:0,views:942,description:'Upload your deck, get instant storytelling + market-fit feedback with scorecards.',videoUrl:EXPLORE_MEDIA.startup.videoUrl,poster:EXPLORE_MEDIA.startup.poster},
+  {id:'ex2',title:'FitQuest PvP',category:'health',author:'pixel',handle:'@pixel',likes:0,comments:0,shares:0,views:721,description:'Fitness streak battles where friends can challenge each other weekly.',videoUrl:EXPLORE_MEDIA.health.videoUrl,poster:EXPLORE_MEDIA.health.poster},
+  {id:'ex3',title:'ClipForge',category:'content',author:'jamie',handle:'@jamie',likes:0,comments:0,shares:0,views:1180,description:'Turn one long video into platform-ready short clips with hooks and captions.',videoUrl:EXPLORE_MEDIA.content.videoUrl,poster:EXPLORE_MEDIA.content.poster},
+  {id:'ex4',title:'Budget Buddy for Students',category:'finance',author:'amira',handle:'@amira',likes:0,comments:0,shares:0,views:540,description:'Track spending and get weekly saving missions for student life.',videoUrl:EXPLORE_MEDIA.finance.videoUrl,poster:EXPLORE_MEDIA.finance.poster},
+  {id:'ex5',title:'Dungeon Study',category:'app',author:'milo',handle:'@milo',likes:0,comments:0,shares:0,views:412,description:'Gamified study planner where tasks become quests and bosses.',videoUrl:EXPLORE_MEDIA.app.videoUrl,poster:EXPLORE_MEDIA.app.poster},
+  {id:'ex6',title:'Roast My Startup',category:'weird',author:'bytecat',handle:'@bytecat',likes:0,comments:0,shares:0,views:876,description:'A playful simulator where AI investors roast your startup idea before users do.',videoUrl:EXPLORE_MEDIA.weird.videoUrl,poster:EXPLORE_MEDIA.weird.poster},
+  {id:'ex7',title:'Clinic Queue Radar',category:'health',author:'sana',handle:'@sana',likes:0,comments:0,shares:0,views:698,description:'Community-based wait-time intel to help users pick faster clinics.',videoUrl:EXPLORE_MEDIA.health.videoUrl,poster:EXPLORE_MEDIA.health.poster},
+  {id:'ex8',title:'AI Product Names Lab',category:'ai',author:'zeph',handle:'@zeph',likes:0,comments:0,shares:0,views:853,description:'Generate product names, slogans, and domains scored by memorability.',videoUrl:EXPLORE_MEDIA.ai.videoUrl,poster:EXPLORE_MEDIA.ai.poster}
 ];
 function buildExploreIdeaPost(idea,index=0){
   const category=(idea.category||idea.industry||'startup').toLowerCase();
@@ -2133,9 +2239,9 @@ function buildExploreIdeaPost(idea,index=0){
   const title=String(idea.title||idea.problem||'Community idea').trim() || 'Community idea';
   const description=String(idea.description||idea.problem||'New concept shared by a Zidea user.').trim() || 'New concept shared by a Zidea user.';
   const author=String(idea.username||idea.author||`creator${index+1}`).trim() || `creator${index+1}`;
-  const baseLikes=Number(idea.likes)||12+index*7;
-  const baseComments=Number(idea.comments)||5+index*3;
-  const baseShares=Number(idea.shares)||2+index*2;
+  const baseLikes=Number(idea.likes)||0;
+  const baseComments=Number(idea.comments)||0;
+  const baseShares=Number(idea.shares)||0;
   const baseViews=Number(idea.views)||320+index*150;
   return {
     id: idea.id || `community_${author}_${index}_${Date.now()}`,
@@ -2165,7 +2271,9 @@ function setStarredIdeas(v){save(ideaStoreKey('starred_ideas'),v);}
 function setIdeaHistory(v){save(ideaStoreKey('idea_history'),v);}
 function setCreatedIdeaStore(v){save(ideaStoreKey('created_ideas'),v);}
 const MATCH_STORE_KEY='zidea_idea_matchmaker_submissions';
+const MAX_IDEA_MEDIA_BYTES = 200 * 1024 * 1024;
 let matchStep=0;
+let ideaMediaFiles=[];
 const matchFields=[['match-name','match-email','match-title','match-description'],['match-problem'],['match-industry'],['match-stage'],['match-skills'],['match-collaborator'],['match-commitment'],['match-audience']];
 const MATCH_SEEDS=[
   {id:'seed-001',createdAt:'2026-04-20T09:00:00.000Z',name:'Maya Chen',email:'maya@example.com',title:'SkillSwap Campus',description:'A peer learning platform where students trade short tutoring sessions and project help.',problem:'Students need affordable academic support and practical project collaborators.',industry:'Education',stage:'Have a plan',skills:'product design, community building, education research',collaborator:'Technical',commitment:'5-10hrs',audience:'university students, tutors, student clubs'},
@@ -2239,6 +2347,58 @@ function validateMatchStep(){
   setMatchError('');
   return true;
 }
+function attachIdeaMediaHandlers(){
+  const dropzone=document.getElementById('idea-media-dropzone');
+  const input=document.getElementById('idea-media-input');
+  if(!dropzone||!input)return;
+  ['dragenter','dragover'].forEach(eventName=>{
+    dropzone.addEventListener(eventName,(event)=>{event.preventDefault();event.stopPropagation();dropzone.classList.add('dragover');});
+  });
+  ['dragleave','dragend','drop'].forEach(eventName=>{
+    dropzone.addEventListener(eventName,(event)=>{event.preventDefault();event.stopPropagation();dropzone.classList.remove('dragover');});
+  });
+  dropzone.addEventListener('drop',(event)=>{
+    const files=event.dataTransfer && event.dataTransfer.files ? event.dataTransfer.files : null;
+    if(files && files.length){handleIdeaMediaFiles(files);}
+  });
+  input.addEventListener('change',(event)=>{
+    if(event.target.files && event.target.files.length){handleIdeaMediaFiles(event.target.files);} 
+    event.target.value='';
+  });
+}
+function handleIdeaMediaFiles(fileList){
+  const files=Array.from(fileList||[]).filter(file=>file && (file.type.startsWith('image/') || file.type.startsWith('video/')));
+  if(!files.length)return;
+  files.forEach(file=>{
+    if(file.size > MAX_IDEA_MEDIA_BYTES){
+      showToast(`"${file.name}" is too large. Videos and images must be 200MB or less.`);
+      return;
+    }
+    const objectUrl=URL.createObjectURL(file);
+    ideaMediaFiles.push({
+      id:`idea_media_${Date.now()}_${Math.random().toString(16).slice(2)}`,
+      name:file.name,
+      type:file.type.startsWith('video/')?'video':'image',
+      size:file.size,
+      previewUrl:objectUrl
+    });
+    renderIdeaMediaPreview();
+  });
+}
+function renderIdeaMediaPreview(){
+  const preview=document.getElementById('idea-media-preview');
+  if(!preview)return;
+  if(!ideaMediaFiles.length){preview.innerHTML='';return;}
+  preview.innerHTML=ideaMediaFiles.map(item=>`<div class="idea-media-item"><button class="idea-media-remove" type="button" onclick="removeIdeaMedia('${item.id}')">×</button>${item.type==='image'?`<img src="${item.previewUrl}" alt="${esc(item.name)}" />`:`<video src="${item.previewUrl}" muted playsinline></video>`}</div>`).join('');
+}
+function removeIdeaMedia(id){
+  const item=ideaMediaFiles.find(entry=>entry.id===id);
+  if(item && item.previewUrl){try{URL.revokeObjectURL(item.previewUrl);}catch(_){} }
+  ideaMediaFiles=ideaMediaFiles.filter(entry=>entry.id!==id);
+  renderIdeaMediaPreview();
+}
+function clearIdeaMedia(){ideaMediaFiles=[];renderIdeaMediaPreview();}
+if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded', attachIdeaMediaHandlers);}else{attachIdeaMediaHandlers();}
 function matchNextStep(){
   if(!validateMatchStep())return;
   if(matchStep<matchFields.length-1){matchStep++;updateMatchStep();return;}
@@ -2246,7 +2406,7 @@ function matchNextStep(){
 }
 function collectMatchIdea(){
   const val=id=>String(document.getElementById(id)?.value||'').trim();
-  return {id:`match_${Date.now()}`,createdAt:new Date().toISOString(),username:currentUser?.username||'',name:val('match-name')||currentUser?.username||'',email:val('match-email')||currentUser?.email||'',title:val('match-title'),description:val('match-description'),problem:val('match-problem'),industry:val('match-industry'),stage:val('match-stage'),skills:val('match-skills'),collaborator:val('match-collaborator'),commitment:val('match-commitment'),audience:val('match-audience')};
+  return {id:`match_${Date.now()}`,createdAt:new Date().toISOString(),username:currentUser?.username||'',name:val('match-name')||currentUser?.username||'',email:val('match-email')||currentUser?.email||'',title:val('match-title'),description:val('match-description'),media:ideaMediaFiles.map(item=>({...item})),problem:val('match-problem'),industry:val('match-industry'),stage:val('match-stage'),skills:val('match-skills'),collaborator:val('match-collaborator'),commitment:val('match-commitment'),audience:val('match-audience')};
 }
 function submitMatchIdea(){
   if(!currentUser){showToast('Sign in to submit and match with real Zidea users.');return;}
@@ -2258,10 +2418,12 @@ function submitMatchIdea(){
   db.write(`matchIdeas/${idea.username}`,idea).catch(()=>{});
   renderMatchResults(idea,scoreMatchIdeas(idea,ideas).slice(0,3));
   showToast('Idea submitted. Matches ready.');
+  clearIdeaMedia();
 }
 function resetMatchmaker(){
   matchFields.flat().forEach(id=>{const el=document.getElementById(id);if(el&&el.tagName!=='SELECT')el.value='';});
   matchStep=0;updateMatchStep();
+  clearIdeaMedia();
   const out=document.getElementById('match-output');if(out)out.innerHTML='';
 }
 function scoreMatchIdeas(current,ideas){
@@ -2384,7 +2546,8 @@ function getCreatedIdeas(){
   return Object.values(byId).sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
 }
 function createdIdeaCardHTML(idea){
-  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#bfb399;margin-top:4px">${esc(new Date(idea.createdAt).toLocaleString())}</div></div><span class="idea-tag">${esc(idea.industry||'Idea')}</span></div><p class="idea-card-body">${esc(idea.description||'')}</p><div class="idea-card-tags"><span class="idea-tag">${esc(idea.stage||'Stage')}</span><span class="idea-tag">Looking for ${esc(idea.collaborator||'Any')}</span><span class="idea-tag">${esc(idea.commitment||'Time')}</span></div><div class="idea-card-body"><strong style="color:#d1d5db">Problem:</strong> ${esc(idea.problem||'')}</div><div class="idea-card-body"><strong style="color:#d1d5db">Audience:</strong> ${esc(idea.audience||'')}</div></div>`;
+  const media=(idea.media||[]).slice(0,2);
+  return `<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff">${esc(idea.title)}</div><div style="font-size:12px;color:#bfb399;margin-top:4px">${esc(new Date(idea.createdAt).toLocaleString())}</div></div><span class="idea-tag">${esc(idea.industry||'Idea')}</span></div><p class="idea-card-body">${esc(idea.description||'')}</p>${media.length?`<div class="idea-media-preview" style="margin-top:10px">${media.map(item=>item.type==='image'?`<div class="idea-media-item" style="width:88px;height:88px"><img src="${item.previewUrl || item.dataUrl}" alt="${esc(item.name)}" /></div>`:`<div class="idea-media-item" style="width:88px;height:88px"><video src="${item.previewUrl || item.dataUrl}" muted playsinline></video></div>`).join('')}</div>`:''}<div class="idea-card-tags"><span class="idea-tag">${esc(idea.stage||'Stage')}</span><span class="idea-tag">Looking for ${esc(idea.collaborator||'Any')}</span><span class="idea-tag">${esc(idea.commitment||'Time')}</span></div><div class="idea-card-body"><strong style="color:#d1d5db">Problem:</strong> ${esc(idea.problem||'')}</div><div class="idea-card-body"><strong style="color:#d1d5db">Audience:</strong> ${esc(idea.audience||'')}</div></div>`;
 }
 function switchLibTab(tab){libTab=tab;['created','saved','starred'].forEach(t=>{const b=document.getElementById('lib-tab-'+t);if(b)b.classList.toggle('active',t===tab);});renderLibrary();}
 function emptyStateHTML(icon,title,copy,cta,action){
@@ -2570,21 +2733,196 @@ function reelFollow(button,username){
   button.style.color = isFollowing ? '#fff' : '#E6CE8B';
   showToast(isFollowing ? 'Follow request cleared for @'+username : 'You are following @'+username);
 }
-function reelLike(button,count){
-  const isLiked = button.classList.toggle('liked');
+function getExploreCommentsMap(){
+  const saved = load('zidea_explore_comments') || {};
+  return saved && typeof saved === 'object' ? saved : {};
+}
+function saveExploreCommentsMap(map){
+  save('zidea_explore_comments', map || {});
+}
+function getExploreCommentsForVideo(videoId){
+  const map = getExploreCommentsMap();
+  const items = Array.isArray(map[videoId]) ? map[videoId] : [];
+  return items.filter(item => item && typeof item.text === 'string' && item.username).slice(-50);
+}
+function updateExploreCommentCount(videoId, comments){
+  const map = getExploreCommentsMap();
+  if(Array.isArray(map[videoId])){
+    return map[videoId].length;
+  }
+  return Number(comments || 0);
+}
+function renderExploreCommentsPanel(videoId){
+  const panel = document.getElementById('explore-comment-list');
+  const title = document.getElementById('comment-video-title');
+  const item = getExploreVideos().find(post => String(post.id) === String(videoId));
+  if(title) title.textContent = item ? item.title : 'Video comments';
+  if(!panel) return;
+  const comments = getExploreCommentsForVideo(videoId);
+  if(!comments.length){
+    panel.innerHTML = '<div class="comment-empty">No comments yet. Be the first to say something.</div>';
+    return;
+  }
+  panel.innerHTML = comments.map(comment => `
+    <div class="comment-item">
+      <div class="comment-avatar">${esc(String(comment.username||'U').slice(0,2).toUpperCase())}</div>
+      <div class="comment-body">
+        <div class="comment-user">@${esc(String(comment.username||'unknown'))}</div>
+        <div class="comment-text">${esc(String(comment.text||''))}</div>
+      </div>
+    </div>
+  `).join('');
+}
+let activeExploreCommentVideoId = null;
+function openExploreComments(videoId){
+  activeExploreCommentVideoId = videoId;
+  const modal = document.getElementById('explore-comment-modal');
+  if(!modal) return;
+  renderExploreCommentsPanel(videoId);
+  modal.classList.add('show');
+  const input = document.getElementById('explore-comment-input');
+  setTimeout(() => { if(input) input.focus(); }, 20);
+}
+function closeExploreComments(){
+  const modal = document.getElementById('explore-comment-modal');
+  if(modal) modal.classList.remove('show');
+  activeExploreCommentVideoId = null;
+  const input = document.getElementById('explore-comment-input');
+  if(input) input.value = '';
+}
+function submitExploreComment(event){
+  event.preventDefault();
+  const text = document.getElementById('explore-comment-input')?.value?.trim() || '';
+  if(!activeExploreCommentVideoId || !text){
+    if(!text) showToast('Write a comment before posting.');
+    return;
+  }
+  const username = currentUser?.username || 'guest';
+  const map = getExploreCommentsMap();
+  const list = Array.isArray(map[activeExploreCommentVideoId]) ? map[activeExploreCommentVideoId] : [];
+  list.push({ username, text, createdAt: Date.now() });
+  map[activeExploreCommentVideoId] = list.slice(-50);
+  saveExploreCommentsMap(map);
+  renderExploreCommentsPanel(activeExploreCommentVideoId);
+  renderExplore();
+  document.getElementById('explore-comment-input').value = '';
+  showToast(`Comment posted by @${username}.`);
+}
+function getExploreLikeMap(){
+  const saved = load('zidea_explore_likes') || {};
+  return saved && typeof saved === 'object' ? saved : {};
+}
+function saveExploreLikeMap(map){
+  save('zidea_explore_likes', map || {});
+}
+function getExploreLikeCount(videoId){
+  const map = getExploreLikeMap();
+  const likes = map[videoId] && typeof map[videoId] === 'object' ? map[videoId] : {};
+  return Object.keys(likes).length;
+}
+function getExploreShareCount(videoId){
+  const map = load('zidea_explore_shares') || {};
+  const shares = map[videoId] && Array.isArray(map[videoId]) ? map[videoId] : [];
+  return shares.length;
+}
+function saveExploreShareCount(videoId, shares){
+  const map = load('zidea_explore_shares') || {};
+  map[videoId] = Array.isArray(shares) ? shares.slice(-200) : [];
+  save('zidea_explore_shares', map);
+}
+function reelLike(button,count,videoId){
+  if(!currentUser){showToast('Please sign in to like this idea.');return;}
+  const card = button.closest('.explore-video-card');
+  const id = videoId || (card && card.dataset && card.dataset.id) || '';
+  if(!id){return;}
+  const map = getExploreLikeMap();
+  const likes = map[id] && typeof map[id] === 'object' ? map[id] : {};
+  const alreadyLiked = !!likes[currentUser.username];
+  if(alreadyLiked){delete likes[currentUser.username];}
+  else {likes[currentUser.username]=true;}
+  map[id]=likes;
+  saveExploreLikeMap(map);
+  const nextCount = Object.keys(likes).length;
   const valueEl = button.querySelector('span');
-  const current = Number(count||0);
-  const next = isLiked ? current + 1 : Math.max(0, current - 1);
-  if(valueEl) valueEl.textContent = next.toLocaleString();
-  button.setAttribute('data-liked', isLiked ? 'true' : 'false');
+  button.classList.toggle('liked', !alreadyLiked);
+  button.setAttribute('data-liked', (!alreadyLiked) ? 'true' : 'false');
+  if(valueEl) valueEl.textContent = nextCount.toLocaleString();
+  showToast(alreadyLiked ? 'Like removed.' : 'You liked this idea.');
 }
 function reelComment(id){
-  showToast('Comments are enabled for this video.');
+  openExploreComments(id);
 }
-function reelShare(title){
-  const text = title ? `Check this idea: ${title}` : 'Check out this Zidea idea.';
+function openShareModal(id,ctx){
+  const idea = getIdeaFromContext(id,ctx); if(!idea) return;
+  activeShareIdea = { id, ctx };
+  const preview = document.getElementById('share-preview');
+  const list = document.getElementById('share-people-list');
+  if(preview){
+    const shareText = `${idea.title}\n${idea.description || ''}\nVideo: ${idea.videoUrl || 'Zidea idea'}\nBy @${idea.author || 'creator'}`;
+    preview.innerHTML = `${esc(idea.title)}<br><span style="color:#bfb399;display:block;margin-top:8px">${esc(idea.description || '')}</span><div style="margin-top:10px;color:#E6CE8B;font-size:11px;word-break:break-word">${esc(shareText)}</div>`;
+    preview.setAttribute('data-share-text', shareText);
+  }
+  const users = getAllUsers().filter(u => u.username !== currentUser?.username);
+  if(list){
+    list.innerHTML = (users.length ? users : [{username:'nova'},{username:'pixel'}]).map(u => `
+      <button type="button" class="share-person" onclick="shareIdeaToUser('${esc(u.username)}')">
+        <span class="meta"><span class="avatar">${esc(String(u.username||'U').slice(0,2).toUpperCase())}</span><span>@${esc(u.username)}</span></span>
+        <span style="color:#E6CE8B;font-size:11px">Send</span>
+      </button>
+    `).join('');
+  }
+  const overlay = document.getElementById('share-modal-overlay');
+  if(overlay) overlay.classList.add('show');
+}
+function closeShareModal(){
+  const overlay = document.getElementById('share-modal-overlay');
+  if(overlay) overlay.classList.remove('show');
+  activeShareIdea = null;
+}
+function bumpShareCount(videoId){
+  const map = load('zidea_explore_shares') || {};
+  const list = Array.isArray(map[videoId]) ? map[videoId] : [];
+  list.push({ by: currentUser?.username || 'guest', ts: Date.now() });
+  map[videoId] = list.slice(-200);
+  save('zidea_explore_shares', map);
+}
+function copyShareText(){
+  const idea = activeShareIdea ? getIdeaFromContext(activeShareIdea.id, activeShareIdea.ctx) : null;
+  const text = idea ? `${idea.title}\n${idea.description || ''}\nVideo: ${idea.videoUrl || 'Zidea idea'}\nBy @${idea.author || 'creator'}` : '';
+  if(!text){showToast('Nothing to copy.');return;}
+  bumpShareCount(activeShareIdea?.id || '');
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(()=>showToast('Idea link copied to clipboard.')).catch(()=>showToast(text));
+    navigator.clipboard.writeText(text).then(()=>showToast('Shared text copied to clipboard.')).catch(()=>showToast(text));
+  } else {
+    showToast(text);
+  }
+  renderExplore();
+}
+function shareIdeaToUser(username){
+  if(!activeShareIdea || !username){return;}
+  const idea = getIdeaFromContext(activeShareIdea.id, activeShareIdea.ctx); if(!idea) return;
+  const shareText = `${idea.title}\n${idea.description || ''}\nVideo: ${idea.videoUrl || 'Zidea idea'}\nBy @${idea.author || 'creator'}`;
+  bumpShareCount(activeShareIdea.id);
+  const key = [currentUser.username, username].sort().join('__');
+  const payload = {from: currentUser.username, text: shareText, ts: Date.now(), read: false};
+  const existing = chatCache[username] || [];
+  chatCache[username] = [...existing, payload].slice(-200);
+  save('chat_' + key, chatCache[username]);
+  if(currentUser){
+    db.patch('chats/' + key + '/messages', {[payload.ts]:payload}).catch(()=>{});
+  }
+  closeShareModal();
+  showToast(`Shared with @${username}.`);
+  renderExplore();
+  openChat(username);
+}
+function reelShare(title, id, ctx){
+  if(id && ctx){openShareModal(id, ctx); return;}
+  const text = title ? `Check this idea: ${title}` : 'Check out this Zidea idea.';
+  if(navigator.share){
+    navigator.share({title: title || 'Zidea idea', text, url: window.location.href}).then(()=>showToast('Idea shared.')).catch(()=>{});
+  } else if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>showToast('Shared text copied to clipboard.')).catch(()=>showToast(text));
   } else {
     showToast(text);
   }
@@ -2607,9 +2945,9 @@ function renderExplore(){
   }
   el.innerHTML=ideas.map((i,idx)=>{
     const initials=esc((i.author||'U').slice(0,2).toUpperCase());
-    const likes=Number(i.likes||0);
-    const comments=Number(i.comments||0);
-    const shares=Number(i.shares||0);
+    const likes = getExploreLikeCount(i.id) || Number(i.likes||0);
+    const comments = getExploreCommentsForVideo(i.id).length || Number(i.comments||0);
+    const shares = getExploreShareCount(i.id) || Number(i.shares||0);
     const cat=esc(CAT_LABEL[i.category]||i.category||'Idea');
     return`<article class="explore-video-card" data-id="${esc(i.id)}" data-idx="${idx}">
       <video class="reel-video" autoplay muted loop playsinline preload="metadata" poster="${esc(i.poster||'')}">
@@ -2629,16 +2967,16 @@ function renderExplore(){
         <div class="reel-caption">${esc(i.description||'')}</div>
       </div>
       <div class="reel-actions">
-        <button class="reel-btn" aria-label="Like" onclick="reelLike(this,${likes})" data-liked="false">
+        <button class="reel-btn${currentUser && getExploreLikeMap()[i.id] && getExploreLikeMap()[i.id][currentUser.username] ? ' liked' : ''}" aria-label="Like" onclick="reelLike(this, ${likes}, '${esc(i.id)}')" data-liked="${currentUser && getExploreLikeMap()[i.id] && getExploreLikeMap()[i.id][currentUser.username] ? 'true' : 'false'}">
           ❤️<span>${likes.toLocaleString()}</span>
         </button>
         <button class="reel-btn" aria-label="Comment" onclick="reelComment('${esc(i.id)}')">
           💬<span>${comments.toLocaleString()}</span>
         </button>
-        <button class="reel-btn" aria-label="Share" onclick="reelShare('${esc(i.title||'')}')">
+        <button class="reel-btn" aria-label="Share" onclick="reelShare('${esc(i.title||'')}', '${esc(i.id)}', 'explore')">
           📤<span>${shares.toLocaleString()}</span>
         </button>
-        <button class="reel-btn" aria-label="Build this idea" onclick="showPage('ideas')" title="Build this idea">
+        <button class="reel-btn" aria-label="Build this idea" onclick="openUserProfile('${esc(i.author || 'nova')}'); showPage('dashboard');" title="Build this idea">
           💡<span>Build</span>
         </button>
       </div>
@@ -2654,6 +2992,9 @@ function renderExplore(){
     });
   },{threshold:0.6});
   el.querySelectorAll('.explore-video-card').forEach(card=>observer.observe(card));
+  if(activeExploreCommentVideoId){
+    renderExploreCommentsPanel(activeExploreCommentVideoId);
+  }
 }
 function callIdeaAuthor(username){
   if(!currentUser){showPage('login');return;}
@@ -2783,20 +3124,54 @@ if(window.location.hash)handleHashRoute();else showPage('explore');
 
 <script>
 // ------ ZiD AI ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const ZIDAI_KEY='AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
-const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise and warm.';
-let zidHistory=[];
-function zidAiMsg(role,text){const el=document.getElementById('zidai-messages');const init=currentUser?.username.slice(0,1).toUpperCase()||'U';const isAi=role==='ai';const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');const div=document.createElement('div');div.className='zidai-msg '+role;div.innerHTML=`<div class="zidai-msg-avatar">${isAi?'🤖':init}</div><div class="zidai-bubble">${fmt}</div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
-function zidAiTyping(){const el=document.getElementById('zidai-messages');const div=document.createElement('div');div.className='zidai-msg ai';div.id='zidai-typing';div.innerHTML=`<div class="zidai-msg-avatar">🤖</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
-async function sendZidAi(){
-  const input=document.getElementById('zidai-input');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';document.getElementById('zidai-send').disabled=true;
-  zidAiMsg('user',text);zidHistory.push({role:'user',parts:[{text}]});zidAiTyping();
-  try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:ZIDAI_SYS}]},contents:zidHistory,generationConfig:{temperature:0.8,maxOutputTokens:1024}})});const data=await res.json();const t=document.getElementById('zidai-typing');if(t)t.remove();if(data.error){zidAiMsg('ai','⚠️ '+data.error.message);}else{const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';zidHistory.push({role:'model',parts:[{text:reply}]});zidAiMsg('ai',reply);}}catch(err){const t=document.getElementById('zidai-typing');if(t)t.remove();zidAiMsg('ai','⚠️ Could not reach AI.');}
-  document.getElementById('zidai-send').disabled=false;
+const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise, warm, and grounded in Zidea website facts. If a website question matches the local knowledge base, answer from that source first.';
+const ZIDAI_STORAGE_KEY='zidea-zidai-chats-v1';
+let zidChats=[];
+let zidActiveChatId=null;
+let zidLoading=false;
+function escapeHtml(value){return String(value ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');}
+function createZidAiMessage(role,text){return {id:'msg-'+Date.now()+'-'+Math.random().toString(16).slice(2),role,text:String(text||'')};}
+function getActiveZidAiChat(){return zidChats.find(chat=>chat.id===zidActiveChatId) || zidChats[0] || null;}
+function deriveZidAiChatName(text){const clean=(text||'').replace(/\s+/g,' ').trim();if(!clean)return 'New chat';return clean.length>30?clean.slice(0,30)+'…':clean;}
+function syncZidAiChatName(chat){if(!chat)return;const firstUser=chat.messages.find(message=>message.role==='user');if(firstUser){chat.name=deriveZidAiChatName(firstUser.text);} else if(!chat.name||chat.name==='New chat'){chat.name='New chat';}}
+function buildZidAiHistory(messages){return messages.filter(message=>message.role==='user'||message.role==='model').map(message=>({role:message.role==='user'?'user':'model',parts:[{text:message.text}]}));}
+function saveZidAiChats(){try{localStorage.setItem(ZIDAI_STORAGE_KEY, JSON.stringify(zidChats));}catch(err){}}
+function loadZidAiChats(){try{const raw=localStorage.getItem(ZIDAI_STORAGE_KEY);return raw?JSON.parse(raw):[];}catch(err){return [];}}
+function newZidAiChat(){const id='chat-'+Date.now()+'-'+Math.random().toString(16).slice(2);const chat={id,name:'New chat',messages:[createZidAiMessage('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.")]};zidChats.unshift(chat);zidActiveChatId=id;renderZidAiList();renderZidAiMessages();saveZidAiChats();toggleZidAiSidebar(false);}
+function selectZidAiChat(chatId){zidActiveChatId=chatId;renderZidAiList();renderZidAiMessages();toggleZidAiSidebar(false);}
+function toggleZidAiSidebar(force){const shell=document.getElementById('zidai-shell');if(!shell)return;const shouldOpen=typeof force==='boolean'?force:!shell.classList.contains('zidai-sidebar-open');shell.classList.toggle('zidai-sidebar-open',shouldOpen);}
+function renderZidAiList(){const list=document.getElementById('zidai-chat-items');if(!list)return;list.innerHTML=(zidChats.length?zidChats:[{id:'empty',name:'New chat',messages:[]}]).map(chat=>`<button class="zidai-chat-item ${chat.id===zidActiveChatId?'active':''}" data-chat-id="${chat.id}" onclick="selectZidAiChat('${chat.id}')"><div class="zidai-chat-item-title">${escapeHtml(chat.name||'New chat')}</div><div class="zidai-chat-item-meta">${(chat.messages||[]).filter(message=>message.role==='user').length} messages</div></button>`).join('');}
+function renderZidAiMessages(){const el=document.getElementById('zidai-messages');const chat=getActiveZidAiChat();if(!el||!chat)return;const init=currentUser?.username?.slice(0,1).toUpperCase()||'U';const messages=chat.messages.map(message=>{const isUser=message.role==='user';const safeText=escapeHtml(message.text||'');const body=safeText.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');return `<div class="zidai-msg ${isUser?'user':'ai'}" data-message-id="${message.id}"><div class="zidai-msg-avatar">${isUser?init:'🤖'}</div><div class="zidai-bubble-wrap"><div class="zidai-bubble">${body}</div>${isUser?`<div class="zidai-message-tools"><button class="zidai-edit-btn" data-edit-id="${message.id}" onclick="editZidAiMessage('${message.id}')">Edit</button></div>`:''}</div></div>`;}).join('');const typingMarkup=zidLoading?`<div class="zidai-msg ai" id="zidai-typing"><div class="zidai-msg-avatar">🤖</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div></div>`:'';el.innerHTML=messages+typingMarkup;el.scrollTop=el.scrollHeight;el.querySelectorAll('.zidai-msg.user .zidai-bubble').forEach(bubble=>{bubble.onpointerdown=function(){clearTimeout(this._zidaiLongPressTimer);this._zidaiLongPressTimer=setTimeout(()=>editZidAiMessage(bubble.closest('.zidai-msg').dataset.messageId),420);};bubble.onpointerup=bubble.onpointerleave=bubble.onpointercancel=function(){clearTimeout(this._zidaiLongPressTimer);};});}
+function editZidAiMessage(messageId){const chat=getActiveZidAiChat();const message=chat?.messages.find(item=>item.id===messageId);if(!message||message.role!=='user')return;const wrap=document.querySelector(`.zidai-msg[data-message-id="${messageId}"] .zidai-bubble-wrap`);if(!wrap)return;wrap.innerHTML=`<div class="zidai-edit-area"><textarea class="zidai-edit-input" rows="3">${escapeHtml(message.text)}</textarea><div class="zidai-edit-actions"><button class="zidai-edit-save" onclick="saveZidAiEdit('${messageId}')">Save</button><button class="zidai-edit-cancel" onclick="cancelZidAiEdit('${messageId}')">Cancel</button></div></div>`;}
+function saveZidAiEdit(messageId){const chat=getActiveZidAiChat();const message=chat?.messages.find(item=>item.id===messageId);if(!message)return;const input=document.querySelector('.zidai-edit-input');if(!input)return;const nextText=input.value.trim();if(!nextText){return;}message.text=nextText;syncZidAiChatName(chat);renderZidAiList();renderZidAiMessages();saveZidAiChats();}
+function cancelZidAiEdit(){renderZidAiMessages();}
+function zidAiTyping(){zidLoading=true;renderZidAiMessages();}
+async function sendZidAi(){const input=document.getElementById('zidai-input');const text=input.value.trim();if(!text)return;const sendButton=document.getElementById('zidai-send');sendButton.disabled=true;input.value='';input.style.height='auto';let chat=getActiveZidAiChat();if(!chat){const newChat={id:'chat-'+Date.now()+'-'+Math.random().toString(16).slice(2),name:'New chat',messages:[createZidAiMessage('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.")]};zidChats.unshift(newChat);zidActiveChatId=newChat.id;chat=newChat;}const userMessage=createZidAiMessage('user',text);chat.messages.push(userMessage);syncZidAiChatName(chat);renderZidAiList();renderZidAiMessages();saveZidAiChats();zidAiTyping();
+  try{
+    const history=buildZidAiHistory(chat.messages);
+    const faq = typeof window !== 'undefined' && window.getZideaFaqMatch ? window.getZideaFaqMatch(text, history) : null;
+    if (faq) {
+      const reply = faq.answer || 'I do not have a verified answer for that Zidea question yet.';
+      const aiMessage=createZidAiMessage('ai', reply);
+      chat.messages.push(aiMessage);
+      zidLoading=false;renderZidAiList();renderZidAiMessages();saveZidAiChats();sendButton.disabled=false;return;
+    }
+    const res=await fetch('/api/zid-ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,history,systemPrompt:ZIDAI_SYS})});
+    const data=await res.json();
+    if(!res.ok || !data || !data.answer){
+      chat.messages.push(createZidAiMessage('ai', data?.message || '⚠️ I could not reach the AI fallback right now.'));
+    } else {
+      chat.messages.push(createZidAiMessage('ai', data.answer));
+    }
+  } catch(err){
+    chat.messages.push(createZidAiMessage('ai','⚠️ I could not reach the AI fallback right now.'));
+  }
+  zidLoading=false;renderZidAiList();renderZidAiMessages();saveZidAiChats();sendButton.disabled=false;
 }
 function zidAiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendZidAi();}}
-function clearZidAi(){zidHistory=[];document.getElementById('zidai-messages').innerHTML='';initZidAi();}
-function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!");}
+function clearZidAi(){zidChats=[];zidActiveChatId=null;initZidAi();}
+function initZidAi(){zidChats=loadZidAiChats();if(!zidChats.length){const chat={id:'chat-'+Date.now()+'-'+Math.random().toString(16).slice(2),name:'New chat',messages:[createZidAiMessage('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.")]};zidChats=[chat];}zidActiveChatId=zidChats[0]?.id || null;renderZidAiList();renderZidAiMessages();saveZidAiChats();}
+initZidAi();
 // ------ Arcade ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const ARCADE_GAMES=[
   {id:'chess',icon:'??',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},

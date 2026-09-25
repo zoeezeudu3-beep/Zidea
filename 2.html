@@ -652,7 +652,7 @@ body.app-active #page-landing footer{display:none}
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="zidai-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..."></textarea><button class="zidai-send-btn" onclick="sendZidAi()">➤</button></div></div>
+  <div class="zidai-shell"><div class="zidai-header"><div><div class="page-title">🤖 ZiD AI</div><div class="page-subtitle">Ask questions and brainstorm faster</div></div></div><div class="zidai-messages" id="zidai-messages"></div><div class="zidai-input-bar"><textarea class="zidai-input" id="zidai-input" rows="1" placeholder="Ask ZiD AI..." onkeydown="zidAiKey(event)"></textarea><button class="zidai-send-btn" id="zidai-send" onclick="sendZidAi()">➤</button></div></div>
 </div>
 
 <!-- GENERATE IDEAS -->
@@ -2309,20 +2309,41 @@ if(window.location.hash)handleHashRoute();else showPage(currentUser?'dashboard':
 
 <script>
 // ------ ZiD AI ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const ZIDAI_KEY='AIzaSyBIfgJLPHBEOlWQHHk50PMl-lHkf6R_pRo';
-const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise and warm.';
+const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise, warm, and grounded in Zidea website facts. If a website question matches the local knowledge base, answer from that source first.';
 let zidHistory=[];
 function zidAiMsg(role,text){const el=document.getElementById('zidai-messages');const init=currentUser?.username.slice(0,1).toUpperCase()||'U';const isAi=role==='ai';const fmt=text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');const div=document.createElement('div');div.className='zidai-msg '+role;div.innerHTML=`<div class="zidai-msg-avatar">${isAi?'🤖':init}</div><div class="zidai-bubble">${fmt}</div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
 function zidAiTyping(){const el=document.getElementById('zidai-messages');const div=document.createElement('div');div.className='zidai-msg ai';div.id='zidai-typing';div.innerHTML=`<div class="zidai-msg-avatar">🤖</div><div class="zidai-bubble zidai-typing"><span class="zidai-dot"></span><span class="zidai-dot"></span><span class="zidai-dot"></span></div>`;el.appendChild(div);el.scrollTop=el.scrollHeight;}
 async function sendZidAi(){
   const input=document.getElementById('zidai-input');const text=input.value.trim();if(!text)return;input.value='';input.style.height='auto';document.getElementById('zidai-send').disabled=true;
   zidAiMsg('user',text);zidHistory.push({role:'user',parts:[{text}]});zidAiTyping();
-  try{const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${ZIDAI_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({system_instruction:{parts:[{text:ZIDAI_SYS}]},contents:zidHistory,generationConfig:{temperature:0.8,maxOutputTokens:1024}})});const data=await res.json();const t=document.getElementById('zidai-typing');if(t)t.remove();if(data.error){zidAiMsg('ai','⚠️ '+data.error.message);}else{const reply=data.candidates?.[0]?.content?.parts?.[0]?.text||'No response.';zidHistory.push({role:'model',parts:[{text:reply}]});zidAiMsg('ai',reply);}}catch(err){const t=document.getElementById('zidai-typing');if(t)t.remove();zidAiMsg('ai','⚠️ Could not reach AI.');}
+  try{
+    const faq = typeof window !== 'undefined' && window.getZideaFaqMatch ? window.getZideaFaqMatch(text, zidHistory) : null;
+    if (faq) {
+      const t=document.getElementById('zidai-typing');if(t)t.remove();
+      const reply = faq.answer || 'I do not have a verified answer for that Zidea question yet.';
+      zidHistory.push({role:'model',parts:[{text:reply}]});
+      zidAiMsg('ai', reply);
+      document.getElementById('zidai-send').disabled=false;
+      return;
+    }
+    const res=await fetch('/api/zid-ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,history:zidHistory,systemPrompt:ZIDAI_SYS})});
+    const data=await res.json();
+    const t=document.getElementById('zidai-typing');if(t)t.remove();
+    if(!res.ok || !data || !data.answer){
+      zidAiMsg('ai', data?.message || '⚠️ I could not reach the AI fallback right now.');
+    } else {
+      zidHistory.push({role:'model',parts:[{text:data.answer}]});
+      zidAiMsg('ai', data.answer);
+    }
+  } catch(err){
+    const t=document.getElementById('zidai-typing');if(t)t.remove();
+    zidAiMsg('ai','⚠️ I could not reach the AI fallback right now.');
+  }
   document.getElementById('zidai-send').disabled=false;
 }
 function zidAiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendZidAi();}}
 function clearZidAi(){zidHistory=[];document.getElementById('zidai-messages').innerHTML='';initZidAi();}
-function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything — I'm powered by Gemini!");}
+function initZidAi(){zidAiMsg('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.");}
 // ------ Arcade ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const ARCADE_GAMES=[
   {id:'chess',icon:'??',name:'Chess',desc:'Classic strategy game. Outsmart your opponent.'},
