@@ -81,8 +81,48 @@
     <script src="https://unpkg.com/react@19/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@19/umd/react-dom.development.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script>
+      window.zidAiAuthReady = (async () => {
+        const response = await fetch('/api/config', { cache: 'no-store' });
+        if (!response.ok) throw new Error('ZIDEA sign-in configuration could not be loaded.');
+        const config = (await response.json()).firebase || {};
+        if (!config.apiKey || !config.authDomain || !config.projectId || !config.appId) {
+          throw new Error('Firebase Auth is not configured for this deployment.');
+        }
+        const loadScript = src => new Promise((resolve, reject) => {
+          const script = document.createElement('script');
+          script.src = src;
+          script.onload = resolve;
+          script.onerror = () => reject(new Error('Firebase Auth could not load. Check your connection.'));
+          document.head.appendChild(script);
+        });
+        if (!window.firebase?.apps?.length) {
+          await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+          await loadScript('https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js');
+          window.firebase.initializeApp(config);
+        }
+        return window.firebase.auth();
+      })();
+    </script>
     <script type="text/babel" data-presets="react,typescript">
       const { StrictMode, useState, useEffect, useRef } = React;
+
+      async function ensureZidAiProfile(user) {
+        const token = await user.getIdToken();
+        const response = await fetch('/api/arcade', { headers: { Authorization: `Bearer ${token}` } });
+        const current = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(current.error || 'Your ZIDEA profile could not be loaded.');
+        if (current.player?.username) return current.player;
+        const username = `zid_${user.uid.slice(0, 12).toLowerCase()}`;
+        const created = await fetch('/api/arcade', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: 'profile', username })
+        });
+        const profile = await created.json().catch(() => ({}));
+        if (!created.ok) throw new Error(profile.error || 'Your ZIDEA profile could not be created.');
+        return profile.profile;
+      }
 
       function Icon({ label, className = "", ...props }) {
         return (
@@ -149,14 +189,32 @@
         useEffect(() => {
           const savedTheme = localStorage.getItem("zid_ai_theme");
           if (savedTheme) setTheme(savedTheme);
-          const savedToken = localStorage.getItem("zid_ai_token");
-          const savedEmail = localStorage.getItem("zid_ai_email");
-          if (savedToken && savedEmail) {
-            setToken(savedToken);
-            setUserEmail(savedEmail);
-            setIsAuthenticated(true);
-            validateSession(savedToken);
-          }
+          let active = true;
+          let unsubscribe;
+          window.zidAiAuthReady.then(auth => {
+            if (!active) return;
+            unsubscribe = auth.onAuthStateChanged(async user => {
+              if (!active) return;
+              if (!user) {
+                setToken(null);
+                setUserEmail(null);
+                setIsAuthenticated(false);
+                setCurrentView('landing');
+                return;
+              }
+              try {
+                const idToken = await user.getIdToken();
+                if (!active) return;
+                setToken(idToken);
+                setUserEmail(user.email || null);
+                setIsAuthenticated(true);
+                setCurrentView('chat');
+              } catch (error) {
+                console.error('Firebase session could not be restored', error);
+              }
+            });
+          }).catch(error => console.error('Firebase Auth initialization failed', error));
+          return () => { active = false; unsubscribe?.(); };
         }, []);
 
         useEffect(() => {
@@ -182,15 +240,6 @@
             loadChatMessages(activeChatId);
           }
         }, [activeChatId, token, guestChat]);
-
-        const validateSession = async (sessionToken) => {
-          try {
-            const res = await fetch("/api/auth/me", { headers: { Authorization: `Bearer ${sessionToken}` } });
-            if (!res.ok) handleLogout();
-          } catch (err) {
-            console.error(err);
-          }
-        };
 
         const fetchChats = async () => {
           if (!token) return;
@@ -219,24 +268,18 @@
         };
 
         const handleLoginSuccess = (userToken, email) => {
-          localStorage.setItem("zid_ai_token", userToken);
-          localStorage.setItem("zid_ai_email", email);
           setToken(userToken);
           setUserEmail(email);
           setIsAuthenticated(true);
           setCurrentView("chat");
         };
 
-        const handleLogout = () => {
-          localStorage.removeItem("zid_ai_token");
-          localStorage.removeItem("zid_ai_email");
-          setToken(null);
-          setUserEmail(null);
-          setIsAuthenticated(false);
-          setChats([]);
-          setActiveChatId(null);
-          setActiveChat(null);
-          setCurrentView("landing");
+        const handleLogout = async () => {
+          try {
+            await (await window.zidAiAuthReady).signOut();
+          } catch (error) {
+            console.error('Firebase sign-out failed', error);
+          }
         };
 
         const handleThemeToggle = (newTheme) => {
@@ -602,11 +645,57 @@
 
       function LoginView({ onLoginSuccess, onNavigate, initialMode = "login" }) {
         const [isLogin, setIsLogin] = useState(initialMode === "login");
-        const [email, setEmail] = useState("ideamanager333@gmail.com");
+        const [email, setEmail] = useState("");
         const [password, setPassword] = useState("");
         const [loading, setLoading] = useState(false);
         const [error, setError] = useState(null);
-        const handleSubmit = async (e) => { e.preventDefault(); if (!email || !password) { setError("Please fill out all fields"); return; } setError(null); setLoading(true); const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register"; try { const response = await fetch(endpoint, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) }); if (!response.ok) { let errMsg = "Authentication failed. Please verify credentials."; try { const errData = await response.json(); errMsg = errData.error || errMsg; } catch { const fallbackText = await response.text().catch(() => ""); errMsg = fallbackText || `Request failed with status ${response.status}`; } throw new Error(errMsg); } const data = await response.json(); onLoginSuccess(data.token, data.user.email); } catch (err) { setError(err?.message || "An internet connection or server error occurred"); } finally { setLoading(false); } };
+        const handleSubmit = async (e) => {
+          e.preventDefault();
+          const normalizedEmail = email.trim().toLowerCase();
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) { setError("Enter a valid email address."); return; }
+          if (!password || (!isLogin && password.length < 6)) { setError(isLogin ? "Enter your password." : "Choose a password with at least 6 characters."); return; }
+          setError(null);
+          setLoading(true);
+          let accountCreated = false;
+          try {
+            const auth = await window.zidAiAuthReady;
+            let user;
+            if (isLogin) {
+              try {
+                user = (await auth.signInWithEmailAndPassword(normalizedEmail, password)).user;
+              } catch (error) {
+                if (!['auth/user-not-found', 'auth/invalid-credential'].includes(error.code)) throw error;
+                const migration = await fetch('/api/auth/account', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ action: 'migrate', email: normalizedEmail, password })
+                });
+                const result = await migration.json().catch(() => ({}));
+                if (!migration.ok) {
+                  if (migration.status === 401) throw error;
+                  throw new Error(result.message || 'This legacy account could not be migrated.');
+                }
+                user = (await auth.signInWithEmailAndPassword(normalizedEmail, password)).user;
+              }
+            } else {
+              user = (await auth.createUserWithEmailAndPassword(normalizedEmail, password)).user;
+              accountCreated = true;
+              await user.updateProfile({ displayName: `zid_${user.uid.slice(0, 12).toLowerCase()}` });
+            }
+            await ensureZidAiProfile(user);
+            onLoginSuccess(await user.getIdToken(), user.email || normalizedEmail);
+          } catch (err) {
+            const message = err?.code === 'auth/email-already-in-use' ? 'An account already uses this email. Log in instead.'
+              : err?.code === 'auth/invalid-email' ? 'Enter a valid email address.'
+              : err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential' ? 'The email or password is incorrect.'
+              : err?.code === 'auth/network-request-failed' ? 'Network error. Check your connection and try again.'
+              : err?.code === 'auth/unauthorized-domain' ? 'This website domain is not authorized in Firebase Authentication settings.'
+              : err?.message || 'Authentication failed. Please try again.';
+            setError(accountCreated ? `Your Firebase account was created, but profile setup could not finish. ${message} Try logging in again.` : message);
+          } finally {
+            setLoading(false);
+          }
+        };
         return (<div className="flex-1 flex flex-col justify-center items-center px-4 md:px-6 py-12 relative"><div className="absolute w-[300px] h-[300px] bg-sky-500/5 blur-[90px] rounded-full top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none" /><div className="w-full max-w-md rounded-2xl border border-slate-800 bg-slate-900/40 p-6 md:p-8 backdrop-blur-md shadow-2xl relative z-10"><div className="text-center pb-4 mb-6 border-b border-slate-800"><div className="inline-flex items-center gap-1.5 rounded-full bg-sky-500/10 px-3 py-1 text-xs text-sky-400"><Sparkles className="h-3 w-3" /><span>Zid ai Gateway</span></div><h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-white">{isLogin ? "Welcome back!" : "Create your account"}</h1><p className="mt-2 text-sm text-slate-400">{isLogin ? "Sign in to access your saved chat history" : "Join Zid ai and save past summaries"}</p></div>{error && (<div className="mb-5 flex items-start gap-2.5 rounded-xl border border-red-500/15 bg-red-500/5 px-4 py-3 text-sm text-red-400"><AlertCircle className="h-5 w-5 shrink-0 text-red-450 mt-0.5" /><span>{error}</span></div>)}<form onSubmit={handleSubmit} className="space-y-4"><div><label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Email Address</label><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><Mail className="h-4.5 w-4.5" /></span><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@school.edu" required disabled={loading} className="w-full rounded-xl border border-slate-800 bg-slate-950/60 py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50" /></div></div><div><label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Password</label><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500"><Lock className="h-4.5 w-4.5" /></span><input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required disabled={loading} className="w-full rounded-xl border border-slate-800 bg-slate-950/60 py-3 pl-11 pr-4 text-sm text-white placeholder-slate-500 transition-all focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 disabled:opacity-50" /></div>{!isLogin && (<p className="mt-2 text-xs text-slate-500">Must be at least 6 characters.</p>)}</div><button type="submit" disabled={loading} className="w-full mt-6 flex items-center justify-center gap-2 rounded-xl bg-sky-500 px-4 py-3.5 text-sm font-bold text-slate-950 shadow-lg shadow-sky-500/10 transition-all hover:bg-sky-400 active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100">{loading ? (<><RefreshCw className="h-4 w-4 animate-spin" /><span>Loading gateway...</span></>) : (<span>{isLogin ? "Sign In" : "Register and Continue"}</span>)}</button></form><div className="mt-6 text-center text-sm"><span className="text-slate-400">{isLogin ? "Don't have an account?" : "Already have an account?"} </span><button onClick={() => { setIsLogin(!isLogin); setError(null); }} disabled={loading} className="font-medium text-sky-400 transition-colors hover:text-sky-300 disabled:opacity-50">{isLogin ? "Sign up free" : "Log in"}</button></div></div></div>);
       }
 

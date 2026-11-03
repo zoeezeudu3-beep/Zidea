@@ -11,15 +11,21 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script>
-  window.zideaGoogleClientId = '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
+document.documentElement.classList.add('auth-restoring');
+window.setTimeout(function(){
+  if(!document.documentElement.classList.contains('auth-restoring'))return;
+  document.documentElement.classList.remove('auth-restoring');
+  if(typeof window.showPage==='function')window.showPage('landing',{skipHash:true});
+  if(typeof window.openAuthModal==='function')window.openAuthModal('login',true);
+},12000);
 </script>
+<style>html.auth-restoring .page{visibility:hidden}</style>
+<link rel="stylesheet" href="./arcade.css"/>
 <script src="./zidea-kb.js"></script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script>try{const s=window.localStorage;if(s&&JSON.parse(s.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
-<style>html.has-session #page-landing{display:none!important}</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--brand:#C9A84C;--brand-dark:#A38738;--brand-light:#E6CE8B;--surface:#0a0a0a;--card:#111111;--border:rgba(201,168,76,0.25)}
+html,body{overflow-x:hidden}
 body{background:
   radial-gradient(circle at 12% 10%, rgba(201,168,76,0.08), transparent 24%),
   radial-gradient(circle at 86% 18%, rgba(201,168,76,0.06), transparent 22%),
@@ -66,6 +72,7 @@ button:active{transform:scale(.98)}
 #page-landing:not(.active){display:none;opacity:0}
 #page-login,#page-signup{flex-direction:column}
 #page-dashboard,#page-arcade,#page-chat,#page-zidai,#page-ideas,#page-library,#page-explore,#page-profile,#page-settings,#page-help{flex-direction:row;min-height:100vh}
+#page-dashboard:not(.active),#page-arcade:not(.active),#page-chat:not(.active),#page-zidai:not(.active),#page-ideas:not(.active),#page-library:not(.active),#page-explore:not(.active),#page-profile:not(.active),#page-settings:not(.active),#page-help:not(.active){display:none!important;opacity:0}
 @keyframes fadeInUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 @keyframes orbFloat{0%,100%{transform:translateY(0) translateX(0)}33%{transform:translateY(-20px) translateX(15px)}66%{transform:translateY(10px) translateX(-10px)}}
 @keyframes bgPulse{0%{opacity:.6}100%{opacity:1}}
@@ -164,6 +171,26 @@ body.app-active #page-landing footer{display:none}
 .room-code{font-size:26px;font-weight:900;letter-spacing:.18em;color:#fff}
 .result-modal-summary{color:#bfb399;font-size:13px;line-height:1.6}
 @media(max-width:960px){.arcade-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){
+  .nav{padding:12px 14px}
+  .logo{font-size:18px}
+  .hero{padding:30px 16px 20px}
+  .hero h1{font-size:clamp(28px,12vw,44px)}
+  .hero p{font-size:14px;max-width:90vw}
+  .hero-actions{width:100%;display:grid;grid-template-columns:1fr;gap:10px}
+  .hero-actions .btn-primary,.hero-actions .btn-ghost{width:100%}
+  .features{padding:0 14px 36px;grid-template-columns:1fr}
+  .feature-card{padding:18px}
+  .auth-box{padding:18px}
+  .auth-page{padding:16px}
+  .card{padding:18px}
+  .page-title{font-size:18px}
+  .main-content{padding:14px 12px 18px}
+  .user-card{align-items:flex-start}
+  .user-actions{width:100%;justify-content:flex-start}
+  .call-btn,.chat-btn{flex:1;justify-content:center}
+  .showcase-phone .phone-shell{width:min(320px,88vw);height:500px}
+}
 @media(max-width:420px){.arcade-grid{grid-template-columns:1fr}.arcade-row{align-items:flex-start;flex-direction:column}}
 .back-link{display:inline-flex;align-items:center;gap:6px;color:#bfb399;font-size:14px;cursor:pointer;background:none;border:none;font-family:inherit;transition:color .2s}
 .back-link:hover{color:#fff}
@@ -586,7 +613,9 @@ body.app-active #page-landing footer{display:none}
 .avatar-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#C9A84C,#A38738);font-size:10px;font-weight:800}
 .game-cta{padding:7px 10px;border-radius:10px;border:1px solid rgba(201,168,76,.3);background:rgba(201,168,76,.12);color:#E6CE8B;font-size:11px;font-weight:700}
 @media(max-width:840px){.product-showcase{grid-template-columns:1fr;padding-top:8px}.showcase-game{order:2}.showcase-phone{order:1}.showcase-phone .phone-shell{width:min(360px,90vw)}}
+@media(max-width:840px){.product-showcase{width:100%;min-width:0;padding-right:14px;padding-left:14px}.product-showcase>.showcase-phone,.product-showcase>.showcase-game{width:100%;min-width:0}.showcase-phone{padding-right:0;padding-left:0}.showcase-phone .phone-shell{width:min(360px,100%)}.game-shell{min-width:0}}
 </style>
+<link rel="stylesheet" href="./zidea-home.css"/>
 
 <!-- LANDING -->
 <div id="page-landing" class="page">
@@ -597,23 +626,43 @@ body.app-active #page-landing footer{display:none}
   </div>
   <nav class="nav">
     <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <div class="landing-nav-links" aria-label="Main navigation">
+      <button type="button" onclick="showPage('landing');window.scrollTo({top:0,behavior:'smooth'})">Home</button>
+      <button type="button" onclick="showPage('arcade')">Games</button>
+      <button type="button" onclick="document.getElementById('landing-features').scrollIntoView({behavior:'smooth'})">Features</button>
+      <button type="button" onclick="document.getElementById('landing-how-it-works').scrollIntoView({behavior:'smooth'})">About</button>
+    </div>
     <div style="display:flex;gap:8px" id="landing-auth-actions">
       <button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage('login')">Log In</button>
       <button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage('signup')">Sign Up</button>
     </div>
   </nav>
-  <section class="hero">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.4);color:var(--brand-light);font-size:12px;padding:6px 16px;border-radius:999px;animation:fadeInUp .6s ease">
-      <span style="width:7px;height:7px;border-radius:50%;background:#E6CE8B;box-shadow:0 0 8px #E6CE8B;display:inline-block"></span>
-      Live now — join free
+  <section class="hero landing-hero">
+    <div class="landing-hero-copy">
+      <p class="landing-eyebrow">A place to meet, play, and make things</p>
+      <h1>Welcome to<br/><em>zidea</em></h1>
+      <p>Connect, share, play &amp; discover in one place. Meet people with similar ideas, chat, call, and enjoy games together.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" type="button" onclick="showPage('signup')"><span aria-hidden="true">➤</span> Get Started</button>
+        <button class="btn-ghost" type="button" onclick="document.getElementById('landing-features').scrollIntoView({behavior:'smooth'})"><span aria-hidden="true">▶</span> Explore Features</button>
+      </div>
     </div>
-    <h1 style="animation:fadeInUp .7s ease .1s both">Connect. Call. <em>Play.</em></h1>
-    <p style="animation:fadeInUp .7s ease .2s both">Find friends by username, jump into voice calls, challenge them to games, and chat with AI — all in one place.</p>
-    <div class="hero-actions" style="animation:fadeInUp .7s ease .3s both">
-      <button class="btn-primary" style="padding:14px 32px;font-size:15px;box-shadow:0 0 30px rgba(201,168,76,.4)" onclick="showPage('signup')">Get Started Free →</button>
-      <button class="btn-ghost" style="padding:14px 32px;font-size:15px" onclick="showPage('login')">Log In</button>
+    <div class="landing-hero-art" aria-hidden="true">
+      <div class="landing-art-orbit landing-art-orbit-one"></div>
+      <div class="landing-art-orbit landing-art-orbit-two"></div>
+      <svg class="landing-art-bolt" viewBox="0 0 220 280" fill="none"><path d="M132 8 20 154h75L78 272l122-160h-76L132 8Z" fill="url(#zideaBoltFill)" stroke="#FFE08A" stroke-width="4" stroke-linejoin="round"/><defs><linearGradient id="zideaBoltFill" x1="110" y1="8" x2="110" y2="272" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF1A8"/><stop offset=".48" stop-color="#FFC638"/><stop offset="1" stop-color="#E99514"/></linearGradient></defs></svg>
+      <span class="landing-art-badge badge-idea">✦ Ideas</span>
+      <span class="landing-art-badge badge-game">🎮 Games</span>
+      <span class="landing-art-badge badge-chat">● Chat</span>
+      <span class="landing-art-badge badge-call">☎ Call</span>
     </div>
   </section>
+  <div class="landing-feature-strip" aria-label="Zidea features">
+    <div><span>✦</span><strong>Idea Matching</strong><small>Find your perfect idea match</small></div>
+    <div><span>🎮</span><strong>Arcade Games</strong><small>Play exciting games</small></div>
+    <div><span>●</span><strong>Chat &amp; Call</strong><small>Connect with friends</small></div>
+    <div><span>♟</span><strong>A Growing Community</strong><small>Be part of Zidea</small></div>
+  </div>
   <section class="product-showcase" aria-label="Zidea app preview">
     <div class="showcase-phone">
       <div class="phone-shell">
@@ -632,8 +681,8 @@ body.app-active #page-landing footer{display:none}
             </div>
           </div>
           <div class="phone-cta">
-            <button class="mini-primary">Call</button>
-            <button class="mini-ghost">Chat</button>
+            <button class="mini-primary" type="button" onclick="focusDashboardSearch()">Find someone to call</button>
+            <button class="mini-ghost" type="button" onclick="showPage('chat')">Open chat</button>
           </div>
           <div class="phone-card-stack">
             <div class="phone-mini-card">
@@ -681,12 +730,12 @@ body.app-active #page-landing footer{display:none}
         </div>
         <div class="game-footer">
           <div class="game-user"><span class="avatar-dot">N</span><span>@nova</span></div>
-          <button class="game-cta">Play now</button>
+          <button class="game-cta" type="button" onclick="showPage('arcade')">Explore games</button>
         </div>
       </div>
     </div>
   </section>
-  <div style="max-width:800px;margin:0 auto 40px;padding:0 20px;position:relative;z-index:1">
+  <div id="landing-how-it-works" style="max-width:800px;margin:0 auto 40px;padding:0 20px;position:relative;z-index:1">
     <h2 style="text-align:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:28px">How it works</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0">
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#bfb399;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
@@ -694,10 +743,10 @@ body.app-active #page-landing footer{display:none}
       <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#bfb399;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
     </div>
   </div>
-  <div class="features">
+  <div class="features" id="landing-features">
     <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Find Friends</h3><p>Search anyone by @username and connect instantly.</p></div>
     <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><h3>Voice Calls</h3><p>Real-time voice calls powered by WebRTC.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>Zidea Arcade</h3><p>Chess, Among Us, Tic-Tac-Toe &mdash; vs friends or AI.</p></div>
+    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>ZIDEA PLAY</h3><p>Play IDEA WARS, BUILD TOGETHER, PITCH BATTLE, and the 60-SECOND CHALLENGE.</p></div>
     <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Generate Ideas</h3><p>AI-powered idea generator with breakdown &amp; scoring.</p></div>
   </div>
   <div style="text-align:center;padding:0 20px 60px;position:relative;z-index:1">
@@ -737,6 +786,23 @@ body.app-active #page-landing footer{display:none}
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><input class="input-field" type="text" id="signup-username" placeholder="Username (e.g. cooldev42)" minlength="3" maxlength="20" required/></div>
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="signup-email" placeholder="Email" required/></div>
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="input-field" type="password" id="signup-password" placeholder="Password (min 6 chars)" minlength="6" required/></div>
+      <div class="card" style="padding:12px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);margin-top:10px;gap:8px;display:flex;flex-direction:column;">
+        <div style="font-size:12px;color:#E6CE8B;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Tell us about you</div>
+        <textarea id="signup-about" class="input-field" rows="2" placeholder="What are you into? What kind of ideas do you love?" style="resize:vertical;min-height:56px"></textarea>
+        <textarea id="signup-wants" class="input-field" rows="2" placeholder="What are you looking for? Co-founder, collaborator, feedback, new friends?" style="resize:vertical;min-height:56px"></textarea>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <select id="signup-vibe" class="input-field">
+            <option value="">Pick your vibe</option>
+            <option value="Builder">Builder</option>
+            <option value="Creator">Creator</option>
+            <option value="Operator">Operator</option>
+            <option value="Researcher">Researcher</option>
+            <option value="Community">Community</option>
+            <option value="Explorer">Explorer</option>
+          </select>
+          <input id="signup-interests" class="input-field" type="text" placeholder="Favorite interests"/>
+        </div>
+      </div>
       <button type="submit" class="btn-primary" style="width:100%">Create Account</button>
     </form>
     <div class="divider">or continue with Google</div>
@@ -767,9 +833,34 @@ body.app-active #page-landing footer{display:none}
     <div class="sidebar-footer"><div class="sidebar-user" id="dash-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
   <div class="main-content">
-    <div><div class="page-title">Discover People</div><div class="page-subtitle">Search by username and start a chat or call</div></div>
-    <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="search-input" placeholder="Search @username..." oninput="filterUsers()"/></div>
-    <div class="dashboard-grid"><div id="user-list" style="display:flex;flex-direction:column;gap:10px"></div><div class="card online-panel"><div class="online-panel-title"><span class="online-dot-green"></span> Online now</div><div id="online-list" style="margin-top:10px"></div></div></div>
+    <header class="home-header">
+      <div><div class="page-title">Home</div><div class="page-subtitle">Your ideas, people, and play space</div></div>
+      <button type="button" class="home-profile-button" onclick="showPage('profile')"><span class="home-profile-avatar" id="dashboard-top-avatar">Z</span><span id="dashboard-top-username">Profile</span><span aria-hidden="true">⌄</span></button>
+    </header>
+    <section class="home-welcome-banner">
+      <div class="home-welcome-avatar" id="dashboard-welcome-avatar">Z</div>
+      <div class="home-welcome-copy"><h1 id="dashboard-greeting">Welcome back</h1><p>Let's turn more ideas into possibilities together.</p></div>
+      <span class="home-welcome-spark" aria-hidden="true">✦</span>
+    </section>
+    <section class="idea-match-banner">
+      <div class="idea-match-icon" aria-hidden="true">💡</div>
+      <div class="idea-match-copy"><h2>Idea Match</h2><p>Discover how compatible your ideas are with others.</p></div>
+      <div class="idea-match-art" aria-hidden="true"><span>💡</span><span>💡</span></div>
+      <button type="button" class="btn-primary" onclick="showPage('ideas')">Start Matching <span aria-hidden="true">→</span></button>
+    </section>
+    <section class="home-feature-grid" aria-label="Zidea features">
+      <button type="button" class="home-feature-card" onclick="showPage('arcade')"><span class="home-feature-icon">🎮</span><strong>Arcade</strong><small>Play fun games</small><span class="home-feature-arrow">›</span></button>
+      <button type="button" class="home-feature-card" onclick="showPage('chat')"><span class="home-feature-icon">💬</span><strong>Chat</strong><small>Talk with friends</small><span class="home-feature-arrow">›</span></button>
+      <button type="button" class="home-feature-card" onclick="focusDashboardSearch()"><span class="home-feature-icon">☎</span><strong>Call</strong><small>Find someone to call</small><span class="home-feature-arrow">›</span></button>
+    </section>
+    <section class="home-bottom-grid">
+      <div class="home-panel home-activity-panel"><div class="home-panel-heading"><span>▥</span><h2>Your Activity</h2></div><div class="home-activity-row"><span class="activity-symbol idea-symbol">✦</span><span>Saved ideas</span><strong id="dashboard-saved-count">0</strong></div><div class="home-activity-row"><span class="activity-symbol game-symbol">🎮</span><span>Games played</span><strong id="dashboard-games-count">0</strong></div><div class="home-activity-row"><span class="activity-symbol people-symbol">♟</span><span>Account</span><strong id="dashboard-activity-username">@username</strong></div></div>
+      <div class="home-panel home-quick-panel"><div class="home-panel-heading"><span>ϟ</span><h2>Quick Actions</h2></div><button type="button" class="home-quick-action" onclick="openChallengeModal('idea-wars')"><span>♟</span> Challenge a Friend <b>→</b></button><button type="button" class="home-quick-action" onclick="showPage('arcade')"><span>🎮</span> Join a Game <b>→</b></button><button type="button" class="home-quick-action" onclick="focusDashboardSearch()"><span>☎</span> Find Someone to Call <b>→</b></button></div>
+    </section>
+    <section class="home-people-section"><div class="home-people-heading"><div><h2>Find People</h2><p>Search by username and start a chat or call.</p></div></div>
+      <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="search-input" placeholder="Search @username..." oninput="filterUsers()"/></div>
+      <div class="dashboard-grid"><div id="user-list" style="display:flex;flex-direction:column;gap:10px"></div><div class="card online-panel"><div class="online-panel-title"><span class="online-dot-green"></span> Online now</div><div id="online-list" style="margin-top:10px"></div></div></div>
+    </section>
   </div>
 </div>
 
@@ -793,54 +884,8 @@ body.app-active #page-landing footer{display:none}
     </nav>
     <div class="sidebar-footer"><div class="sidebar-user" id="arcade-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
   </aside>
-  <div class="main-content">
-    <div><div class="page-title">🎮 Arcade</div><div class="page-subtitle">Play quick games solo or while you are on a call</div></div>
-    <div id="game-picker" style="display:flex;flex-direction:column;gap:16px">
-      <div class="arcade-grid" id="arcade-game-grid"></div>
-      <div class="card arcade-panel">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff">Active game sessions</div><div style="font-size:12px;color:#bfb399;margin-top:3px">Pending challenges and open rooms</div></div><button class="btn-ghost" style="font-size:12px;padding:7px 10px" onclick="renderArcadeHome()">Refresh</button></div>
-        <div id="arcade-invites"></div>
-      </div>
-      <div class="card arcade-panel">
-        <div style="font-size:15px;font-weight:800;color:#fff">Recent results</div>
-        <div id="arcade-results"></div>
-      </div>
-      <div class="card arcade-panel">
-        <div style="font-size:15px;font-weight:800;color:#fff">Leaderboard</div>
-        <div id="arcade-leaderboard"></div>
-      </div>
-      <div class="card game-lobby" id="game-lobby">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff" id="lobby-title">Game Lobby</div><div style="font-size:12px;color:#bfb399;margin-top:3px" id="lobby-status">Waiting for opponent...</div></div><button class="btn-ghost" style="font-size:12px" onclick="exitLobby()">Exit lobby</button></div>
-        <div class="room-code" id="lobby-code">----</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap"><input class="input-field" id="join-room-code" placeholder="Enter room code" style="max-width:220px;text-transform:uppercase"/><button class="btn-primary" onclick="joinGameRoom()">Join room</button></div>
-      </div>
-    </div>
-    <div id="game-ttt" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div id="ttt-status" style="color:#fff;font-weight:800">Your turn</div><div id="ttt-grid" class="ttt-grid"></div><div id="ttt-result" style="display:none;flex-direction:column;align-items:center;gap:8px"><div id="ttt-result-text" style="color:#fff;font-weight:800"></div><button class="btn-primary" onclick="resetTTT()">Play again</button></div></div>
-    <div id="game-chess" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center">
-      <div id="chess-status" style="color:#fff;font-weight:800">Your turn (White)</div>
-      <div class="chess-clock-row" style="width:100%;max-width:720px;justify-content:center">
-        <div class="chess-clock-label" id="chess-clock-white">White: 05:00</div>
-        <div class="chess-clock-label" id="chess-clock-black">Black: 05:00</div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;width:100%;max-width:720px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center">
-          <button class="chess-lvl-btn active" data-lvl="1" onclick="setChessLevel(1)">200 Elo</button>
-          <button class="chess-lvl-btn" data-lvl="2" onclick="setChessLevel(2)">800 Elo</button>
-          <button class="chess-lvl-btn" data-lvl="3" onclick="setChessLevel(3)">1400 Elo</button>
-          <button class="chess-lvl-btn" data-lvl="4" onclick="setChessLevel(4)">2200 Elo</button>
-          <button class="chess-lvl-btn" data-lvl="5" onclick="setChessLevel(5)">3000 Elo</button>
-        </div>
-        <div id="chess-level-label" style="color:#bfb399;font-size:13px">Bot strength: 200 Elo</div>
-      </div>
-      <div id="chess-board" class="chess-board"></div>
-      <div id="chess-result" style="display:none;flex-direction:column;align-items:center;gap:8px">
-        <div id="chess-result-text" style="color:#fff;font-weight:800"></div>
-        <button class="btn-primary" onclick="resetChess()">Play again</button>
-      </div>
-      <button class="btn-ghost" onclick="resetChess()">Reset chess</button>
-    </div>
-    <div id="game-rps" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-primary" onclick="rpsPlay('rock')">✊ Rock</button><button class="btn-primary" onclick="rpsPlay('paper')">✋ Paper</button><button class="btn-primary" onclick="rpsPlay('scissors')">✌️ Scissors</button></div><div id="rps-result" style="color:#fff;font-weight:800">Pick a move</div><div id="rps-score" style="color:#bfb399">You: 0 — Bot: 0</div><button class="btn-ghost" onclick="resetRPS()">Reset</button></div>
-    <div id="game-amongus" class="card" style="display:none;flex-direction:column;gap:12px;align-items:center"><canvas id="amongus-canvas" width="640" height="360" style="width:100%;max-width:720px;border-radius:16px;background:#080811"></canvas><div id="au-status" style="color:#bfb399;font-size:13px">Move with arrow keys or WASD.</div><button class="btn-ghost" onclick="auMeeting()">🚨 Meeting</button><div id="au-vote-panel" style="display:none;flex-direction:column;gap:8px"></div></div>
+  <div class="main-content" aria-live="polite">
+    <div class="play-shell"><div class="play-loading">Opening the ZIDEA PLAY arena…</div></div>
   </div>
 </div>
 
@@ -1097,6 +1142,22 @@ body.app-active #page-landing footer{display:none}
       <div class="card" style="text-align:center"><div id="profile-starred-count" style="font-size:22px;font-weight:800;color:#fff">0</div><div style="font-size:12px;color:#bfb399">Starred</div></div>
     </div>
 
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;color:#E6CE8B;font-weight:800;letter-spacing:.08em;text-transform:uppercase">ZIDEA PLAY stats</div>
+      <div id="profile-game-stats" style="display:flex;flex-direction:column;gap:8px"><div style="color:#bfb399;font-size:13px">Sign in securely to see your ZIDEA PLAY stats.</div></div>
+    </div>
+
+    <div class="card" style="display:flex;flex-direction:column;gap:12px">
+      <div style="font-size:12px;color:#E6CE8B;font-weight:800;letter-spacing:.08em;text-transform:uppercase">About</div>
+      <div id="profile-about" style="color:#dfe7ee;line-height:1.7;font-size:13px">Building ideas and meeting people who love the same kind of work.</div>
+      <div style="font-size:12px;color:#E6CE8B;font-weight:800;letter-spacing:.08em;text-transform:uppercase">Looking for</div>
+      <div id="profile-wants" style="color:#dfe7ee;line-height:1.7;font-size:13px">Open to feedback, collaboration, and meaningful conversations.</div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+        <div class="card" style="padding:12px"><div style="font-size:11px;color:#bfb399;text-transform:uppercase;letter-spacing:.08em">Vibe</div><div id="profile-vibe" style="color:#fff;font-weight:700;margin-top:6px">Builder</div></div>
+        <div class="card" style="padding:12px"><div style="font-size:11px;color:#bfb399;text-transform:uppercase;letter-spacing:.08em">Interests</div><div id="profile-interests" style="color:#fff;font-weight:700;margin-top:6px">Ideas</div></div>
+      </div>
+    </div>
+
     <div class="card profile-upload-banner">
       <div class="profile-banner-header">
         <div>
@@ -1161,7 +1222,7 @@ body.app-active #page-landing footer{display:none}
     <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How does the collaboration matcher work?</div><p style="color:#bfb399;font-size:13px;line-height:1.7">Generate Ideas asks a few structured questions, saves your idea, then scores real submissions by category, audience overlap, skills, collaborator need, and weekly commitment.</p></div>
     <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I play games?</div><p style="color:#bfb399;font-size:13px;line-height:1.7">Go to Arcade to play solo against the bot or switch to multiplayer mode. During a call, use the Play button to open a lightweight in-call game dock.</p></div>
     <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">What can ZiD AI do?</div><p style="color:#bfb399;font-size:13px;line-height:1.7">ZiD AI can brainstorm, explain Zidea features, help shape an idea, draft messages, and answer general questions when an API key is configured.</p></div>
-    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I reset my password?</div><p style="color:#bfb399;font-size:13px;line-height:1.7">On the login modal, choose Forgot password? and enter your account email. Zidea starts a reset request and shows confirmation without exposing whether an email exists.</p></div>
+    <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I reset my password?</div><p style="color:#bfb399;font-size:13px;line-height:1.7">On the login modal, choose Forgot password? and enter your account email. Firebase will email password reset instructions.</p></div>
     <div class="card"><div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:8px">How do I delete my account?</div><p style="color:#bfb399;font-size:13px;line-height:1.7">Open Contact from the footer or email hello@zidea.app from your account email. Include your @username and request account deletion so support can verify and remove your data.</p></div>
   </div></div>
 </div>
@@ -1303,32 +1364,70 @@ body.app-active #page-landing footer{display:none}
   </div>
 </div>
 
-<!-- GOOGLE MODAL -->
-<div class="modal-overlay" id="google-modal" onclick="if(event.target===this)closeGoogleModal()">
-  <div class="modal-box">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#bfb399;font-size:13px">Google OAuth is not connected yet. Use email and password for now.</p></div>
-    <div id="google-error" class="error-msg"></div>
-    <form style="display:flex;flex-direction:column;gap:12px" onsubmit="handleGoogleSubmit(event)">
-      <div id="google-step1"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="google-email" placeholder="your@gmail.com"/></div></div>
-      <div id="google-step2" style="display:none"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="input-field" type="password" id="google-password" placeholder="Password"/></div></div>
-      <div style="display:flex;gap:10px">
-        <button type="button" class="btn-ghost" style="flex:1" onclick="closeGoogleModal()">Cancel</button>
-        <button type="submit" class="btn-primary" style="flex:1" id="google-btn">Next</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <script>
 // ------ Firebase ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const FB = 'https://zidea-9da13-default-rtdb.firebaseio.com';
+function reportDatabaseError(error){
+  console.error('Firebase database request failed:',error);
+  if(currentUser)showToast(error?.message||'Could not synchronize data with Firebase. Check your connection and database permissions.');
+}
+async function firebaseRequest(p,method,data){
+  const firebaseUser=window.firebase?.apps?.length&&typeof window.firebase.auth==='function'
+    ?window.firebase.auth().currentUser
+    :null;
+  if(method!=='GET'&&!firebaseUser)throw new Error('Sign in to synchronize your Zidea data.');
+  const headers={'Content-Type':'application/json'};
+  if(firebaseUser)headers.Authorization=`Bearer ${await firebaseUser.getIdToken()}`;
+  let response;
+  try{
+    response=await fetch(`${FB}/${p}.json`,{
+      method,
+      headers,
+      ...(data===undefined?{}:{body:JSON.stringify(data)})
+    });
+  }catch(error){
+    throw new Error('Could not reach Firebase. Check your connection and try again.');
+  }
+  let result=null;
+  if(method!=='DELETE'){
+    try{result=await response.json();}
+    catch{throw new Error('Firebase returned an unreadable response. Try again shortly.');}
+  }
+  if(!response.ok){
+    const error=new Error(result?.error||`Firebase rejected the request (${response.status}).`);
+    error.status=response.status;
+    throw error;
+  }
+  return result;
+}
 const db = {
-  patch(p,d){return fetch(`${FB}/${p}.json`,{method:'PATCH',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).then(r=>r.json()).catch(()=>{return new Promise(res=>setTimeout(res,500)).then(()=>fetch(`${FB}/${p}.json`,{method:'PATCH',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{}));})},
-  write(p,d){return fetch(`${FB}/${p}.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).then(r=>r.json()).catch(()=>{return new Promise(res=>setTimeout(res,500)).then(()=>fetch(`${FB}/${p}.json`,{method:'PUT',body:JSON.stringify(d),headers:{'Content-Type':'application/json'}}).catch(()=>{}));})},
-  async read(p){for(let n=0;n<3;n++){try{const r=await fetch(`${FB}/${p}.json`);if(r.ok)return await r.json();}catch(_){}if(n<2)await new Promise(res=>setTimeout(res,400*(n+1)));}return null;},
-  del(p){return fetch(`${FB}/${p}.json`,{method:'DELETE'}).catch(()=>{})}
+  async patch(p,d){try{return await firebaseRequest(p,'PATCH',d);}catch(error){reportDatabaseError(error);throw error;}},
+  async write(p,d){try{return await firebaseRequest(p,'PUT',d);}catch(error){reportDatabaseError(error);throw error;}},
+  async read(p){
+    let lastError;
+    for(let n=0;n<3;n++){
+      try{return await firebaseRequest(p,'GET');}
+      catch(error){
+        lastError=error;
+        if(error.status||n===2)break;
+        await new Promise(resolve=>setTimeout(resolve,400*(n+1)));
+      }
+    }
+    reportDatabaseError(lastError);
+    throw lastError;
+  },
+  async del(p){try{return await firebaseRequest(p,'DELETE');}catch(error){reportDatabaseError(error);throw error;}}
 };
-async function testFirebaseAccess(){try{const r=await fetch(`${FB}/_test.json`,{method:'PUT',body:JSON.stringify({ok:true}),headers:{'Content-Type':'application/json'}});if(!r.ok){const t=await r.text();if(t.includes('Permission denied')||t.includes('PERMISSION_DENIED')){const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';b.innerHTML='⚠ Firebase rules blocking writes. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> → Realtime Database → Rules → set { "rules": { ".read": true, ".write": true } }';document.body.prepend(b);}}else{fetch(`${FB}/_test.json`,{method:'DELETE'});}}catch(_){}}
+async function createFirebaseStream(path){
+  const uid=currentUser?.uid;
+  const firebaseUser=window.firebase?.apps?.length&&typeof window.firebase.auth==='function'
+    ?window.firebase.auth().currentUser
+    :null;
+  if(!uid||!firebaseUser||firebaseUser.uid!==uid)throw new Error('Your Firebase session is no longer available.');
+  const token=await firebaseUser.getIdToken();
+  if(currentUser?.uid!==uid)return null;
+  return new EventSource(`${FB}/${path}.json?auth=${encodeURIComponent(token)}`);
+}
 // Storage
 const memoryStore={};
 function getLocalStorage(){
@@ -1369,7 +1468,7 @@ const timeoutPromise=(ms)=>new Promise((_,reject)=>setTimeout(()=>reject(new Err
 const withTimeout=(promise,ms=1800)=>Promise.race([promise,timeoutPromise(ms)]);
 const onlineReady=()=>navigator.onLine!==false;
 // State
-let currentUser=null,fbUsers={},fbSSE=null,fbStarted=false,incomingSSE=null,searchQuery='';
+let currentUser=null,fbUsers={},fbSSE=null,fbStarted=false,presenceReconnectTimer=null,presenceUnloadListenerAdded=false,incomingSSE=null,searchQuery='';
 let googleClientId='',googleReady=false,googleTokenClient=null;
 const PAGE_META={
   landing:{title:'Zidea - Connect, Call, Play',desc:'Connect with friends, generate ideas, chat, call, and play games on Zidea.'},
@@ -1380,7 +1479,7 @@ const PAGE_META={
   library:{title:'Library - Zidea',desc:'Browse your saved, starred, and history ideas.'},
   explore:{title:'Explore - Zidea',desc:'Explore community ideas by category.'},
   chat:{title:'Messages - Zidea',desc:'Chat and call friends in real time.'},
-  arcade:{title:'Arcade - Zidea',desc:'Play chess, tic-tac-toe, rock paper scissors, and among us style mode.'},
+  arcade:{title:'ZIDEA PLAY - Zidea',desc:'Think. Create. Compete. Connect. Play IDEA WARS, BUILD TOGETHER, PITCH BATTLE and the 60-SECOND CHALLENGE.'},
   zidai:{title:'ZiD AI - Zidea',desc:'Ask ZiD AI and get instant responses.'},
   profile:{title:'Profile - Zidea',desc:'View and manage your Zidea profile and stats.'},
   settings:{title:'Settings - Zidea',desc:'Manage preferences and account settings.'},
@@ -1466,6 +1565,32 @@ function toggleMobileMore(force){
   const show=typeof force==='boolean'?force:!drawer.classList.contains('show');
   drawer.classList.toggle('show',show);
 }
+function focusDashboardSearch(){
+  if(!currentUser){showPage('login');return;}
+  showPage('dashboard');
+  const input=document.getElementById('search-input');
+  if(!input)return;
+  input.scrollIntoView({behavior:'smooth',block:'center'});
+  setTimeout(()=>input.focus(),180);
+}
+function renderDashboardHome(){
+  const username=currentUser?.username||'';
+  const greeting=document.getElementById('dashboard-greeting');
+  const profileName=document.getElementById('dashboard-top-username');
+  const activityName=document.getElementById('dashboard-activity-username');
+  const initials=getUserInitials(username||'Z');
+  if(greeting)greeting.textContent=username?`Welcome back, @${username}!`:'Welcome to Zidea';
+  if(profileName)profileName.textContent=username;
+  if(activityName)activityName.textContent=username?`@${username}`:'Sign in';
+  ['dashboard-top-avatar','dashboard-welcome-avatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
+  const saved=typeof getSavedIdeas==='function'?getSavedIdeas():[];
+  const games=load(username?`zidea_game_stats_${username}`:'zidea_game_stats')||{};
+  const gamesPlayed=Object.values(games).reduce((count,game)=>count+(game.wins||0)+(game.losses||0)+(game.draws||0),0);
+  const savedCount=document.getElementById('dashboard-saved-count');
+  const gamesCount=document.getElementById('dashboard-games-count');
+  if(savedCount)savedCount.textContent=String(saved.length);
+  if(gamesCount)gamesCount.textContent=String(gamesPlayed);
+}
 function openAuthModal(kind,skipHash=false){
   const login=document.getElementById('page-login'),signup=document.getElementById('page-signup');
   login.classList.remove('show');signup.classList.remove('show');
@@ -1499,24 +1624,27 @@ function showPage(name,opts={}){
   if(more)more.classList.toggle('active',['zidai','library','settings','help'].includes(name));
   toggleMobileMore(false);
   if(!opts.skipHash){suppressHashChange=true;window.location.hash=name;setTimeout(()=>{suppressHashChange=false;},0);}
-  if(name==='dashboard'){searchQuery='';const si=document.getElementById('search-input');if(si)si.value='';renderUsers();renderOnline();}
+  if(name==='dashboard'){searchQuery='';const si=document.getElementById('search-input');if(si)si.value='';renderDashboardHome();renderUsers();renderOnline();}
   if(name==='chat'){document.getElementById('chat-username').textContent='@'+(currentUser?.username||'');const ci=document.getElementById('convo-items');if(ci&&!Object.keys(chatCache).length)ci.innerHTML=skeletonConvos(5);loadAllConvos().then(()=>{renderConvos(activeChatUser);if(!activeChatUser&&!activeGroupId){const chatted=Object.keys(chatCache);if(chatted.length)openConvo(chatted[0]);}});loadMyGroups().then(()=>{if(activeConvoTab==='groups')renderGroupList();});}
   if(name!=='chat')document.getElementById('page-chat')?.classList.remove('chat-open');
-  if(name==='arcade'){const u=document.getElementById('arcade-username');if(u)u.textContent='@'+(currentUser?.username||'');renderArcadeHome();listenGameInvites();}
+  if(name==='arcade'){const u=document.getElementById('arcade-username');if(u)u.textContent='@'+(currentUser?.username||'');renderArcadeHome();}
   if(name==='zidai'){if(!document.querySelector('.zidai-msg'))initZidAi();}
   if(name==='ideas'){const u=document.getElementById('ideas-username');if(u)u.textContent='@'+(currentUser?.username||'');ensureMatchSeeds();prefillMatchUser();updateMatchStep();syncMatchIdeasFromFirebase().then(()=>updateMatchStep());}
-  if(name==='library'){const u=document.getElementById('library-username');if(u)u.textContent='@'+(currentUser?.username||'');const list=document.getElementById('library-list');if(list)list.innerHTML=skeletonUserCards(2);Promise.all([syncMatchIdeasFromFirebase(),syncCreatedIdeasFromFirebase()]).then(renderLibrary).catch(renderLibrary);}
+  if(name==='library'){const u=document.getElementById('library-username');if(u)u.textContent='@'+(currentUser?.username||'');const list=document.getElementById('library-list');if(list)list.innerHTML=skeletonUserCards(2);Promise.all([syncMatchIdeasFromFirebase(),syncCreatedIdeasFromFirebase()]).then(renderLibrary).catch(renderLibrary);if(window.zideaPlayAuth?.getLibrary){window.zideaPlayAuth.getLibrary().then(items=>{window.zideaPlayLibraryItems=items;renderLibrary();}).catch(error=>showToast(error.message||'ZIDEA PLAY creations could not be loaded.'));}}
   if(name==='explore'){const u=document.getElementById('explore-username');if(u)u.textContent='@'+(currentUser?.username||'');const list=document.getElementById('explore-list');if(list)list.innerHTML=skeletonUserCards(2);renderExplore();}
-  if(name==='profile'){const u=document.getElementById('profile-username-sidebar');if(u)u.textContent='@'+(currentUser?.username||'');const recent=document.getElementById('profile-recent-ideas');if(recent)recent.innerHTML=skeletonUserCards(2);renderProfile();}
+  if(name==='profile'){const u=document.getElementById('profile-username-sidebar');if(u)u.textContent='@'+(currentUser?.username||'');const recent=document.getElementById('profile-recent-ideas');if(recent)recent.innerHTML=skeletonUserCards(2);renderProfile();window.zideaPlayAuth?.renderProfileStats?.();}
   if(name==='settings'){const u=document.getElementById('settings-username');if(u)u.textContent='@'+(currentUser?.username||'');renderSettings();}
   if(name==='help'){const u=document.getElementById('help-username');if(u)u.textContent='@'+(currentUser?.username||'');}
 }
 function handleHashRoute(){
   if(suppressHashChange)return;
   const route=(window.location.hash||'#landing').replace('#','');
-  if(route==='login'||route==='signup'){openAuthModal(route,true);if(!currentUser)showPage('landing',{skipHash:true});return;}
+  if(route==='login'||route==='signup'){
+    if(currentUser)showPage('dashboard',{skipHash:true});
+    else {showPage('landing',{skipHash:true});openAuthModal(route,true);}
+    return;
+  }
   if(route.startsWith('arcade-')){
-
     if(!currentUser){showPage('landing',{skipHash:true});openAuthModal('login',true);return;}
     const game=route.replace('arcade-','');
     showPage('arcade',{skipHash:true});
@@ -1527,35 +1655,64 @@ function handleHashRoute(){
 }
 window.addEventListener('hashchange',handleHashRoute);
 window.addEventListener('keydown',e=>{if(e.key==='Escape')closeAuthModal();});
-// Auth
 function normalizeEmail(email){return String(email||'').trim().toLowerCase();}
+function getProfileStore(){
+  const raw=load('zidea_profiles')||{};
+  return raw && typeof raw === 'object' ? raw : {};
+}
+function saveProfileStore(profiles){save('zidea_profiles', profiles || {});}
+function getProfileForUsername(username){
+  const clean=String(username||'').trim();
+  if(!clean)return {username:'',about:'Building ideas and meeting great people.',wants:'Open to feedback, collaboration, and meaningful conversations.',vibe:'Builder',interests:'Ideas, product, people',skills:''};
+  const profiles=getProfileStore();
+  const record=profiles[clean.toLowerCase()]||profiles[clean]||{};
+  return {
+    username: clean.toLowerCase(), email: record.email || '',
+    about: record.about || 'Building ideas and meeting great people.',
+    wants: record.wants || 'Open to feedback, collaboration, and meaningful conversations.',
+    vibe: record.vibe || 'Builder', interests: record.interests || 'Ideas, product, people',
+    skills: record.skills || '', avatar: record.avatar || ''
+  };
+}
+function saveProfileForUsername(username, profile){
+  const clean=String(username||'').trim();
+  if(!clean)return;
+  const profiles=getProfileStore();
+  profiles[clean.toLowerCase()]={
+    username: clean.toLowerCase(), email: profile.email || '',
+    about: profile.about || 'Building ideas and meeting great people.',
+    wants: profile.wants || 'Open to feedback, collaboration, and meaningful conversations.',
+    vibe: profile.vibe || 'Builder', interests: profile.interests || 'Ideas, product, people',
+    skills: profile.skills || '', avatar: profile.avatar || '', createdAt: profile.createdAt || Date.now()
+  };
+  saveProfileStore(profiles);
+}
+function buildSignupQuestionnaire(){
+  return {
+    about: document.getElementById('signup-about')?.value?.trim() || '',
+    wants: document.getElementById('signup-wants')?.value?.trim() || '',
+    vibe: document.getElementById('signup-vibe')?.value || 'Builder',
+    interests: document.getElementById('signup-interests')?.value?.trim() || '',
+    skills: ''
+  };
+}
 function getAccounts(){
   const raw=load('zidea_accounts')||{};
   const accounts={};
   Object.entries(raw).forEach(([key,value])=>{
     if(!value||typeof value!=='object')return;
     const email=normalizeEmail(value.email||key);
-    if(email)accounts[email]={...value,email};
+    if(email){const safe={...value,email};delete safe.password;accounts[email]=safe;}
   });
   save('zidea_accounts',accounts);
   return accounts;
 }
-async function findRemoteAccount(email){
-  if(!onlineReady())return null;
-  const data=await withTimeout(db.read('accounts'),1600).catch(()=>null);
-  if(!data)return null;
-  const found=Object.values(data).find(a=>normalizeEmail(a?.email)===email);
-  if(!found)return null;
-  return {email,username:found.username,password:found.password||'',wins:found.wins||0,losses:found.losses||0};
-}
-function saveAccount(email,account){
-  const accounts=getAccounts();
-  accounts[email]={...account,email};
-  save('zidea_accounts',accounts);
-}
 function enterApp(user){
-  currentUser=user;
-  save('zidea_session',user);
+  const hydrated = user && typeof user === 'object' ? user : {username:'',email:''};
+  if (!hydrated.uid || hydrated.firebaseAuth !== true) return;
+  const profile = hydrated.profile || getProfileForUsername(hydrated.username);
+  currentUser={...hydrated, profile};
+  if(currentUser.username){saveProfileForUsername(currentUser.username,{...profile,email:currentUser.email||profile.email||'',username:currentUser.username});}
   try{setLoggedInUI();}catch(error){console.warn('setLoggedInUI failed',error);}
   try{updateLandingAuthUI();}catch(error){console.warn('updateLandingAuthUI failed',error);}
   try{closeAuthModal(true);}catch(error){console.warn('closeAuthModal failed',error);}
@@ -1563,68 +1720,6 @@ function enterApp(user){
   setTimeout(()=>{try{startFirebase();listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();}catch(error){console.warn('background sync failed',error);}},100);
   setTimeout(showWelcomeTour,350);
   showToast('Signed in successfully.');
-}
-function syncAccountOnline(email,account){
-  if(!onlineReady()||!account?.username)return;
-  withTimeout(db.write(`accounts/${account.username}`,{
-    email,
-    username:account.username,
-    password:account.password||'',
-    wins:account.wins||0,
-    losses:account.losses||0,
-    createdAt:account.createdAt||Date.now(),
-    updatedAt:Date.now()
-  }),1800).catch(()=>{});
-}
-function syncAllAccountsOnline(){
-  if(!onlineReady())return;
-  const accounts=getAccounts();
-  Object.entries(accounts).forEach(([email,account])=>syncAccountOnline(email,account));
-}
-async function handleLogin(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.classList.add('btn-loading');
-  const email=normalizeEmail(document.getElementById('login-email').value);
-  const pw=document.getElementById('login-password').value;
-  const err=document.getElementById('login-error');
-  const accounts=getAccounts();
-  let acc=accounts[email];
-  if(!acc){acc=await findRemoteAccount(email);if(acc)saveAccount(email,acc);}
-  if(!acc){err.textContent='No account found.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  if(acc.password!==pw){err.textContent='Wrong password.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  err.classList.remove('show');
-  if(btn)btn.classList.remove('btn-loading');
-  syncAccountOnline(email,acc);
-  loginSuccess({email,username:acc.username});
-}
-function handleSignup(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
-  const username=document.getElementById('signup-username').value.trim().toLowerCase();
-  const email=normalizeEmail(document.getElementById('signup-email').value);
-  const pw=document.getElementById('signup-password').value;
-  const err=document.getElementById('signup-error');
-  try{
-    const accounts=getAccounts();
-    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent='Use 3-20 letters, numbers, or underscores for username.';err.classList.add('show');return;}
-    if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');return;}
-    if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');return;}
-    err.classList.remove('show');
-    const account={email,username,password:pw,wins:0,losses:0,createdAt:Date.now()};
-    saveAccount(email,account);
-    err.classList.remove('show');
-    enterApp({email,username});
-    setTimeout(()=>syncAccountOnline(email,account),50);
-  }catch(error){
-    err.textContent='Could not create account: '+(error?.message||'Try again.');
-    err.classList.add('show');
-    console.error(error);
-  }finally{
-    if(btn)btn.disabled=false;
-  }
-}
-function loginSuccess(user){
-  enterApp(user);
 }
 function setLoggedInUI(){
   const n='@'+currentUser.username;
@@ -1636,120 +1731,19 @@ function setLoggedInUI(){
 function handleLogout(force=false){
   if(!force&&!confirm('Sign out of Zidea?'))return;
   if(activeCallUser)endCall();
+  if(gcallGroupId)endGroupCall();
+  incomingStreamGeneration++;
   if(incomingSSE){incomingSSE.close();incomingSSE=null;}
+  chatStreamGeneration++;if(chatSSE){chatSSE.close();chatSSE=null;}
+  groupStreamGeneration++;if(groupSSE){groupSSE.close();groupSSE=null;}
+  gcallStreamGeneration++;if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}
+  gameRoomStreamGeneration++;if(gameRoomSSE){gameRoomSSE.close();gameRoomSSE=null;}
+  gameInviteStreamGeneration++;if(gameInviteSSE){gameInviteSSE.close();gameInviteSSE=null;}
   if(fbSSE){fbSSE.close();fbSSE=null;}
-  if(currentUser&&fbStarted)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});
-  fbStarted=false;currentUser=null;removeStored('zidea_session');showPage('landing');showToast('Signed out.');
+  if(presenceReconnectTimer){clearTimeout(presenceReconnectTimer);presenceReconnectTimer=null;}
+  if(currentUser&&fbStarted&&window.firebase?.apps?.length&&window.firebase.auth().currentUser?.uid===currentUser.uid)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()}).catch(error=>console.warn('Could not update offline presence:',error));
+  fbStarted=false;selectedProfileUser=null;currentUser=null;removeStored('zidea_session');showPage('landing');showToast('Signed out.');
   updateLandingAuthUI();
-}
-async function handleForgotPassword(){
-  const email=normalizeEmail(document.getElementById('login-email')?.value||prompt('Enter your account email for password reset:')||'');
-  const err=document.getElementById('login-error');
-  if(!email){if(err){err.textContent='Enter your email first so we know where to send reset instructions.';err.classList.add('show');}return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){if(err){err.textContent='Enter a valid email address.';err.classList.add('show');}return;}
-  const request={email,requestedAt:Date.now(),status:'requested'};
-  const requests=load('zidea_password_reset_requests')||[];
-  save('zidea_password_reset_requests',[request,...requests].slice(0,25));
-  await db.patch('passwordResets',{[Date.now()]:request}).catch(()=>{});
-  if(err)err.classList.remove('show');
-  showToast('Password reset instructions have been sent if this email is registered.');
-}
-async function loadGoogleConfig(){
-  if(googleClientId) return googleClientId;
-  try{
-    const res = await fetch('/api/config');
-    if(res.ok){
-      const data = await res.json();
-      googleClientId = data.googleClientId || '';
-    }
-  }catch(_){}
-  // Static local previews can also set the client ID directly via window vars.
-  googleClientId = googleClientId || window.zideaGoogleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
-  return googleClientId;
-}
-async function initGoogleAuth(){
-  const clientId = await loadGoogleConfig();
-  if(!clientId){
-    showToast('Google sign-in is not configured yet.');
-    return false;
-  }
-  if(!window.google?.accounts?.id){
-    showToast('Google sign-in is still loading. Try again in a moment.');
-    return false;
-  }
-  if(!googleReady){
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleCredentialResponse,
-      ux_mode: 'popup',
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-    googleReady=true;
-  }
-  return true;
-}
-async function handleGoogleLogin(){
-  const ready=await initGoogleAuth();
-  if(!ready)return;
-  try {
-    google.accounts.id.prompt(notification => {
-      console.log('Google prompt notification', notification);
-      if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
-        showToast('Google prompt was blocked or did not appear. Please allow popups and try again.');
-        let fallback=document.getElementById('google-fallback-button');
-        if(!fallback){
-          fallback=document.createElement('div');
-          fallback.id='google-fallback-button';
-          fallback.style.position='fixed';
-          fallback.style.left='-9999px';
-          document.body.appendChild(fallback);
-        }
-        google.accounts.id.renderButton(fallback,{theme:'outline',size:'large'});
-      }
-    });
-  } catch (error) {
-    console.error('Google sign-in failed', error);
-    showToast('Google sign-in failed. Please try again.');
-  }
-}
-async function handleCredentialResponse(response){
-  const idToken = response?.credential;
-  if(!idToken){
-    showToast('Google sign-in failed. Please try again.');
-    return;
-  }
-  try{
-    const res = await fetch('/api/auth/google', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({idToken})
-    });
-    const data = await res.json().catch(() => ({}));
-    if(!res.ok || !data.success) throw new Error(data.message || 'Authentication failed. Try again.');
-    if(data.token) save('zidea_google_session_token', data.token);
-    if(data.user?.avatar) save(`zidea_avatar_data_${data.user.username}`, data.user.avatar);
-    saveAccount(normalizeEmail(data.user.email), {
-      email: data.user.email,
-      username: data.user.username,
-      password: '',
-      google_id: data.user.google_id || '',
-      avatar: data.user.avatar || '',
-      wins: data.user.wins || 0,
-      losses: data.user.losses || 0
-    });
-    loginSuccess({email: data.user.email, username: data.user.username, avatar: data.user.avatar || ''});
-  } catch (error) {
-    const msg = String(error?.message || 'Google sign-in failed. Please try again.');
-    console.error('Google auth failed', error, {response: error?.response});
-    showToast(msg);
-  }
-}
-let gStep='email',gEmail='';
-function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
-function handleGoogleSubmit(e){
-  e.preventDefault();
-  handleGoogleLogin();
 }
 </script>
 
@@ -1757,28 +1751,78 @@ function handleGoogleSubmit(e){
 // ------ Firebase Presence ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 function startFirebase(){
   if(!currentUser||fbStarted)return;fbStarted=true;
-  db.write('users/'+currentUser.username,{username:currentUser.username,lastSeen:Date.now(),online:true});
-  db.read('users').then(data=>{if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser.username)fbUsers[k]=u;});renderUsers();renderOnline();});
-  const sse=new EventSource(`${FB}/users.json`);fbSSE=sse;
-  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;fbUsers={};Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]=u;});renderUsers();renderOnline();}catch(_){}});
-  sse.addEventListener('patch',e=>{try{const{data}=JSON.parse(e.data);if(!data)return;Object.entries(data).forEach(([k,u])=>{if(u?.username!==currentUser?.username)fbUsers[k]={...(fbUsers[k]||{}),...u};});renderUsers();renderOnline();}catch(_){}});
-  sse.onerror=()=>{sse.close();fbSSE=null;setTimeout(startFirebase,5000);};
-  window.addEventListener('beforeunload',()=>{if(currentUser)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});});
+  const user=currentUser;
+  if(presenceReconnectTimer){clearTimeout(presenceReconnectTimer);presenceReconnectTimer=null;}
+  db.write('users/'+user.username,{uid:user.uid,username:user.username,lastSeen:Date.now(),online:true})
+    .catch(error=>console.warn('Could not update ZIDEA presence:',error));
+  db.read('users').then(data=>{
+    if(!data||currentUser?.uid!==user.uid)return;
+    fbUsers={};
+    Object.entries(data).forEach(([key,profile])=>{if(profile?.username!==user.username)fbUsers[key]=profile;});
+    renderUsers();renderOnline();
+  }).catch(error=>console.warn('Could not load ZIDEA presence:',error));
+  const scheduleReconnect=()=>{
+    if(!currentUser||currentUser.uid!==user.uid||presenceReconnectTimer)return;
+    fbStarted=false;
+    presenceReconnectTimer=setTimeout(()=>{presenceReconnectTimer=null;startFirebase();},5000);
+  };
+  const connect=async()=>{
+    const sse=await createFirebaseStream('users');
+    if(!sse||currentUser?.uid!==user.uid)return;
+    fbSSE=sse;
+    sse.addEventListener('put',event=>{
+      try{
+        const {data}=JSON.parse(event.data);
+        if(!data)return;
+        fbUsers={};
+        Object.entries(data).forEach(([key,profile])=>{if(profile?.username!==currentUser?.username)fbUsers[key]=profile;});
+        renderUsers();renderOnline();
+      }catch(error){console.warn('Could not process ZIDEA presence update:',error);}
+    });
+    sse.addEventListener('patch',event=>{
+      try{
+        const {data}=JSON.parse(event.data);
+        if(!data)return;
+        Object.entries(data).forEach(([key,profile])=>{
+          if(profile?.username!==currentUser?.username)fbUsers[key]={...(fbUsers[key]||{}),...profile};
+        });
+        renderUsers();renderOnline();
+      }catch(error){console.warn('Could not process ZIDEA presence update:',error);}
+    });
+    sse.onerror=()=>{
+      if(fbSSE!==sse)return;
+      sse.close();fbSSE=null;
+      scheduleReconnect();
+    };
+  };
+  connect().catch(error=>{
+    console.warn('Could not connect to ZIDEA presence:',error);
+    showToast('Online status could not be synchronized. Retrying shortly.');
+    scheduleReconnect();
+  });
+  if(!presenceUnloadListenerAdded){
+    window.addEventListener('beforeunload',()=>{if(currentUser)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()}).catch(error=>console.warn('Could not update offline presence:',error));});
+    presenceUnloadListenerAdded=true;
+  }
 }
 function isOnline(u){if(!u)return false;return u.online===true&&Date.now()-(u.lastSeen||0)<180000;}
-function touchPresence(){if(!currentUser||!fbStarted)return;db.patch('users/'+currentUser.username,{lastSeen:Date.now(),online:true});}
+function touchPresence(){if(!currentUser||!fbStarted)return;db.patch('users/'+currentUser.username,{lastSeen:Date.now(),online:true}).catch(error=>console.warn('Could not refresh ZIDEA presence:',error));}
 setInterval(touchPresence,15000);
 setInterval(()=>{renderOnline();renderUsers();},10000);
-function getAllUsers(){const fb=Object.values(fbUsers);if(fb.length)return fb;const accounts=load('zidea_accounts')||{};return Object.entries(accounts).filter(([e])=>e!==currentUser?.email).map(([,a])=>({username:a.username,wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0}));}
+function getAllUsers(){const fb=Object.values(fbUsers);if(fb.length)return fb;const accounts=getAccounts();return Object.entries(accounts).filter(([e])=>e!==currentUser?.email).map(([,a])=>({username:a.username,wins:a.wins||0,losses:a.losses||0,lastSeen:a.lastSeen||0}));}
 function filterUsers(){searchQuery=document.getElementById('search-input').value;const list=document.getElementById('user-list');if(searchQuery&&!Object.keys(fbUsers).length&&list)list.innerHTML=skeletonUserCards(3);renderUsers();}
 function renderUsers(){
   const list=document.getElementById('user-list');if(!list)return;
   if(!searchQuery){list.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px 20px;text-align:center"><div style="width:64px;height:64px;border-radius:20px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.2);display:flex;align-items:center;justify-content:center"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E6CE8B" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div><div><p style="color:#e0e0e0;font-size:15px;font-weight:700;margin-bottom:6px">Find someone</p><p style="color:#bfb399;font-size:13px;line-height:1.6">Search by @username to find people</p></div></div>`;return;}
-  const users=getAllUsers().filter(u=>u.username.toLowerCase().includes(searchQuery.toLowerCase()));
+  const users=getAllUsers().filter(u=>typeof u?.username==='string'&&/^[a-z0-9_]{3,20}$/i.test(u.username)&&u.username.toLowerCase().includes(searchQuery.toLowerCase()));
   if(!users.length){list.innerHTML=`<p style="color:#bfb399;font-size:14px;text-align:center;padding:40px 20px">No users found for "<strong style="color:#E6CE8B">${esc(searchQuery)}</strong>"</p>`;return;}
-  list.innerHTML=users.map(u=>`<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${u.username.slice(0,2).toUpperCase()}</div><div class="user-info"><strong>@${u.username}</strong><div class="user-stats"><span style="color:#C9A84C">W:${u.wins||0}</span><span style="color:#F87171">L:${u.losses||0}</span><span style="color:${isOnline(u)?'#E6CE8B':'#bfb399'}">${isOnline(u)?'● Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===u.username?' active':''}" id="call-${u.username}" onclick="toggleCall('${u.username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===u.username?'End':'Call'}</button></div></div>`).join('');
+  list.innerHTML=users.map(u=>{
+    const username=u.username.toLowerCase();
+    const safeUsername=escapeHtml(username);
+    return `<div class="card user-card"><div style="display:flex;align-items:center;gap:12px"><div class="user-avatar${isOnline(u)?' is-online':''}">${safeUsername.slice(0,2).toUpperCase()}</div><div class="user-info"><strong role="button" tabindex="0" onclick="openUserProfile('${username}')" style="cursor:pointer">@${safeUsername}</strong><div class="user-stats"><span style="color:#C9A84C">W:${Number(u.wins)||0}</span><span style="color:#F87171">L:${Number(u.losses)||0}</span><span style="color:${isOnline(u)?'#E6CE8B':'#bfb399'}">${isOnline(u)?'● Online':'Offline'}</span></div></div></div><div class="user-actions"><button class="chat-btn" onclick="openChat('${username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Chat</button><button class="call-btn${activeCallUser===username?' active':''}" id="call-${username}" onclick="toggleCall('${username}')"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.18 2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 6 6l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>${activeCallUser===username?'End':'Call'}</button></div></div>`;
+  }).join('');
 }
-function renderOnline(){const el=document.getElementById('online-list');if(!el)return;const online=getAllUsers().filter(u=>isOnline(u));if(!online.length){el.innerHTML='<div class="online-empty">No one online yet</div>';return;}el.innerHTML=online.map(u=>`<div class="online-user-row"><div class="online-avatar">${u.username.slice(0,2).toUpperCase()}</div><div><div class="online-user-name">@${u.username}</div></div></div>`).join('');}
+function renderOnline(){const el=document.getElementById('online-list');if(!el)return;const online=getAllUsers().filter(u=>typeof u?.username==='string'&&/^[a-z0-9_]{3,20}$/i.test(u.username)&&isOnline(u));if(!online.length){el.innerHTML='<div class="online-empty">No one online yet</div>';return;}el.innerHTML=online.map(u=>{const username=u.username.toLowerCase();const safeUsername=escapeHtml(username);return `<div class="online-user-row"><div class="online-avatar">${safeUsername.slice(0,2).toUpperCase()}</div><div><div class="online-user-name" role="button" tabindex="0" onclick="openUserProfile('${username}')" style="cursor:pointer">@${safeUsername}</div></div></div>`;}).join('');}
 // Skeletons
 function skeletonConvos(n=5){return Array(n).fill(0).map(()=>`<div class="skeleton-convo"><div class="skeleton skeleton-circle" style="width:42px;height:42px;flex-shrink:0"></div><div style="flex:1;min-width:0"><div class="skeleton" style="height:13px;width:70%;margin-bottom:7px;border-radius:6px"></div><div class="skeleton" style="height:11px;width:50%;border-radius:6px"></div></div></div>`).join('');}
 function skeletonUserCards(n=3){return Array(n).fill(0).map(()=>`<div class="skeleton-card"><div class="skeleton skeleton-circle" style="width:44px;height:44px;flex-shrink:0"></div><div style="flex:1"><div class="skeleton" style="height:13px;width:60%;margin-bottom:8px;border-radius:6px"></div><div class="skeleton" style="height:11px;width:40%;border-radius:6px"></div></div><div style="display:flex;gap:8px"><div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div><div class="skeleton" style="width:60px;height:32px;border-radius:10px"></div></div></div>`).join('');}
@@ -1788,7 +1832,7 @@ function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').repl
 
 <script>
 // ------ Voice Calls (WebRTC) ------------------------------------------------------------------------------------------------------------------------------------------------------
-let rtcPeer=null,localStream=null,activeCallUser=null,callMuted=false,callTimer=null,callSecs=0,incomingUser=null,sigSSE=null,callConnectTimeout=null;
+let rtcPeer=null,localStream=null,activeCallUser=null,callMuted=false,callTimer=null,callSecs=0,incomingUser=null,sigSSE=null,sigStreamGeneration=0,callConnectTimeout=null;
 const RTC_CONFIG={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'}]};
 function callChan(a,b){return[a,b].sort().join('__');}
 function sigPath(chan){return`webrtc/${chan}`;}
@@ -1808,59 +1852,32 @@ function prepareCallUI(username,status){
   document.getElementById('call-timer').textContent='00:00';
 }
 async function toggleCall(username){if(activeCallUser){endCall();return;}await startCall(username);}
-async function startCall(username){
-  if(!currentUser)return;activeCallUser=username;
-  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';
-  prepareCallUI(username,'Connecting...');
-  const chan=callChan(currentUser.username,username);
-  await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,ts:Date.now()});
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;showToast('Microphone unavailable.');return;}
-  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
-  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';showToast('Call connection failed.');setTimeout(endCall,900);}};
-  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  const offer=await rtcPeer.createOffer();await rtcPeer.setLocalDescription(offer);await db.write(sigPath(chan)+'/offer',{sdp:offer.sdp,type:offer.type,from:currentUser.username});
-  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='No answer';showToast('No answer. Call ended.');endCall();}},30000);
-  listenSignals(chan,false);renderUsers();
-}
 function listenSignals(chan,isCallee){
-  if(sigSSE){sigSSE.close();sigSSE=null;}const me=currentUser.username;
-  const sse=new EventSource(`${FB}/${sigPath(chan)}.json`);sigSSE=sse;
-  sse.addEventListener('put',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;if(isCallee&&data.offer&&data.offer.from!==me&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.offer.type,sdp:data.offer.sdp}));const answer=await rtcPeer.createAnswer();await rtcPeer.setLocalDescription(answer);await db.write(sigPath(chan)+'/answer',{sdp:answer.sdp,type:answer.type,from:me});}if(!isCallee&&data.answer&&data.answer.from!==me&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}const otherUser=isCallee?data.offer?.from:data.answer?.from;const iceNode=data['ice_'+otherUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(_){}}};}catch(_){}});
-  sse.addEventListener('patch',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;const otherUser=isCallee?activeCallUser:activeCallUser;const iceNode=data['ice_'+otherUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(_){}}}if(!isCallee&&data.answer&&data.answer.from!==currentUser.username&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}}catch(_){}});
-}
-async function endCall(){
-  if(!activeCallUser)return;const u=activeCallUser;activeCallUser=null;callMuted=false;
-  if(currentUser){db.del('calls/'+currentUser.username+'/incoming');db.del('calls/'+u+'/incoming');const chan=callChan(currentUser.username,u);db.del(sigPath(chan));}
-  if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}
-  if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
-  const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
+  if(sigSSE){sigSSE.close();sigSSE=null;}
+  const generation=++sigStreamGeneration;
+  const uid=currentUser.uid;
+  const me=currentUser.username;
+  createFirebaseStream(sigPath(chan)).then(sse=>{
+    if(!sse||generation!==sigStreamGeneration||currentUser?.uid!==uid||!rtcPeer){sse?.close();return;}
+    sigSSE=sse;
+    sse.addEventListener('put',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;if(isCallee&&data.offer&&data.offer.from!==me&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.offer.type,sdp:data.offer.sdp}));const answer=await rtcPeer.createAnswer();await rtcPeer.setLocalDescription(answer);await db.write(sigPath(chan)+'/answer',{sdp:answer.sdp,type:answer.type,from:me});}if(!isCallee&&data.answer&&data.answer.from!==me&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}const otherUser=isCallee?data.offer?.from:data.answer?.from;const iceNode=data['ice_'+otherUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(error){console.warn('Ignoring an invalid ICE candidate:',error);}}};}catch(error){console.error('Call signaling update failed:',error);}});
+    sse.addEventListener('patch',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;const otherUser=activeCallUser;const iceNode=data['ice_'+otherUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(error){console.warn('Ignoring an invalid ICE candidate:',error);}}}if(!isCallee&&data.answer&&data.answer.from!==currentUser.username&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}}catch(error){console.error('Call signaling update failed:',error);}});
+    sse.onerror=()=>{if(sigSSE!==sse)return;sse.close();sigSSE=null;};
+  }).catch(error=>{
+    if(generation!==sigStreamGeneration)return;
+    console.error('Could not open call signaling stream:',error);
+    showToast('Call connection could not synchronize. Please try again.');
+  });
 }
 function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'🔇':'🎤';}
 function startCallTimer(){callSecs=0;callTimer=setInterval(()=>{callSecs++;const m=String(Math.floor(callSecs/60)).padStart(2,'0');const s=String(callSecs%60).padStart(2,'0');const el=document.getElementById('call-timer');if(el)el.textContent=m+':'+s;},1000);}
 function stopCallTimer(){if(callTimer){clearInterval(callTimer);callTimer=null;}callSecs=0;}
-function listenIncoming(){
-  if(!currentUser||incomingSSE)return;
-  const sse=new EventSource(`${FB}/calls/${currentUser.username}/incoming.json`);incomingSSE=sse;
-  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data||!data.from||data.from===currentUser?.username||activeCallUser)return;incomingUser=data.from;document.getElementById('incoming-name').textContent='@'+data.from;document.getElementById('incoming-avatar').textContent=getUserInitials(data.from);document.getElementById('incoming-toast').style.display='block';setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);}catch(_){}});
-}
-async function acceptCall(){
-  if(!incomingUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser;incomingUser=null;activeCallUser=caller;
-  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';prepareCallUI(caller,'Connecting...');
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;return;}
-  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
-  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';setTimeout(endCall,900);}};
-  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);const chan=callChan(currentUser.username,caller);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
-  const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
-}
-function declineCall(){incomingUser=null;document.getElementById('incoming-toast').style.display='none';if(currentUser)db.del('calls/'+currentUser.username+'/incoming');}
+function declineCall(){incomingUser=null;document.getElementById('incoming-toast').style.display='none';if(currentUser)db.del('calls/'+currentUser.username+'/incoming').catch(error=>console.warn('Could not decline call in Firebase:',error));}
 </script>
 
 <script>
 // ------ Video calls + in-call games --------------------------------------------------
-let incomingCallVideo=false;
+let incomingCallVideo=false,incomingStreamGeneration=0;
 function toggleVideoCall(username){if(activeCallUser){endCall();return;}return startCall(username,true);}
 function setupCallMedia(stream,isVideo){
   const stage=document.getElementById('video-call-stage'),localVideo=document.getElementById('local-video');
@@ -1876,43 +1893,95 @@ function attachRemoteStream(stream){
   audio.srcObject=stream;
 }
 async function startCall(username,isVideo=false){
-  if(!currentUser)return;activeCallUser=username;
+  if(!currentUser||!/^[a-z0-9_]{3,20}$/i.test(String(username))||username===currentUser.username)return;
+  const uid=currentUser.uid;activeCallUser=username;
   const overlay=document.getElementById('call-overlay');overlay.style.display='flex';
   prepareCallUI(username,isVideo?'Requesting camera and microphone...':'Requesting microphone...');
   document.getElementById('call-game-dock')?.classList.remove('show');
   const chan=callChan(currentUser.username,username);
-  await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,video:!!isVideo,ts:Date.now()});
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:!!isVideo});}catch(err){document.getElementById('call-status').textContent='Permission error: '+err.message;showToast(isVideo?'Camera or microphone unavailable.':'Microphone unavailable.');return;}
-  setupCallMedia(localStream,isVideo);
-  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{attachRemoteStream(e.streams[0]);document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
-  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';showToast('Call connection failed.');setTimeout(endCall,900);}};
-  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  const offer=await rtcPeer.createOffer();await rtcPeer.setLocalDescription(offer);await db.write(sigPath(chan)+'/offer',{sdp:offer.sdp,type:offer.type,from:currentUser.username});
-  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='No answer';showToast('No answer. Call ended.');endCall();}},30000);
-  listenSignals(chan,false);renderUsers();
+  try{
+    localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:!!isVideo});
+    if(currentUser?.uid!==uid||activeCallUser!==username){localStream.getTracks().forEach(track=>track.stop());localStream=null;await endCall();return;}
+    setupCallMedia(localStream,isVideo);
+    rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(track=>rtcPeer.addTrack(track,localStream));
+    rtcPeer.ontrack=e=>{attachRemoteStream(e.streams[0]);document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
+    rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';showToast('Call connection failed.');setTimeout(endCall,900);}};
+    rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);try{await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}catch(error){console.error('Could not send call ICE candidate:',error);}}};
+    await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,video:!!isVideo,ts:Date.now()});
+    if(currentUser?.uid!==uid||activeCallUser!==username){
+      db.del('calls/'+username+'/incoming').catch(error=>console.warn('Could not clear cancelled call invitation:',error));
+      db.del(sigPath(chan)).catch(error=>console.warn('Could not clear cancelled call signaling:',error));
+      await endCall();return;
+    }
+    const offer=await rtcPeer.createOffer();await rtcPeer.setLocalDescription(offer);await db.write(sigPath(chan)+'/offer',{sdp:offer.sdp,type:offer.type,from:currentUser.username});
+    if(currentUser?.uid!==uid||activeCallUser!==username){
+      db.del('calls/'+username+'/incoming').catch(error=>console.warn('Could not clear cancelled call invitation:',error));
+      db.del(sigPath(chan)).catch(error=>console.warn('Could not clear cancelled call signaling:',error));
+      await endCall();return;
+    }
+    callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='No answer';showToast('No answer. Call ended.');endCall();}},30000);
+    listenSignals(chan,false);renderUsers();
+  }catch(error){
+    console.error('Could not start call:',error);
+    showToast(isVideo?'Video call could not start. Check camera, microphone, and Firebase permissions.':'Call could not start. Check microphone and Firebase permissions.');
+    await endCall();
+  }
 }
 function listenIncoming(){
   if(!currentUser||incomingSSE)return;
-  const sse=new EventSource(`${FB}/calls/${currentUser.username}/incoming.json`);incomingSSE=sse;
-  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data||!data.from||data.from===currentUser?.username||activeCallUser)return;incomingUser=data.from;incomingCallVideo=!!data.video;document.getElementById('incoming-name').textContent='@'+data.from;renderAvatar(document.getElementById('incoming-avatar'),data.from);const label=document.querySelector('#incoming-name')?.nextElementSibling;if(label)label.textContent=incomingCallVideo?'Incoming video call...':'Incoming call...';document.getElementById('incoming-toast').style.display='block';setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);}catch(_){}});}
+  const generation=++incomingStreamGeneration;
+  const uid=currentUser.uid;
+  createFirebaseStream(`calls/${currentUser.username}/incoming`).then(sse=>{
+    if(!sse||generation!==incomingStreamGeneration||currentUser?.uid!==uid||incomingSSE){sse?.close();return;}
+    incomingSSE=sse;
+    sse.addEventListener('put',event=>{
+      try{
+        const {data}=JSON.parse(event.data);
+        if(!data||!(/^[a-z0-9_]{3,20}$/i.test(String(data.from||'')))||data.from===currentUser?.username||activeCallUser)return;
+        incomingUser=data.from;incomingCallVideo=!!data.video;
+        document.getElementById('incoming-name').textContent='@'+data.from;
+        renderAvatar(document.getElementById('incoming-avatar'),data.from);
+        const label=document.querySelector('#incoming-name')?.nextElementSibling;
+        if(label)label.textContent=incomingCallVideo?'Incoming video call...':'Incoming call...';
+        document.getElementById('incoming-toast').style.display='block';
+        setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);
+      }catch(error){console.error('Could not process incoming-call notification:',error);}
+    });
+    sse.onerror=()=>{if(incomingSSE!==sse)return;sse.close();incomingSSE=null;};
+  }).catch(error=>{
+    if(generation!==incomingStreamGeneration)return;
+    console.error('Could not open incoming-call stream:',error);
+    showToast('Incoming calls could not be synchronized. Check your Firebase connection and rules.');
+  });}
 async function acceptCall(){
-  if(!incomingUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser,isVideo=!!incomingCallVideo;incomingUser=null;incomingCallVideo=false;activeCallUser=caller;
+  if(!incomingUser||!currentUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser,isVideo=!!incomingCallVideo;incomingUser=null;incomingCallVideo=false;activeCallUser=caller;
   const overlay=document.getElementById('call-overlay');overlay.style.display='flex';prepareCallUI(caller,isVideo?'Requesting camera and microphone...':'Requesting microphone...');
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});}catch(err){document.getElementById('call-status').textContent='Permission error: '+err.message;return;}
-  setupCallMedia(localStream,isVideo);
-  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{attachRemoteStream(e.streams[0]);document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
-  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';setTimeout(endCall,900);}};
-  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);const chan=callChan(currentUser.username,caller);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
-  const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
+  const uid=currentUser?.uid,chan=currentUser?callChan(currentUser.username,caller):null;
+  try{
+    localStream=await navigator.mediaDevices.getUserMedia({audio:true,video:isVideo});
+    if(currentUser?.uid!==uid||activeCallUser!==caller){localStream.getTracks().forEach(track=>track.stop());localStream=null;await endCall();return;}
+    setupCallMedia(localStream,isVideo);
+    rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(track=>rtcPeer.addTrack(track,localStream));
+    rtcPeer.ontrack=e=>{attachRemoteStream(e.streams[0]);document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
+    rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';setTimeout(endCall,900);}};
+    rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);try{await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}catch(error){console.error('Could not send call ICE candidate:',error);}}};
+    callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
+    listenSignals(chan,true);renderUsers();
+  }catch(error){
+    console.error('Could not accept call:',error);
+    showToast(isVideo?'Video call could not connect. Check camera, microphone, and Firebase permissions.':'Call could not connect. Check microphone and Firebase permissions.');
+    await endCall();
+  }
 }
 function toggleVideo(){const track=localStream?.getVideoTracks?.()[0];if(!track){showToast('Start a video call to use camera.');return;}track.enabled=!track.enabled;document.getElementById('video-btn').textContent=track.enabled?'📹':'🚫';}
 function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'🔇':'🎤';}
 async function endCall(){
   if(!activeCallUser)return;const u=activeCallUser;activeCallUser=null;callMuted=false;
-  if(currentUser){db.del('calls/'+currentUser.username+'/incoming');db.del('calls/'+u+'/incoming');const chan=callChan(currentUser.username,u);db.del(sigPath(chan));}
+  sigStreamGeneration++;
+  if(currentUser){
+    const chan=callChan(currentUser.username,u);
+    for(const path of ['calls/'+currentUser.username+'/incoming','calls/'+u+'/incoming',sigPath(chan)])db.del(path).catch(error=>console.warn('Could not clear call state:',error));
+  }
   if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}
   if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
   const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();const lv=document.getElementById('local-video'),rv=document.getElementById('remote-video');if(lv)lv.srcObject=null;if(rv)rv.srcObject=null;document.getElementById('video-call-stage')?.classList.remove('show');document.getElementById('call-game-dock')?.classList.remove('show');document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
@@ -1926,7 +1995,7 @@ function renderCallMiniGame(type){const root=document.getElementById('call-mini-
 
 <script>
 // ------ Chat ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-let activeChatUser=null,chatSSE=null;
+let activeChatUser=null,chatSSE=null,chatStreamGeneration=0;
 const chatCache={};
 function openChat(username){showPage('chat');renderConvos(username);openConvo(username);}
 async function loadAllConvos(){
@@ -1952,7 +2021,7 @@ function relativeTime(ts){
   if(!ts)return'';if(m<1)return'now';if(m<60)return`${m}m ago`;if(h<24)return`${h}h ago`;if(d===1)return'Yesterday';return`${d}d ago`;
 }
 function openConvo(username){
-  activeChatUser=username;if(chatSSE){chatSSE.close();chatSSE=null;}
+  activeChatUser=username;const streamGeneration=++chatStreamGeneration;if(chatSSE){chatSSE.close();chatSSE=null;}
   document.getElementById('page-chat')?.classList.add('chat-open');
   const user=getAllUsers().find(u=>u.username===username);const online=user&&isOnline(user);
   document.getElementById('chat-window').innerHTML=`
@@ -1979,15 +2048,24 @@ function openConvo(username){
   else if(chatCache[username].length){renderMsgs();}
   else{const msgsEl=document.getElementById('chat-msgs');if(msgsEl)msgsEl.innerHTML=skeletonMessages(5);}
   const key=[currentUser.username,username].sort().join('__');
-  const sse=new EventSource(`${FB}/chats/${key}/messages.json`);chatSSE=sse;let seeded=false;
+  let seeded=false;
   function mergeMessages(d){
     if(!d||typeof d!=='object')return;let entries=Object.values(d);if(entries.length&&entries[0]&&typeof entries[0]==='object'&&!entries[0].from)entries=Object.values(entries[0]);
     let changed=false;entries.forEach(m=>{if(!m||!m.ts||!m.from)return;const existing=chatCache[username].find(x=>x.ts===m.ts&&x.from===m.from);if(!existing){chatCache[username].push(m);changed=true;}else if(existing._pending&&!m._pending){Object.assign(existing,m);changed=true;}});
     if(changed){chatCache[username].sort((a,b)=>a.ts-b.ts);markRead(username);save('chat_'+key,chatCache[username].slice(-200));renderMsgs();renderConvos(username);}
   }
-  sse.addEventListener('put',e=>{try{const{data:d}=JSON.parse(e.data);if(!seeded){seeded=true;if(d){chatCache[username]=Object.values(d).filter(m=>m&&m.ts&&m.from);chatCache[username].sort((a,b)=>a.ts-b.ts);markRead(username);save('chat_'+key,chatCache[username].slice(-200));renderMsgs();renderConvos(username);}}else{mergeMessages(d);}}catch(_){}});
-  sse.addEventListener('patch',e=>{try{mergeMessages(JSON.parse(e.data).data);}catch(_){}});
-  sse.onerror=()=>{sse.close();chatSSE=null;};
+  createFirebaseStream(`chats/${key}/messages`).then(sse=>{
+    if(!sse||streamGeneration!==chatStreamGeneration||activeChatUser!==username){sse?.close();return;}
+    chatSSE=sse;
+    sse.addEventListener('put',event=>{try{const{data:d}=JSON.parse(event.data);if(!seeded){seeded=true;if(d){chatCache[username]=Object.values(d).filter(m=>m&&m.ts&&m.from);chatCache[username].sort((a,b)=>a.ts-b.ts);markRead(username);save('chat_'+key,chatCache[username].slice(-200));renderMsgs();renderConvos(username);}}else{mergeMessages(d);}}catch(error){console.error('Could not process chat update:',error);}});
+    sse.addEventListener('patch',event=>{try{mergeMessages(JSON.parse(event.data).data);}catch(error){console.error('Could not process chat update:',error);}});
+    sse.onerror=()=>{if(chatSSE!==sse)return;sse.close();chatSSE=null;showToast('This conversation lost its live connection. Reopen it to retry.');};
+  }).catch(error=>{
+    if(streamGeneration!==chatStreamGeneration)return;
+    console.error('Could not open chat stream:',error);
+    const messages=document.getElementById('chat-msgs');
+    if(messages)messages.textContent='Messages could not be loaded. Check your connection and Firebase permissions.';
+  });
   setTimeout(()=>{const i=document.getElementById('chat-input');if(i)i.focus();},50);
 }
 function markRead(username){if(!chatCache[username])return;chatCache[username].forEach(m=>{if(m.from!==currentUser?.username)m.read=true;});}
@@ -2091,13 +2169,20 @@ function filterConvos(q){const items=document.querySelectorAll('.convo-item');it
 
 <script>
 // ------ Groups ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-let activeGroupId=null,groupSSE=null;
+let activeGroupId=null,groupSSE=null,groupStreamGeneration=0;
 const groupCache={};let myGroups={};
-let gcallPeers={},gcallStream=null,gcallTimer=null,gcallSecs=0,gcallMuted=false,gcallGroupId=null,gcallSigSSE=null,gcallConnected=false;
+let gcallPeers={},gcallStream=null,gcallTimer=null,gcallSecs=0,gcallMuted=false,gcallGroupId=null,gcallSigSSE=null,gcallConnected=false,gcallStreamGeneration=0;
 function openCreateGroup(){
   const list=document.getElementById('group-member-list');document.getElementById('group-name-input').value='';document.getElementById('group-modal-overlay').classList.add('show');
   list.innerHTML='<div style="padding:16px;text-align:center;color:#bfb399;font-size:13px">Loading users...</div>';
-  db.read('users').then(data=>{const users=data?Object.values(data).filter(u=>u&&u.username&&u.username!==currentUser?.username):getAllUsers();if(!users.length){list.innerHTML='<div style="padding:16px;text-align:center;color:#bfb399;font-size:13px">No other users found.</div>';return;}list.innerHTML=users.map(u=>`<div class="group-member-row" id="gmr-${u.username}" onclick="toggleGroupMember('${u.username}')"><div class="gm-avatar">${u.username.slice(0,2).toUpperCase()}</div><span class="gm-name">@${u.username}</span><div class="gm-check" id="gmc-${u.username}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div></div>`).join('');});
+  db.read('users').then(data=>{
+    const users=(data?Object.values(data):getAllUsers()).filter(u=>u&&typeof u.username==='string'&&/^[a-z0-9_]{3,20}$/i.test(u.username)&&u.username!==currentUser?.username);
+    if(!users.length){list.innerHTML='<div style="padding:16px;text-align:center;color:#bfb399;font-size:13px">No other users found.</div>';return;}
+    list.innerHTML=users.map(u=>`<div class="group-member-row" id="gmr-${u.username}" onclick="toggleGroupMember('${u.username}')"><div class="gm-avatar">${u.username.slice(0,2).toUpperCase()}</div><span class="gm-name">@${u.username}</span><div class="gm-check" id="gmc-${u.username}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="display:none"><polyline points="20 6 9 17 4 12"/></svg></div></div>`).join('');
+  }).catch(error=>{
+    console.error('Could not load group members:',error);
+    list.textContent='Users could not be loaded. Check your connection and Firebase permissions.';
+  });
 }
 function toggleGroupMember(username){const row=document.getElementById('gmr-'+username);if(!row)return;row.classList.toggle('selected');const check=row.querySelector('.gm-check svg');if(check)check.style.display=row.classList.contains('selected')?'block':'none';}
 function filterGroupMembers(q){document.querySelectorAll('.group-member-row').forEach(row=>{row.style.display=row.textContent.toLowerCase().includes(String(q||'').toLowerCase())?'flex':'none';});}
@@ -2107,7 +2192,9 @@ async function confirmCreateGroup(){
   const selected=[...document.querySelectorAll('.group-member-row.selected')].map(el=>el.id.replace('gmr-',''));if(!selected.length){alert('Select at least one member.');return;}
   const members=[currentUser.username,...selected];const groupId='g_'+Date.now()+'_'+Math.random().toString(36).slice(2,7);
   const group={id:groupId,name,members,createdBy:currentUser.username,ts:Date.now()};
-  await db.write(`groups/${groupId}`,group);myGroups[groupId]=group;closeCreateGroup();switchConvoTab('groups');openGroupConvo(groupId);
+  try{await db.write(`groups/${groupId}`,group);}
+  catch(error){console.error('Could not create group:',error);showToast('The group could not be created. Check your connection and Firebase permissions.');return;}
+  myGroups[groupId]=group;closeCreateGroup();switchConvoTab('groups');openGroupConvo(groupId);
 }
 async function loadMyGroups(){if(!currentUser)return;const data=await db.read('groups');if(!data)return;myGroups={};Object.values(data).forEach(g=>{if(g&&g.members&&g.members.includes(currentUser.username))myGroups[g.id]=g;});}
 function renderGroupList(){
@@ -2117,7 +2204,7 @@ function renderGroupList(){
   el.innerHTML=groups.map(g=>{const msgs=groupCache[g.id]||[];const last=msgs[msgs.length-1];const unread=msgs.filter(m=>m.from!==currentUser.username&&!m.read).length;const preview=last?(last.type?'📎 '+(last.name||'file'):(last.from===currentUser.username?'You: ':last.from+': ')+esc(last.text||'')):'No messages yet';return`<div class="convo-item${activeGroupId===g.id?' active':''}" onclick="openGroupConvo('${g.id}')"><div class="convo-avatar" style="background:linear-gradient(135deg,#f97316,#A38738)">${g.name.slice(0,2).toUpperCase()}</div><div class="convo-meta"><div class="convo-name">${esc(g.name)}</div><div class="convo-preview">${preview}</div></div><div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px">${last?`<span class="convo-time">${last.time}</span>`:''} ${unread>0?`<span class="unread-badge">${unread}</span>`:''}</div></div>`;}).join('');
 }
 function openGroupConvo(groupId){
-  activeGroupId=groupId;activeChatUser=null;if(chatSSE){chatSSE.close();chatSSE=null;}if(groupSSE){groupSSE.close();groupSSE=null;}
+  activeGroupId=groupId;activeChatUser=null;chatStreamGeneration++;if(chatSSE){chatSSE.close();chatSSE=null;}const streamGeneration=++groupStreamGeneration;if(groupSSE){groupSSE.close();groupSSE=null;}
   const group=myGroups[groupId];if(!group)return;
   const memberStr=group.members.filter(m=>m!==currentUser.username).join(', @');
   document.getElementById('chat-window').innerHTML=`
@@ -2133,10 +2220,19 @@ function openGroupConvo(groupId){
     </div>`;
   groupCache[groupId]=groupCache[groupId]||[];
   const gMsgsEl=document.getElementById('chat-msgs');if(gMsgsEl){if(!groupCache[groupId].length)gMsgsEl.innerHTML=skeletonMessages(4);else renderGroupMsgs(groupId);}
-  const sse=new EventSource(`${FB}/groupchats/${groupId}/messages.json`);groupSSE=sse;let seeded=false;
-  sse.addEventListener('put',e=>{try{const{data:d}=JSON.parse(e.data);if(!seeded){seeded=true;if(d){groupCache[groupId]=Object.values(d).filter(m=>m&&m.ts&&m.from);groupCache[groupId].sort((a,b)=>a.ts-b.ts);groupCache[groupId].forEach(m=>{if(m.from!==currentUser.username)m.read=true;});renderGroupMsgs(groupId);if(activeConvoTab==='groups')renderGroupList();}}}catch(_){}});
-  sse.addEventListener('patch',e=>{try{const{data:d}=JSON.parse(e.data);if(!d)return;Object.values(d).forEach(m=>{if(!m||!m.ts||!m.from)return;if(!groupCache[groupId].find(x=>x.ts===m.ts&&x.from===m.from)){m.read=(m.from===currentUser.username);groupCache[groupId].push(m);}});groupCache[groupId].sort((a,b)=>a.ts-b.ts);renderGroupMsgs(groupId);if(activeConvoTab==='groups')renderGroupList();}catch(_){}});
-  sse.onerror=()=>{sse.close();groupSSE=null;};
+  const uid=currentUser.uid;let seeded=false;
+  createFirebaseStream(`groupchats/${groupId}/messages`).then(sse=>{
+    if(!sse||streamGeneration!==groupStreamGeneration||currentUser?.uid!==uid||activeGroupId!==groupId){sse?.close();return;}
+    groupSSE=sse;
+    sse.addEventListener('put',event=>{try{const{data:d}=JSON.parse(event.data);if(!seeded){seeded=true;if(d){groupCache[groupId]=Object.values(d).filter(m=>m&&m.ts&&m.from);groupCache[groupId].sort((a,b)=>a.ts-b.ts);groupCache[groupId].forEach(m=>{if(m.from!==currentUser.username)m.read=true;});renderGroupMsgs(groupId);if(activeConvoTab==='groups')renderGroupList();}}}catch(error){console.error('Could not process group-message update:',error);}});
+    sse.addEventListener('patch',event=>{try{const{data:d}=JSON.parse(event.data);if(!d)return;Object.values(d).forEach(m=>{if(!m||!m.ts||!m.from)return;if(!groupCache[groupId].find(x=>x.ts===m.ts&&x.from===m.from)){m.read=(m.from===currentUser.username);groupCache[groupId].push(m);}});groupCache[groupId].sort((a,b)=>a.ts-b.ts);renderGroupMsgs(groupId);if(activeConvoTab==='groups')renderGroupList();}catch(error){console.error('Could not process group-message update:',error);}});
+    sse.onerror=()=>{if(groupSSE!==sse)return;sse.close();groupSSE=null;showToast('This group lost its live connection. Reopen it to retry.');};
+  }).catch(error=>{
+    if(streamGeneration!==groupStreamGeneration)return;
+    console.error('Could not open group-message stream:',error);
+    const messages=document.getElementById('chat-msgs');
+    if(messages)messages.textContent='Group messages could not be loaded. Check your connection and Firebase permissions.';
+  });
   setTimeout(()=>{const i=document.getElementById('chat-input');if(i)i.focus();},50);
 }
 function renderGroupMsgs(groupId){
@@ -2150,18 +2246,29 @@ function sendGroupMsg(){
   const input=document.getElementById('chat-input');if(!input||!activeGroupId||!currentUser)return;const text=input.value.trim();if(!text)return;
   input.value='';input.style.height='auto';const ts=Date.now();const time=new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const msg={from:currentUser.username,text,time,ts,read:true};if(!groupCache[activeGroupId])groupCache[activeGroupId]=[];groupCache[activeGroupId].push(msg);renderGroupMsgs(activeGroupId);
-  db.patch(`groupchats/${activeGroupId}/messages`,{[ts]:{from:msg.from,text:msg.text,time:msg.time,ts:msg.ts,read:msg.read}}).then(()=>{msg._pending=false;renderGroupMsgs(activeGroupId);}).catch(()=>{msg._pending=false;msg._failed=true;renderGroupMsgs(activeGroupId);});
+  db.patch(`groupchats/${activeGroupId}/messages`,{[ts]:{from:msg.from,text:msg.text,time:msg.time,ts:msg.ts,read:msg.read}}).then(()=>{msg._pending=false;renderGroupMsgs(activeGroupId);}).catch(error=>{console.error('Could not send group message:',error);msg._pending=false;msg._failed=true;renderGroupMsgs(activeGroupId);showToast('Message was not sent. Use Retry to try again.');});
 }
 function groupChatKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendGroupMsg();}}
 // Group calls
 async function startGroupCall(groupId){
-  const group=myGroups[groupId];if(!group)return;gcallGroupId=groupId;gcallPeers={};gcallMuted=false;
-  try{gcallStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){alert('Mic error: '+err.message);return;}
-  await db.write(`groupcalls/${groupId}/members/${currentUser.username}`,{joined:true,ts:Date.now()});
-  document.getElementById('gcall-group-name').textContent='📞 '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
-  const grid=document.getElementById('gcall-grid');if(grid)grid.innerHTML=group.members.map(u=>`<div class="gcall-tile" id="gcall-tile-${u}"><div class="gcall-avatar">${u.slice(0,2).toUpperCase()}</div><div class="gcall-name">@${esc(u)}${u===currentUser.username?' (you)':''}</div><div class="gcall-speaking"></div></div>`).join('');
-  document.getElementById('gcall-overlay').classList.add('show');gcallSecs=0;gcallConnected=false;
-  listenGroupCallSignals(groupId);const existing=await db.read(`groupcalls/${groupId}/members`);if(existing){const others=Object.keys(existing).filter(u=>u!==currentUser.username);for(const u of others)await gcallConnectTo(groupId,u,true);}
+  const group=myGroups[groupId];if(!group||!currentUser)return;
+  const uid=currentUser.uid;
+  try{gcallStream=await navigator.mediaDevices.getUserMedia({audio:true});}
+  catch(error){showToast(`Microphone unavailable: ${error.message}`);return;}
+  if(currentUser?.uid!==uid){gcallStream.getTracks().forEach(track=>track.stop());gcallStream=null;return;}
+  gcallGroupId=groupId;gcallPeers={};gcallMuted=false;
+  try{
+    await db.write(`groupcalls/${groupId}/members/${currentUser.username}`,{joined:true,ts:Date.now()});
+    if(currentUser?.uid!==uid){await endGroupCall();return;}
+    document.getElementById('gcall-group-name').textContent='📞 '+group.name;document.getElementById('gcall-timer-display').textContent='00:00';
+    const grid=document.getElementById('gcall-grid');if(grid)grid.innerHTML=group.members.map(u=>`<div class="gcall-tile" id="gcall-tile-${u}"><div class="gcall-avatar">${u.slice(0,2).toUpperCase()}</div><div class="gcall-name">@${esc(u)}${u===currentUser.username?' (you)':''}</div><div class="gcall-speaking"></div></div>`).join('');
+    document.getElementById('gcall-overlay').classList.add('show');gcallSecs=0;gcallConnected=false;
+    listenGroupCallSignals(groupId);const existing=await db.read(`groupcalls/${groupId}/members`);if(currentUser?.uid!==uid){await endGroupCall();return;}if(existing){const others=Object.keys(existing).filter(u=>u!==currentUser.username);for(const u of others)await gcallConnectTo(groupId,u,true);}
+  }catch(error){
+    console.error('Could not start group call:',error);
+    showToast('The group call could not connect. Check your connection and Firebase permissions.');
+    await endGroupCall();
+  }
 }
 function gcallStartTimer(){
   if(gcallTimer)return;
@@ -2171,14 +2278,23 @@ async function gcallConnectTo(groupId,remoteUser,isInitiator){
   if(gcallPeers[remoteUser])return;const pc=new RTCPeerConnection({iceServers:[{urls:'stun:stun.l.google.com:19302'}]});gcallPeers[remoteUser]=pc;
   if(gcallStream)gcallStream.getTracks().forEach(t=>pc.addTrack(t,gcallStream));
   pc.ontrack=e=>{let audio=document.getElementById('gcall-audio-'+remoteUser);if(!audio){audio=document.createElement('audio');audio.id='gcall-audio-'+remoteUser;audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];if(!gcallConnected){gcallConnected=true;gcallStartTimer();}};
-  pc.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/ice`,{[key]:JSON.stringify(e.candidate)});}};
+  pc.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);try{await db.patch(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/ice`,{[key]:JSON.stringify(e.candidate)});}catch(error){console.error('Could not send group-call ICE candidate:',error);}}};
   if(isInitiator){const offer=await pc.createOffer();await pc.setLocalDescription(offer);await db.write(`groupcalls/${groupId}/signals/${currentUser.username}/${remoteUser}/offer`,{sdp:offer.sdp,type:offer.type});}
 }
 function listenGroupCallSignals(groupId){
-  if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}const sse=new EventSource(`${FB}/groupcalls/${groupId}.json`);gcallSigSSE=sse;
-  sse.addEventListener('put',e=>{try{handleGcallData(groupId,JSON.parse(e.data).data);}catch(_){}});
-  sse.addEventListener('patch',e=>{try{handleGcallData(groupId,JSON.parse(e.data).data);}catch(_){}});
-  sse.onerror=()=>{sse.close();gcallSigSSE=null;};
+  if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}
+  const generation=++gcallStreamGeneration,uid=currentUser?.uid;
+  createFirebaseStream(`groupcalls/${groupId}`).then(sse=>{
+    if(!sse||generation!==gcallStreamGeneration||currentUser?.uid!==uid||gcallGroupId!==groupId){sse?.close();return;}
+    gcallSigSSE=sse;
+    sse.addEventListener('put',event=>{try{handleGcallData(groupId,JSON.parse(event.data).data).catch(error=>console.error('Could not process group-call update:',error));}catch(error){console.error('Could not parse group-call update:',error);}});
+    sse.addEventListener('patch',event=>{try{handleGcallData(groupId,JSON.parse(event.data).data).catch(error=>console.error('Could not process group-call update:',error));}catch(error){console.error('Could not parse group-call update:',error);}});
+    sse.onerror=()=>{if(gcallSigSSE!==sse)return;sse.close();gcallSigSSE=null;showToast('Group call signaling lost its live connection.');};
+  }).catch(error=>{
+    if(generation!==gcallStreamGeneration)return;
+    console.error('Could not open group-call stream:',error);
+    showToast('Group call signaling could not connect. Check your Firebase connection and rules.');
+  });
 }
 async function handleGcallData(groupId,data){
   if(!data)return;const me=currentUser.username;
@@ -2186,7 +2302,17 @@ async function handleGcallData(groupId,data){
   if(data.signals){for(const[fromUser,toMap]of Object.entries(data.signals)){if(fromUser===me)continue;const sig=toMap[me];if(!sig)continue;const pc=gcallPeers[fromUser];if(sig.offer&&(!pc||!pc.remoteDescription)){let peer=pc;if(!peer){await gcallConnectTo(groupId,fromUser,false);peer=gcallPeers[fromUser];}if(!peer||peer.remoteDescription)continue;await peer.setRemoteDescription(new RTCSessionDescription({type:sig.offer.type,sdp:sig.offer.sdp}));const answer=await peer.createAnswer();await peer.setLocalDescription(answer);await db.write(`groupcalls/${groupId}/signals/${me}/${fromUser}/answer`,{sdp:answer.sdp,type:answer.type});}if(sig.answer&&pc&&!pc.remoteDescription){await pc.setRemoteDescription(new RTCSessionDescription({type:sig.answer.type,sdp:sig.answer.sdp}));}if(sig.ice&&pc&&pc.remoteDescription){for(const key of Object.keys(sig.ice)){try{await pc.addIceCandidate(new RTCIceCandidate(JSON.parse(sig.ice[key])));}catch(_){}}}}}
 }
 function gcallToggleMute(){gcallMuted=!gcallMuted;if(gcallStream)gcallStream.getAudioTracks().forEach(t=>t.enabled=!gcallMuted);document.getElementById('gcall-mute-btn').textContent=gcallMuted?'🔇':'🎤';}
-async function endGroupCall(){if(gcallGroupId&&currentUser)await db.del(`groupcalls/${gcallGroupId}/members/${currentUser.username}`);if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}Object.values(gcallPeers).forEach(pc=>pc.close());gcallPeers={};if(gcallStream){gcallStream.getTracks().forEach(t=>t.stop());gcallStream=null;}document.querySelectorAll('[id^="gcall-audio-"]').forEach(a=>a.remove());if(gcallTimer){clearInterval(gcallTimer);gcallTimer=null;}gcallConnected=false;gcallSecs=0;gcallGroupId=null;document.getElementById('gcall-overlay').classList.remove('show');}
+async function endGroupCall(){
+  const groupId=gcallGroupId,username=currentUser?.username;
+  if(groupId&&username)db.del(`groupcalls/${groupId}/members/${username}`).catch(error=>console.warn('Could not leave the group call in Firebase:',error));
+  gcallStreamGeneration++;
+  if(gcallSigSSE){gcallSigSSE.close();gcallSigSSE=null;}
+  Object.values(gcallPeers).forEach(pc=>pc.close());gcallPeers={};
+  if(gcallStream){gcallStream.getTracks().forEach(t=>t.stop());gcallStream=null;}
+  document.querySelectorAll('[id^="gcall-audio-"]').forEach(a=>a.remove());
+  if(gcallTimer){clearInterval(gcallTimer);gcallTimer=null;}
+  gcallConnected=false;gcallSecs=0;gcallGroupId=null;document.getElementById('gcall-overlay').classList.remove('show');
+}
 </script>
 
 <script>
@@ -2557,12 +2683,14 @@ function renderLibrary(){
   const list=document.getElementById('library-list');if(!list)return;
   const q=(document.getElementById('lib-search')?.value||'').toLowerCase().trim();
   const source=libTab==='saved'?getSavedIdeas():libTab==='starred'?getStarredIdeas():getCreatedIdeas();
-  const filtered=source.filter(i=>!q||i.title.toLowerCase().includes(q)||String(i.description||'').toLowerCase().includes(q));
-  const tags=[...new Set(source.map(i=>i.category||i.industry).filter(Boolean))];
+  const playCreations=libTab==='created'&&Array.isArray(window.zideaPlayLibraryItems)?window.zideaPlayLibraryItems:[];
+  const combined=[...source,...playCreations];
+  const filtered=combined.filter(i=>!q||String(i.title||'').toLowerCase().includes(q)||String(i.description||'').toLowerCase().includes(q));
+  const tags=[...new Set(combined.map(i=>i.category||i.industry).filter(Boolean))];
   const tagWrap=document.getElementById('lib-tag-filter');
   if(tagWrap)tagWrap.innerHTML=tags.map(t=>`<button class="idea-tag" onclick="document.getElementById('lib-search').value='${t}';renderLibrary()">${esc(CAT_LABEL[t]||t)}</button>`).join('');
   if(!filtered.length){list.innerHTML=emptyStateHTML('??','No ideas yet','Generate your first idea and it will appear in your library.','Generate your first idea',"showPage('ideas')");return;}
-  list.innerHTML=filtered.map(i=>libTab==='created'?createdIdeaCardHTML(i):createIdeaCardHTML(i,'library')).join('');
+  list.innerHTML=filtered.map(i=>i.game==='build-together'?`<div class="idea-card"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap"><div><div style="font-size:15px;font-weight:800;color:#fff">${esc(i.title)}</div><div style="font-size:12px;color:#bfb399;margin-top:4px">${esc(new Date(i.completedAt).toLocaleString())}</div></div><span class="idea-tag">ZIDEA PLAY · BUILD TOGETHER</span></div><p class="idea-card-body"><strong style="color:#d1d5db">Challenge:</strong> ${esc(i.prompt||'')}</p><p class="idea-card-body">${esc(i.description||'')}</p><div class="idea-card-body">${Object.values(i.contributions||{}).map(entry=>`<div><strong style="color:#E6CE8B">@${esc(entry.username)}</strong> — ${esc(entry.text)}</div>`).join('')}</div></div>`:libTab==='created'?createdIdeaCardHTML(i):createIdeaCardHTML(i,'library')).join('');
 }
 function filterExplore(cat){
   exploreCategory=cat;
@@ -2720,10 +2848,18 @@ function handleProfileVideoUpload(event){
   const rightsBox=document.getElementById('profile-rights-confirm'); if(rightsBox) rightsBox.checked=false;
   showToast('Your video was added to your account profile and Explore.');
 }
-function reelGoToProfile(username){
+function openUserProfile(username){
   const user = String(username||'').trim();
+  selectedProfileUser = user || (currentUser && currentUser.username) || null;
   showPage('profile');
   if(user){ showToast('Viewing @'+user+' profile'); }
+}
+function closeUserProfile(){
+  selectedProfileUser = null;
+  if(currentUser){showPage('profile');} else {showPage('landing');}
+}
+function reelGoToProfile(username){
+  openUserProfile(username);
 }
 function reelFollow(button,username){
   const isFollowing = (button.textContent||'').trim().toLowerCase()==='following';
@@ -2976,7 +3112,7 @@ function renderExplore(){
         <button class="reel-btn" aria-label="Share" onclick="reelShare('${esc(i.title||'')}', '${esc(i.id)}', 'explore')">
           📤<span>${shares.toLocaleString()}</span>
         </button>
-        <button class="reel-btn" aria-label="Build this idea" onclick="openUserProfile('${esc(i.author || 'nova')}'); showPage('dashboard');" title="Build this idea">
+        <button class="reel-btn" aria-label="Build this idea" onclick="openUserProfile('${esc(i.author || 'nova')}');" title="Build this idea">
           💡<span>Build</span>
         </button>
       </div>
@@ -3003,25 +3139,37 @@ function callIdeaAuthor(username){
 }
 function renderProfile(){
   if(!currentUser)return;
-  const avatar=load(ideaStoreKey('avatar_data'));
+  const targetUser = (selectedProfileUser && selectedProfileUser !== currentUser.username) ? selectedProfileUser : currentUser.username;
+  const isSelf = targetUser === currentUser.username;
+  const profile = getProfileForUsername(targetUser);
+  const avatarKey = `zidea_avatar_data_${targetUser}`;
+  const avatar = load(avatarKey) || (isSelf ? load(ideaStoreKey('avatar_data')) : null);
   const avatarEl=document.getElementById('profile-avatar');
   if(avatarEl){
-    const initials=getUserInitials(currentUser.username);
-    avatarEl.style.background=`linear-gradient(135deg,${userColor(currentUser.username)},#A38738)`;
+    const initials=getUserInitials(targetUser);
+    avatarEl.style.background=`linear-gradient(135deg,${userColor(targetUser)},#A38738)`;
     avatarEl.innerHTML=avatar?`<img src="${avatar}" alt="avatar" style="width:100%;height:100%;object-fit:cover"/>`:initials;
   }
   const removeBtn=document.getElementById('remove-avatar-btn');
-  if(removeBtn)removeBtn.style.display=avatar?'inline-block':'none';
+  if(removeBtn)removeBtn.style.display=(isSelf && avatar)?'inline-block':'none';
   const nameEl=document.getElementById('profile-name');
-  if(nameEl)nameEl.textContent='@'+currentUser.username;
+  if(nameEl)nameEl.textContent='@'+targetUser;
   const emailEl=document.getElementById('profile-email');
-  if(emailEl)emailEl.textContent=currentUser.email||'';
+  if(emailEl)emailEl.textContent = isSelf ? (currentUser.email||'') : (profile.email || '');
+  const aboutEl=document.getElementById('profile-about');
+  if(aboutEl)aboutEl.textContent=profile.about||'Building ideas and meeting great people.';
+  const wantsEl=document.getElementById('profile-wants');
+  if(wantsEl)wantsEl.textContent=profile.wants||'Open to feedback, collaboration, and meaningful conversations.';
+  const vibeEl=document.getElementById('profile-vibe');
+  if(vibeEl)vibeEl.textContent=profile.vibe||'Builder';
+  const interestsEl=document.getElementById('profile-interests');
+  if(interestsEl)interestsEl.textContent=profile.interests||'Ideas, product, people';
   const ideasCount=document.getElementById('profile-ideas-count');
-  if(ideasCount)ideasCount.textContent=getIdeaHistory().length;
   const savedCount=document.getElementById('profile-saved-count');
-  if(savedCount)savedCount.textContent=getSavedIdeas().length;
   const starredCount=document.getElementById('profile-starred-count');
-  if(starredCount)starredCount.textContent=getStarredIdeas().length;
+  if(ideasCount)ideasCount.textContent=isSelf?getIdeaHistory().length:0;
+  if(savedCount)savedCount.textContent=isSelf?getSavedIdeas().length:0;
+  if(starredCount)starredCount.textContent=isSelf?getStarredIdeas().length:0;
 
   const videoGrid=document.getElementById('profile-video-grid');
   const accountVideos=getAccountVideos();
@@ -3052,7 +3200,7 @@ function renderProfile(){
     gameStats.innerHTML=rows.length?rows.map(([type,s])=>`<div class="arcade-row"><span>${gameIcon(type)} ${gameLabel(type)}</span><span style="color:#E6CE8B;font-weight:800">${s.wins||0}W ${s.losses||0}L ${s.draws||0}D</span></div>`).join(''):'<div style="color:#bfb399;font-size:13px">No game stats yet.</div>';
   }
   const recent=document.getElementById('profile-recent-ideas');
-  const top=getIdeaHistory().slice(0,5);
+  const top=isSelf?getIdeaHistory().slice(0,5):[];
   recent.innerHTML=top.length?top.map(i=>`<div class="card" style="padding:10px 12px"><div style="font-size:13px;color:#fff;font-weight:600">${esc(i.title)}</div><div style="font-size:11px;color:#bfb399;margin-top:3px">${esc(CAT_LABEL[i.category]||i.category||'Idea')}</div></div>`).join(''):'<div style="color:#bfb399;font-size:13px">No ideas yet.</div>';
 }
 function renderSettings(){
@@ -3076,10 +3224,16 @@ function clearSavedIdeas(){if(confirm('Are you sure? This cannot be undone.')){s
 function handleAvatarUpload(event){
   const file=event.target.files?.[0];if(!file)return;
   const reader=new FileReader();
-  reader.onload=()=>{save(ideaStoreKey('avatar_data'),reader.result);renderProfile();syncAvatarToFirebase();};
+  reader.onload=()=>{
+    const dataUrl = String(reader.result || '');
+    save(ideaStoreKey('avatar_data'),dataUrl);
+    save(`zidea_avatar_data_${currentUser.username}`,dataUrl);
+    const profile=getProfileForUsername(currentUser.username); profile.avatar=dataUrl; saveProfileForUsername(currentUser.username,{...profile,email:currentUser.email||profile.email||'',username:currentUser.username});
+    renderProfile();syncAvatarToFirebase();
+  };
   reader.readAsDataURL(file);
 }
-function removeAvatar(){removeStored(ideaStoreKey('avatar_data'));renderProfile();syncAvatarToFirebase(true);}
+function removeAvatar(){removeStored(ideaStoreKey('avatar_data'));removeStored(`zidea_avatar_data_${currentUser.username}`);const profile=getProfileForUsername(currentUser.username); profile.avatar=''; saveProfileForUsername(currentUser.username,{...profile,email:currentUser.email||profile.email||'',username:currentUser.username}); renderProfile();syncAvatarToFirebase(true);}
 function syncIdeasToFirebase(){
   if(!currentUser)return;
   db.patch(`ideas/${currentUser.username}`,{saved:getSavedIdeas(),starred:getStarredIdeas(),history:getIdeaHistory().slice(0,80),updatedAt:Date.now()}).catch(()=>{});
@@ -3103,28 +3257,20 @@ async function syncAvatarFromFirebase(){
   if(data.avatar)save(ideaStoreKey('avatar_data'),data.avatar);
   renderProfile();
 }
-function seedExploreUsers(){
-  const accounts=load('zidea_accounts')||{};
-  EXPLORE_MOCK.forEach(i=>{if(!accounts[(i.author||'user')+'@zidea.local'])accounts[(i.author||'user')+'@zidea.local']={username:i.author,password:'demo123',wins:0,losses:0};});
-  save('zidea_accounts',accounts);
-}
 // Boot
-testFirebaseAccess();
-seedExploreUsers();
-window.addEventListener('online',syncAllAccountsOnline);
-setTimeout(syncAllAccountsOnline,1200);
 document.getElementById('incoming-toast').style.display='none';
-if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
-else{applyTheme();}
+getAccounts();
+removeStored('zidea_session');
+removeStored('zidea_google_session_token');
+currentUser=null;
+applyTheme();
 updateLandingAuthUI();
 const pathSeg=window.location.pathname.split('/').filter(Boolean).pop();
 if(!window.location.hash&&pathSeg&&pathSeg!=='index.html'){window.location.hash=pathSeg;}
-if(window.location.hash)handleHashRoute();else showPage('explore');
 </script>
 
 <script>
 // ------ ZiD AI ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-const ZIDAI_SYS='You are ZiD AI, a friendly helpful assistant built into Zidea. Be concise, warm, and grounded in Zidea website facts. If a website question matches the local knowledge base, answer from that source first.';
 const ZIDAI_STORAGE_KEY='zidea-zidai-chats-v1';
 let zidChats=[];
 let zidActiveChatId=null;
@@ -3134,9 +3280,9 @@ function createZidAiMessage(role,text){return {id:'msg-'+Date.now()+'-'+Math.ran
 function getActiveZidAiChat(){return zidChats.find(chat=>chat.id===zidActiveChatId) || zidChats[0] || null;}
 function deriveZidAiChatName(text){const clean=(text||'').replace(/\s+/g,' ').trim();if(!clean)return 'New chat';return clean.length>30?clean.slice(0,30)+'…':clean;}
 function syncZidAiChatName(chat){if(!chat)return;const firstUser=chat.messages.find(message=>message.role==='user');if(firstUser){chat.name=deriveZidAiChatName(firstUser.text);} else if(!chat.name||chat.name==='New chat'){chat.name='New chat';}}
-function buildZidAiHistory(messages){return messages.filter(message=>message.role==='user'||message.role==='model').map(message=>({role:message.role==='user'?'user':'model',parts:[{text:message.text}]}));}
+function buildZidAiHistory(messages){return messages.filter(message=>message.role==='user'||message.role==='model'||message.role==='ai').map(message=>({role:message.role==='user'?'user':'model',parts:[{text:message.text}]}));}
 function saveZidAiChats(){try{localStorage.setItem(ZIDAI_STORAGE_KEY, JSON.stringify(zidChats));}catch(err){}}
-function loadZidAiChats(){try{const raw=localStorage.getItem(ZIDAI_STORAGE_KEY);return raw?JSON.parse(raw):[];}catch(err){return [];}}
+function loadZidAiChats(){try{const raw=localStorage.getItem(ZIDAI_STORAGE_KEY);const parsed=raw?JSON.parse(raw):[];if(!Array.isArray(parsed))return [];return parsed.filter(chat=>chat&&typeof chat==='object'&&Array.isArray(chat.messages)).slice(0,100).map((chat,index)=>({id:typeof chat.id==='string'&&/^chat-[a-zA-Z0-9_-]{1,100}$/.test(chat.id)?chat.id:`chat-restored-${Date.now()}-${index}`,name:typeof chat.name==='string'?chat.name.slice(0,100):'New chat',messages:chat.messages.filter(message=>message&&typeof message==='object'&&['user','ai'].includes(message.role)&&typeof message.text==='string').slice(-200).map(message=>({id:typeof message.id==='string'&&/^msg-[a-zA-Z0-9_-]{1,100}$/.test(message.id)?message.id:`msg-restored-${Date.now()}-${Math.random().toString(16).slice(2)}`,role:message.role,text:message.text.slice(0,10000)}))}));}catch(err){console.warn('Could not restore saved ZiD AI chats:',err);return [];}}
 function newZidAiChat(){const id='chat-'+Date.now()+'-'+Math.random().toString(16).slice(2);const chat={id,name:'New chat',messages:[createZidAiMessage('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.")]};zidChats.unshift(chat);zidActiveChatId=id;renderZidAiList();renderZidAiMessages();saveZidAiChats();toggleZidAiSidebar(false);}
 function selectZidAiChat(chatId){zidActiveChatId=chatId;renderZidAiList();renderZidAiMessages();toggleZidAiSidebar(false);}
 function toggleZidAiSidebar(force){const shell=document.getElementById('zidai-shell');if(!shell)return;const shouldOpen=typeof force==='boolean'?force:!shell.classList.contains('zidai-sidebar-open');shell.classList.toggle('zidai-sidebar-open',shouldOpen);}
@@ -3146,7 +3292,7 @@ function editZidAiMessage(messageId){const chat=getActiveZidAiChat();const messa
 function saveZidAiEdit(messageId){const chat=getActiveZidAiChat();const message=chat?.messages.find(item=>item.id===messageId);if(!message)return;const input=document.querySelector('.zidai-edit-input');if(!input)return;const nextText=input.value.trim();if(!nextText){return;}message.text=nextText;syncZidAiChatName(chat);renderZidAiList();renderZidAiMessages();saveZidAiChats();}
 function cancelZidAiEdit(){renderZidAiMessages();}
 function zidAiTyping(){zidLoading=true;renderZidAiMessages();}
-async function sendZidAi(){const input=document.getElementById('zidai-input');const text=input.value.trim();if(!text)return;const sendButton=document.getElementById('zidai-send');sendButton.disabled=true;input.value='';input.style.height='auto';let chat=getActiveZidAiChat();if(!chat){const newChat={id:'chat-'+Date.now()+'-'+Math.random().toString(16).slice(2),name:'New chat',messages:[createZidAiMessage('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.")]};zidChats.unshift(newChat);zidActiveChatId=newChat.id;chat=newChat;}const userMessage=createZidAiMessage('user',text);chat.messages.push(userMessage);syncZidAiChatName(chat);renderZidAiList();renderZidAiMessages();saveZidAiChats();zidAiTyping();
+async function sendZidAi(){const input=document.getElementById('zidai-input');const sendButton=document.getElementById('zidai-send');if(!input||!sendButton||zidLoading)return;const text=input.value.trim();if(!text)return;sendButton.disabled=true;input.value='';input.style.height='auto';let chat=getActiveZidAiChat();if(!chat){const newChat={id:'chat-'+Date.now()+'-'+Math.random().toString(16).slice(2),name:'New chat',messages:[createZidAiMessage('ai',"Hey! I'm ZiD AI ⚡ Ask me anything about Zidea. I check the local Zidea knowledge base first and use the AI fallback only when needed.")]};zidChats.unshift(newChat);zidActiveChatId=newChat.id;chat=newChat;}const userMessage=createZidAiMessage('user',text);chat.messages.push(userMessage);syncZidAiChatName(chat);renderZidAiList();renderZidAiMessages();saveZidAiChats();zidAiTyping();
   try{
     const history=buildZidAiHistory(chat.messages);
     const faq = typeof window !== 'undefined' && window.getZideaFaqMatch ? window.getZideaFaqMatch(text, history) : null;
@@ -3154,19 +3300,25 @@ async function sendZidAi(){const input=document.getElementById('zidai-input');co
       const reply = faq.answer || 'I do not have a verified answer for that Zidea question yet.';
       const aiMessage=createZidAiMessage('ai', reply);
       chat.messages.push(aiMessage);
-      zidLoading=false;renderZidAiList();renderZidAiMessages();saveZidAiChats();sendButton.disabled=false;return;
+      return;
     }
-    const res=await fetch('/api/zid-ai',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text,history,systemPrompt:ZIDAI_SYS})});
-    const data=await res.json();
-    if(!res.ok || !data || !data.answer){
-      chat.messages.push(createZidAiMessage('ai', data?.message || '⚠️ I could not reach the AI fallback right now.'));
-    } else {
-      chat.messages.push(createZidAiMessage('ai', data.answer));
-    }
+    const auth=await window.zideaPlayAuth?.initialize();
+    const user=auth?.currentUser;
+    if(!user)throw new Error('Sign in to use the AI assistant.');
+    const token=await user.getIdToken();
+    const res=await fetch('/api/zid-ai',{
+      method:'POST',
+      headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},
+      body:JSON.stringify({question:text,history})
+    });
+    const data=await res.json().catch(()=>({}));
+    if(!res.ok||!data?.answer)throw new Error(data?.message||'ZiD AI could not respond. Please try again.');
+    chat.messages.push(createZidAiMessage('ai',data.answer));
   } catch(err){
-    chat.messages.push(createZidAiMessage('ai','⚠️ I could not reach the AI fallback right now.'));
+    chat.messages.push(createZidAiMessage('ai',`⚠️ ${err?.message||'I could not reach the AI service. Please try again.'}`));
+  } finally {
+    zidLoading=false;renderZidAiList();renderZidAiMessages();saveZidAiChats();sendButton.disabled=false;
   }
-  zidLoading=false;renderZidAiList();renderZidAiMessages();saveZidAiChats();sendButton.disabled=false;
 }
 function zidAiKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendZidAi();}}
 function clearZidAi(){zidChats=[];zidActiveChatId=null;initZidAi();}
@@ -3179,7 +3331,7 @@ const ARCADE_GAMES=[
   {id:'rps',icon:'?',name:'Rock Paper Scissors',desc:'Best of 3. No luck allowed.'},
   {id:'amongus',icon:'??',name:'Among Us Mode',desc:"Find the impostor before it's too late."}
 ];
-let pendingChallengeGame='chess',gameInviteSSE=null,currentRoom=null,currentResultGame='tictactoe';
+let pendingChallengeGame='chess',gameInviteSSE=null,gameInviteStreamGeneration=0,currentRoom=null,currentResultGame='tictactoe',gameRoomSSE=null,gameRoomStreamGeneration=0;
 function gameLabel(type){return ARCADE_GAMES.find(g=>g.id===type)?.name||type;}
 function gameIcon(type){return ARCADE_GAMES.find(g=>g.id===type)?.icon||'??';}
 function renderArcadeHome(){
@@ -3198,8 +3350,11 @@ function challengeArcadeGame(type){
 function roomCode(){return Math.random().toString(36).slice(2,8).toUpperCase();}
 async function createGameRoom(type){
   if(!currentUser)return showPage('login');
-  const code=roomCode();currentRoom={code,type,host:currentUser.username};
-  await db.write(`gameRooms/${code}`,{code,type,host:currentUser.username,players:[currentUser.username],state:'waiting',updatedAt:Date.now()});
+  const code=roomCode(),uid=currentUser.uid;
+  try{await db.write(`gameRooms/${code}`,{code,type,host:currentUser.username,players:[currentUser.username],state:'waiting',updatedAt:Date.now()});}
+  catch(error){console.error('Could not create game room:',error);showToast('The game room could not be created. Check your connection and Firebase permissions.');return;}
+  if(currentUser?.uid!==uid)return;
+  currentRoom={code,type,host:currentUser.username};
   document.getElementById('game-lobby').style.display='flex';
   document.getElementById('lobby-title').textContent=`${gameLabel(type)} room`;
   document.getElementById('lobby-status').textContent='Waiting for opponent... Share this room code.';
@@ -3209,7 +3364,11 @@ async function createGameRoom(type){
 async function joinGameRoom(){
   const code=String(document.getElementById('join-room-code')?.value||'').trim().toUpperCase();
   if(!code||!currentUser)return;
-  const room=await db.read(`gameRooms/${code}`);
+  if(!/^[A-Z0-9]{6}$/.test(code)){showToast('Enter a valid six-character room code.');return;}
+  const uid=currentUser.uid;
+  let room;
+  try{room=await db.read(`gameRooms/${code}`);}
+  catch(error){console.error('Could not load game room:',error);showToast('The game room could not be loaded. Check your connection and Firebase permissions.');return;}
   if(!room){showToast('Room not found.');return;}
   if(room.type==='chess'&&room.options){
     applyChessOptions(room.options);
@@ -3220,22 +3379,36 @@ async function joinGameRoom(){
   }
   if(room.type==='chess')gameMode='multiplayer';
   const players=[...new Set([...(room.players||[]),currentUser.username])].slice(0,2);
-  await db.patch(`gameRooms/${code}`,{players,state:players.length>1?'active':'waiting',updatedAt:Date.now()});
+  try{await db.patch(`gameRooms/${code}`,{players,state:players.length>1?'active':'waiting',updatedAt:Date.now()});}
+  catch(error){console.error('Could not join game room:',error);showToast('You could not join this room. Check your connection and Firebase permissions.');return;}
+  if(currentUser?.uid!==uid)return;
   currentRoom={code,type:room.type,host:room.host};
   listenGameRoom(code);startGame(room.type);
 }
 function listenGameRoom(code){
-  const sse=new EventSource(`${FB}/gameRooms/${code}.json`);
-  sse.addEventListener('put',e=>{try{updateLobbyFromRoom(JSON.parse(e.data).data);}catch(_){}});
-  sse.addEventListener('patch',e=>{try{db.read(`gameRooms/${code}`).then(updateLobbyFromRoom);}catch(_){}});
-  setTimeout(()=>sse.close(),60*60*1000);
+  if(gameRoomSSE){gameRoomSSE.close();gameRoomSSE=null;}
+  const generation=++gameRoomStreamGeneration,uid=currentUser?.uid;
+  createFirebaseStream(`gameRooms/${code}`).then(sse=>{
+    if(!sse||generation!==gameRoomStreamGeneration||currentUser?.uid!==uid||currentRoom?.code!==code){sse?.close();return;}
+    gameRoomSSE=sse;
+    sse.addEventListener('put',event=>{try{updateLobbyFromRoom(JSON.parse(event.data).data);}catch(error){console.error('Could not process game-room update:',error);}});
+    sse.addEventListener('patch',async()=>{
+      try{updateLobbyFromRoom(await db.read(`gameRooms/${code}`));}
+      catch(error){console.error('Could not refresh game-room state:',error);}
+    });
+    sse.onerror=()=>{if(gameRoomSSE!==sse)return;sse.close();gameRoomSSE=null;showToast('The game room lost its live connection. Reopen the room to retry.');};
+  }).catch(error=>{
+    if(generation!==gameRoomStreamGeneration)return;
+    console.error('Could not open game-room stream:',error);
+    showToast('Game-room updates could not connect. Check your Firebase connection and rules.');
+  });
 }
 function updateLobbyFromRoom(room){
   if(!room)return;
   const status=document.getElementById('lobby-status');
   if(status)status.textContent=(room.players||[]).length>1?`Opponent joined: @${room.players.find(p=>p!==currentUser?.username)}`:'Waiting for opponent...';
 }
-function exitLobby(){document.getElementById('game-lobby').style.display='none';currentRoom=null;}
+function exitLobby(){gameRoomStreamGeneration++;if(gameRoomSSE){gameRoomSSE.close();gameRoomSSE=null;}document.getElementById('game-lobby').style.display='none';currentRoom=null;}
 function openChallengeModal(type,username=''){
   if(type==='chess'){openChessSetup('challenge',username);return;}
   pendingChallengeGame=type;
@@ -3251,32 +3424,59 @@ async function sendGameChallenge(){
   const input=isChessFriend?document.getElementById('chess-setup-search'):document.getElementById('challenge-search');
   const statusEl=isChessFriend?document.getElementById('chess-setup-status'):document.getElementById('challenge-status');
   const to=String(input?.value||'').trim().replace(/^@/,'').toLowerCase();
-  if(!to||to===currentUser.username){if(statusEl)statusEl.textContent='Enter a valid friend username.';return;}
-  const code=roomCode();
+  if(!/^[a-z0-9_]{3,20}$/.test(to)||to===currentUser.username){if(statusEl)statusEl.textContent='Enter a valid friend username.';return;}
+  const code=roomCode(),uid=currentUser.uid;
   const roomData={code,type:pendingChallengeGame,host:currentUser.username,players:[currentUser.username],state:'waiting',updatedAt:Date.now()};
   if(isChessFriend)roomData.options={...currentChessOptions};
-  await db.write(`gameRooms/${code}`,roomData);
   const invitePayload={code,type:pendingChallengeGame,from:currentUser.username,to,ts:Date.now(),status:'pending'};
   if(isChessFriend)invitePayload.options={...currentChessOptions};
-  await db.patch(`gameInvites/${to}`,{[code]:invitePayload});
+  try{
+    await db.write(`gameRooms/${code}`,roomData);
+    await db.patch(`gameInvites/${to}`,{[code]:invitePayload});
+  }catch(error){console.error('Could not send game challenge:',error);if(statusEl)statusEl.textContent='The challenge could not be sent. Check your connection and Firebase permissions.';return;}
+  if(currentUser?.uid!==uid)return;
   if(statusEl)statusEl.textContent=`Waiting for @${to} to accept... Room ${code}`;
   currentRoom={code,type:pendingChallengeGame,host:currentUser.username};listenGameRoom(code);renderArcadeHome();
 }
 function listenGameInvites(){
   if(!currentUser||gameInviteSSE)return;
-  gameInviteSSE=new EventSource(`${FB}/gameInvites/${currentUser.username}.json`);
-  gameInviteSSE.addEventListener('put',e=>{try{renderInvites(JSON.parse(e.data).data);}catch(_){}});
-  gameInviteSSE.addEventListener('patch',()=>renderInvites());
+  const generation=++gameInviteStreamGeneration,uid=currentUser.uid;
+  createFirebaseStream(`gameInvites/${currentUser.username}`).then(sse=>{
+    if(!sse||generation!==gameInviteStreamGeneration||currentUser?.uid!==uid||gameInviteSSE){sse?.close();return;}
+    gameInviteSSE=sse;
+    sse.addEventListener('put',event=>{try{renderInvites(JSON.parse(event.data).data).catch(error=>console.error('Could not render game invites:',error));}catch(error){console.error('Could not process game-invite update:',error);}});
+    sse.addEventListener('patch',()=>{renderInvites().catch(error=>console.error('Could not refresh game invites:',error));});
+    sse.onerror=()=>{if(gameInviteSSE!==sse)return;sse.close();gameInviteSSE=null;showToast('Game invites lost their live connection. Reopen Arcade to retry.');};
+  }).catch(error=>{
+    if(generation!==gameInviteStreamGeneration)return;
+    console.error('Could not open game-invite stream:',error);
+    showToast('Game invites could not synchronize. Check your Firebase connection and rules.');
+  });
 }
 async function renderInvites(data){
   const el=document.getElementById('arcade-invites');if(!el)return;
-  const invites=data||await db.read(`gameInvites/${currentUser?.username}`)||{};
-  const list=Object.values(invites).filter(i=>i&&i.status==='pending');
+  let invites=data;
+  if(!invites){
+    try{invites=await db.read(`gameInvites/${currentUser?.username}`)||{};}
+    catch(error){console.error('Could not load game invites:',error);el.textContent='Game invites could not be loaded. Check your connection and Firebase permissions.';return;}
+  }
+  const list=Object.values(invites).filter(i=>i&&i.status==='pending'&&/^[A-Z0-9]{6}$/.test(String(i.code||''))&&ARCADE_GAMES.some(game=>game.id===i.type)&&/^[a-z0-9_]{3,20}$/i.test(String(i.from||'')));
   if(!list.length){el.innerHTML='<div class="arcade-row" style="color:#bfb399;font-size:13px">No active games � challenge a friend!</div>';return;}
   el.innerHTML=list.map(i=>`<div class="arcade-row"><div><div style="color:#fff;font-weight:800">${gameIcon(i.type)} Pending ${gameLabel(i.type)} challenge</div><div style="color:#bfb399;font-size:12px;margin-top:3px">From @${esc(i.from)} � room ${esc(i.code)}</div></div><div style="display:flex;gap:8px"><button class="btn-primary" style="font-size:12px" onclick="acceptGameInvite('${i.code}','${i.type}')">Accept</button><button class="btn-ghost" style="font-size:12px" onclick="declineGameInvite('${i.code}')">Decline</button></div></div>`).join('');
 }
-async function acceptGameInvite(code,type){document.getElementById('join-room-code').value=code;await joinGameRoom();await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'accepted'});startGame(type);}
-async function declineGameInvite(code){await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'declined'});renderInvites();}
+async function acceptGameInvite(code,type){
+  if(!currentUser||!/^[A-Z0-9]{6}$/.test(String(code))||!ARCADE_GAMES.some(game=>game.id===type))return;
+  document.getElementById('join-room-code').value=code;
+  await joinGameRoom();
+  if(!currentRoom||currentRoom.code!==code)return;
+  try{await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'accepted'});startGame(type);}
+  catch(error){console.error('Could not accept game invite:',error);showToast('The invitation could not be accepted. Check your connection and Firebase permissions.');}
+}
+async function declineGameInvite(code){
+  if(!currentUser||!/^[A-Z0-9]{6}$/.test(String(code)))return;
+  try{await db.patch(`gameInvites/${currentUser.username}/${code}`,{status:'declined'});renderInvites();}
+  catch(error){console.error('Could not decline game invite:',error);showToast('The invitation could not be declined. Check your connection and Firebase permissions.');}
+}
 function getGameStats(){return load(ideaStoreKey('game_stats'))||{};}
 function setGameStats(v){save(ideaStoreKey('game_stats'),v);}
 function recordGameResult(type,result,opponent='AI'){
@@ -3624,5 +3824,4 @@ function startChessTimer(){
   },1000);
 }
 </script>
-
-
+<script src="./arcade.js"></script>

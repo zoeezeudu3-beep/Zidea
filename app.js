@@ -266,27 +266,14 @@ function getAccounts(){
   Object.entries(raw).forEach(([key,value])=>{
     if(!value||typeof value!=='object')return;
     const email=normalizeEmail(value.email||key);
-    if(email)accounts[email]={...value,email};
+    if(email){const safe={...value,email};delete safe.password;accounts[email]=safe;}
   });
   save('zidea_accounts',accounts);
   return accounts;
 }
-async function findRemoteAccount(email){
-  if(!onlineReady())return null;
-  const data=await withTimeout(db.read('accounts'),1600).catch(()=>null);
-  if(!data)return null;
-  const found=Object.values(data).find(a=>normalizeEmail(a?.email)===email);
-  if(!found)return null;
-  return {email,username:found.username,password:found.password||'',wins:found.wins||0,losses:found.losses||0};
-}
-function saveAccount(email,account){
-  const accounts=getAccounts();
-  accounts[email]={...account,email};
-  save('zidea_accounts',accounts);
-}
 function enterApp(user){
-  currentUser=user;
-  save('zidea_session',user);
+  if(!user?.uid||user.firebaseAuth!==true)return;
+  currentUser = user;
   try{setLoggedInUI();}catch(error){console.warn('setLoggedInUI failed',error);}
   try{updateLandingAuthUI();}catch(error){console.warn('updateLandingAuthUI failed',error);}
   try{closeAuthModal(true);}catch(error){console.warn('closeAuthModal failed',error);}
@@ -295,66 +282,17 @@ function enterApp(user){
   setTimeout(showWelcomeTour,350);
   showToast('Signed in successfully.');
 }
-function syncAccountOnline(email,account){
-  if(!onlineReady()||!account?.username)return;
-  withTimeout(db.write(`accounts/${account.username}`,{
-    email,
-    username:account.username,
-    password:account.password||'',
-    wins:account.wins||0,
-    losses:account.losses||0,
-    createdAt:account.createdAt||Date.now(),
-    updatedAt:Date.now()
-  }),1800).catch(()=>{});
-}
-function syncAllAccountsOnline(){
-  if(!onlineReady())return;
-  const accounts=getAccounts();
-  Object.entries(accounts).forEach(([email,account])=>syncAccountOnline(email,account));
-}
+function syncAccountOnline(){ return Promise.resolve(); }
+function syncAllAccountsOnline(){ return Promise.resolve(); }
 async function handleLogin(e){
-  e.preventDefault();
-  if(!canSubmitAuth('login'))return;
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.classList.add('btn-loading');
-  const email=normalizeEmail(document.getElementById('login-email').value);
-  const pw=document.getElementById('login-password').value;
+  e?.preventDefault();
   const err=document.getElementById('login-error');
-  const accounts=getAccounts();
-  let acc=accounts[email];
-  if(!acc){acc=await findRemoteAccount(email);if(acc)saveAccount(email,acc);}
-  if(!acc){err.textContent='No account found.';err.classList.add('show');if(btn){btn.classList.remove('btn-loading');btn.disabled=false;}return;}
-  if(acc.password!==pw){err.textContent='Wrong password.';err.classList.add('show');if(btn){btn.classList.remove('btn-loading');btn.disabled=false;}return;}
-  err.classList.remove('show');
-  if(btn){btn.classList.remove('btn-loading');btn.disabled=false;}
-  syncAccountOnline(email,acc);
-  loginSuccess({email,username:acc.username});
+  if(err){err.textContent='Secure sign-in is unavailable in this version. Reload the website to use Firebase Authentication.';err.classList.add('show');}
 }
 function handleSignup(e){
-  e.preventDefault();
-  if(!canSubmitAuth('signup'))return;
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
-  const username=document.getElementById('signup-username').value.trim().toLowerCase();
-  const email=normalizeEmail(document.getElementById('signup-email').value);
-  const pw=document.getElementById('signup-password').value;
+  e?.preventDefault();
   const err=document.getElementById('signup-error');
-  try{
-    const accounts=getAccounts();
-    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent='Use 3-20 letters, numbers, or underscores for username.';err.classList.add('show');if(btn)btn.disabled=false;return;}
-    if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');if(btn)btn.disabled=false;return;}
-    if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');if(btn)btn.disabled=false;return;}
-    err.classList.remove('show');
-    const account={email,username,password:pw,wins:0,losses:0,createdAt:Date.now()};
-    saveAccount(email,account);
-    err.classList.remove('show');
-    enterApp({email,username});
-    setTimeout(()=>syncAccountOnline(email,account),50);
-  }catch(error){
-    err.textContent='Could not create account: '+(error?.message||'Try again.');
-    err.classList.add('show');
-    console.error(error);
-  }finally{
-    if(btn)btn.disabled=false;
-  }
+  if(err){err.textContent='Secure sign-up is unavailable in this version. Reload the website to use Firebase Authentication.';err.classList.add('show');}
 }
 function loginSuccess(user){
   enterApp(user);
@@ -384,125 +322,9 @@ function handleLogout(force=false){
   fbStarted=false;currentUser=null;removeStored('zidea_session');showPage('landing');showToast('Signed out.');
   updateLandingAuthUI();
 }
-async function handleForgotPassword(){
-  const resetBox=document.getElementById('forgot-password-fields');
-  if(resetBox&&!resetBox.classList.contains('show')){
-    resetBox.classList.add('show');
-    const input=document.getElementById('forgot-email');
-    if(input){
-      input.value=document.getElementById('login-email')?.value||'';
-      input.focus();
-    }
-    return;
-  }
-  const email=normalizeEmail(document.getElementById('forgot-email')?.value||document.getElementById('login-email')?.value||'');
-  const err=document.getElementById('login-error');
-  if(!email){if(err){err.textContent='Enter your email first so we know where to send reset instructions.';err.classList.add('show');}return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){if(err){err.textContent='Enter a valid email address.';err.classList.add('show');}return;}
-  const request={email,requestedAt:Date.now(),status:'requested'};
-  const requests=load('zidea_password_reset_requests')||[];
-  save('zidea_password_reset_requests',[request,...requests].slice(0,25));
-  await db.patch('passwordResets',{[Date.now()]:request}).catch(()=>{});
-  if(err)err.classList.remove('show');
-  showToast('Password reset instructions have been sent if this email is registered.');
-  if(resetBox)resetBox.classList.remove('show');
-}
-async function loadGoogleConfig(){
-  if(googleClientId) return googleClientId;
-  try{
-    const res = await fetch('/api/config');
-    if(res.ok){
-      const data = await res.json();
-      googleClientId = data.googleClientId || '';
-    }
-  }catch(_){}
-  googleClientId = googleClientId || '';
-  return googleClientId;
-}
-async function initGoogleAuth(){
-  const clientId = await loadGoogleConfig();
-  if(!clientId){
-    showToast('Google sign-in is not configured yet.');
-    return false;
-  }
-  if(!window.google?.accounts?.id){
-    showToast('Google sign-in is still loading. Try again in a moment.');
-    return false;
-  }
-  if(!googleReady){
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleCredentialResponse,
-      ux_mode: 'popup',
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-    googleReady=true;
-  }
-  return true;
-}
-async function handleGoogleLogin(){
-  const ready=await initGoogleAuth();
-  if(!ready)return;
-  try {
-    google.accounts.id.prompt(notification => {
-      console.log('Google prompt notification', notification);
-      if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
-        showToast('Google prompt was blocked or did not appear. Please allow popups and try again.');
-        let fallback=document.getElementById('google-fallback-button');
-        if(!fallback){
-          fallback=document.createElement('div');
-          fallback.id='google-fallback-button';
-          fallback.style.position='fixed';
-          fallback.style.left='-9999px';
-          document.body.appendChild(fallback);
-        }
-        google.accounts.id.renderButton(fallback,{theme:'outline',size:'large'});
-      }
-    });
-  } catch (error) {
-    console.error('Google sign-in failed', error);
-    showToast('Google sign-in failed. Please try again.');
-  }
-}
-async function handleCredentialResponse(response){
-  const idToken = response?.credential;
-  if(!idToken){
-    showToast('Google sign-in failed. Please try again.');
-    return;
-  }
-  try{
-    const res = await fetch('/api/auth/google', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({idToken})
-    });
-    const data = await res.json().catch(() => ({}));
-    if(!res.ok || !data.success) throw new Error(data.message || 'Authentication failed. Try again.');
-    if(data.token) save('zidea_google_session_token', data.token);
-    if(data.user?.avatar) save(`zidea_avatar_data_${data.user.username}`, data.user.avatar);
-    saveAccount(normalizeEmail(data.user.email), {
-      email: data.user.email,
-      username: data.user.username,
-      password: '',
-      google_id: data.user.google_id || '',
-      avatar: data.user.avatar || '',
-      wins: data.user.wins || 0,
-      losses: data.user.losses || 0
-    });
-    loginSuccess({email: data.user.email, username: data.user.username, avatar: data.user.avatar || ''});
-  } catch (error) {
-    const msg = String(error?.message || 'Google sign-in failed. Please try again.');
-    console.error('Google auth failed', error, {response: error?.response});
-    showToast(msg);
-  }
-}
-let gStep='email',gEmail='';
-function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
-function handleGoogleSubmit(e){
-  e.preventDefault();
-  handleGoogleLogin();
-}
+async function handleForgotPassword(){showToast('Reload the website to use Firebase password reset.');}
+async function handleGoogleLogin(){showToast('Reload the website to use Firebase Google sign-in.');}
+function handleGoogleSubmit(e){e?.preventDefault();handleGoogleLogin();}
 
 // ------ Storage Utils --------------------------------
 const save=(key,val)=>localStorage.setItem(key,JSON.stringify(val));
@@ -724,52 +546,11 @@ function prepareCallUI(username,status){
   document.getElementById('call-timer').textContent='00:00';
 }
 async function toggleCall(username){if(activeCallUser){endCall();return;}await startCall(username);}
-async function startCall(username){
-  if(!currentUser)return;activeCallUser=username;
-  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';
-  prepareCallUI(username,'Connecting...');
-  const chan=callChan(currentUser.username,username);
-  await db.write('calls/'+username+'/incoming',{from:currentUser.username,channel:chan,ts:Date.now()});
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;showToast('Microphone unavailable.');return;}
-  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
-  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';showToast('Call connection failed.');setTimeout(endCall,900);}};
-  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  const offer=await rtcPeer.createOffer();await rtcPeer.setLocalDescription(offer);await db.write(sigPath(chan)+'/offer',{sdp:offer.sdp,type:offer.type,from:currentUser.username});
-  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='No answer';showToast('No answer. Call ended.');endCall();}},30000);
-  listenSignals(chan,false);renderUsers();
-}
 function listenSignals(chan,isCallee){
   if(sigSSE){sigSSE.close();sigSSE=null;}const me=currentUser.username;
   const sse=new EventSource(`${FB}/${sigPath(chan)}.json`);sigSSE=sse;
   sse.addEventListener('put',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;if(isCallee&&data.offer&&data.offer.from!==me&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.offer.type,sdp:data.offer.sdp}));const answer=await rtcPeer.createAnswer();await rtcPeer.setLocalDescription(answer);await db.write(sigPath(chan)+'/answer',{sdp:answer.sdp,type:answer.type,from:me});}if(!isCallee&&data.answer&&data.answer.from!==me&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}const otherUser=isCallee?data.offer?.from:data.answer?.from;const iceNode=data['ice_'+otherUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(_){}}};}catch(_){}});
-  sse.addEventListener('patch',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;const otherUser=isCallee?activeCallUser:activeCallUser;const iceNode=data['ice_'+otherUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(_){}}}if(!isCallee&&data.answer&&data.answer.from!==currentUser.username&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}}catch(_){}});
-}
-async function endCall(){
-  if(!activeCallUser)return;const u=activeCallUser;activeCallUser=null;callMuted=false;
-  if(currentUser){db.del('calls/'+currentUser.username+'/incoming');db.del('calls/'+u+'/incoming');const chan=callChan(currentUser.username,u);db.del(sigPath(chan));}
-  if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}
-  if(sigSSE){sigSSE.close();sigSSE=null;}if(localStream){localStream.getTracks().forEach(t=>t.stop());localStream=null;}if(rtcPeer){rtcPeer.close();rtcPeer=null;}
-  const audio=document.getElementById('rtc-remote-audio');if(audio)audio.remove();document.getElementById('call-overlay').style.display='none';stopCallTimer();renderUsers();
-}
-function toggleMute(){if(!localStream)return;callMuted=!callMuted;localStream.getAudioTracks().forEach(t=>t.enabled=!callMuted);document.getElementById('mute-btn').textContent=callMuted?'🔇':'🎤';}
-function startCallTimer(){callSecs=0;callTimer=setInterval(()=>{callSecs++;const m=String(Math.floor(callSecs/60)).padStart(2,'0');const s=String(callSecs%60).padStart(2,'0');const el=document.getElementById('call-timer');if(el)el.textContent=m+':'+s;},1000);}
-function stopCallTimer(){if(callTimer){clearInterval(callTimer);callTimer=null;}callSecs=0;}
-function listenIncoming(){
-  if(!currentUser||incomingSSE)return;
-  const sse=new EventSource(`${FB}/calls/${currentUser.username}/incoming.json`);incomingSSE=sse;
-  sse.addEventListener('put',e=>{try{const{data}=JSON.parse(e.data);if(!data||!data.from||data.from===currentUser?.username||activeCallUser)return;incomingUser=data.from;document.getElementById('incoming-name').textContent='@'+data.from;document.getElementById('incoming-avatar').textContent=getUserInitials(data.from);document.getElementById('incoming-toast').style.display='block';setTimeout(()=>{if(incomingUser===data.from)declineCall();},30000);}catch(_){}});
-}
-async function acceptCall(){
-  if(!incomingUser)return;document.getElementById('incoming-toast').style.display='none';const caller=incomingUser;incomingUser=null;activeCallUser=caller;
-  const overlay=document.getElementById('call-overlay');overlay.style.display='flex';prepareCallUI(caller,'Connecting...');
-  try{localStream=await navigator.mediaDevices.getUserMedia({audio:true});}catch(err){document.getElementById('call-status').textContent='Mic error: '+err.message;return;}
-  rtcPeer=new RTCPeerConnection(RTC_CONFIG);localStream.getTracks().forEach(t=>rtcPeer.addTrack(t,localStream));
-  rtcPeer.ontrack=e=>{let audio=document.getElementById('rtc-remote-audio');if(!audio){audio=document.createElement('audio');audio.id='rtc-remote-audio';audio.autoplay=true;document.body.appendChild(audio);}audio.srcObject=e.streams[0];document.getElementById('call-status').textContent='Connected';if(!callTimer)startCallTimer();if(callConnectTimeout){clearTimeout(callConnectTimeout);callConnectTimeout=null;}};
-  rtcPeer.onconnectionstatechange=()=>{if(!rtcPeer)return;const st=rtcPeer.connectionState;const statusEl=document.getElementById('call-status');if(!statusEl)return;if(st==='connected')statusEl.textContent='Connected';if(st==='connecting')statusEl.textContent='Connecting...';if(st==='failed'||st==='disconnected'){statusEl.textContent='Connection failed';setTimeout(endCall,900);}};
-  rtcPeer.onicecandidate=async e=>{if(e.candidate){const key=Date.now()+'_'+Math.random().toString(36).slice(2);const chan=callChan(currentUser.username,caller);await db.patch(sigPath(chan)+'/ice_'+currentUser.username,{[key]:JSON.stringify(e.candidate)});}};
-  callConnectTimeout=setTimeout(()=>{if(activeCallUser&&document.getElementById('call-status')?.textContent!=='Connected'){document.getElementById('call-status').textContent='Connection timeout';endCall();}},30000);
-  const chan=callChan(currentUser.username,caller);listenSignals(chan,true);renderUsers();
+  sse.addEventListener('patch',async e=>{try{const{data}=JSON.parse(e.data);if(!data||!rtcPeer)return;const iceNode=data['ice_'+activeCallUser];if(iceNode&&rtcPeer.remoteDescription){for(const key of Object.keys(iceNode)){try{await rtcPeer.addIceCandidate(new RTCIceCandidate(JSON.parse(iceNode[key])));}catch(_){}}}if(!isCallee&&data.answer&&data.answer.from!==currentUser.username&&!rtcPeer.remoteDescription){await rtcPeer.setRemoteDescription(new RTCSessionDescription({type:data.answer.type,sdp:data.answer.sdp}));}}catch(_){}});
 }
 function declineCall(){incomingUser=null;document.getElementById('incoming-toast').style.display='none';if(currentUser)db.del('calls/'+currentUser.username+'/incoming');}
 
@@ -879,6 +660,7 @@ function attachMessageInteractions(){
 
 function editMessage(ts){if(!ts) return;const cache=activeChatUser?chatCache[activeChatUser]:(activeGroupId?groupCache[activeGroupId]:null);if(!cache)return;const m=cache.find(x=>String(x.ts)===String(ts));if(!m)return;const bubble=document.querySelector('.bubble[data-ts="'+ts+'"]');if(!bubble)return;const prevText=m.text||'';bubble.innerHTML=`<div style="display:flex;flex-direction:column;gap:8px"><textarea style="min-width:220px;max-width:100%;padding:8px;border-radius:8px;background:var(--card);border:1px solid var(--border);color:#e0e0e0" id="_edit_${ts}">${esc(prevText)}</textarea><div style="display:flex;gap:8px"><button class="btn-primary" id="_save_${ts}">Save</button><button class="btn-ghost" id="_cancel_${ts}">Cancel</button></div></div>`;document.getElementById('_cancel_'+ts).onclick=()=>{renderMsgs();};document.getElementById('_save_'+ts).onclick=async()=>{const v=document.getElementById('_edit_'+ts).value.trim();m.text=v;m.edited=true;renderMsgs();try{const key=[currentUser.username,activeChatUser].sort().join('__');if(activeChatUser)await db.patch('chats/'+key+'/messages',{[ts]:{...m}});else await db.patch(`groupchats/${activeGroupId}/messages`,{[ts]:{...m}});}catch(err){showToast('Failed to save edit');console.error(err);} };
 
+}
 async function deleteMessage(ts){if(!ts) return;const cache=activeChatUser?chatCache[activeChatUser]:(activeGroupId?groupCache[activeGroupId]:null);if(!cache)return;const m=cache.find(x=>String(x.ts)===String(ts));if(!m)return;const confirmDel=confirm('Delete this message?');if(!confirmDel) return; m.deleted=true; m.text='';renderMsgs();try{const key=[currentUser.username,activeChatUser].sort().join('__');if(activeChatUser)await db.patch('chats/'+key+'/messages',{[ts]:{...m}});else await db.patch(`groupchats/${activeGroupId}/messages`,{[ts]:{...m}});}catch(err){showToast('Failed to delete');console.error(err);} }
 function openChat(username){
   if(!currentUser)return;
@@ -1526,22 +1308,15 @@ async function syncAvatarFromFirebase(){
   if(data.avatar)save(ideaStoreKey('avatar_data'),data.avatar);
   renderProfile();
 }
-function seedExploreUsers(){
-  const accounts=load('zidea_accounts')||{};
-  EXPLORE_MOCK.forEach(i=>{if(!accounts[(i.author||'user')+'@zidea.local'])accounts[(i.author||'user')+'@zidea.local']={username:i.author,password:'demo123',wins:0,losses:0};});
-  save('zidea_accounts',accounts);
-}
 // Boot
 function initializeApp(){
-  testFirebaseAccess();
-  seedExploreUsers();
-  window.addEventListener('online',syncAllAccountsOnline);
-  setTimeout(syncAllAccountsOnline,1200);
   const incomingToast = document.getElementById('incoming-toast');
   if(incomingToast)incomingToast.style.display='none';
+  getAccounts();
+  removeStored('zidea_session');
+  removeStored('zidea_google_session_token');
   updateStats();
-  if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
-  else{applyTheme();}
+  applyTheme();
   renderSidebarNav();
   updateLandingAuthUI();
   const landing = document.getElementById('page-landing');

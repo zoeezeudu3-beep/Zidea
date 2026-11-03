@@ -9,12 +9,8 @@
 <meta name="description" id="meta-description" content="Zidea helps you generate ideas, chat, call, and play with friends."/>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='13 2 3 14 12 14 11 22 21 10 12 10 13 2' fill='%237C3AED'/></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<script>
-  window.zideaGoogleClientId = '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
-</script>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
-<script>try{const s=window.localStorage;if(s&&JSON.parse(s.getItem("zidea_session")))document.documentElement.classList.add("has-session");}catch(e){}</script>
-<style>html.has-session #page-landing{display:none!important}</style>
+<script>document.documentElement.classList.add('auth-restoring');</script>
+<style>html.auth-restoring .page{visibility:hidden}</style>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--brand:#C9A84C;--brand-dark:#A38738;--brand-light:#E6CE8B;--surface:#0a0a0a;--card:#111111;--border:rgba(201,168,76,0.25)}
@@ -952,22 +948,6 @@ body.app-active #page-landing footer{display:none}
   </div>
 </div>
 
-<!-- GOOGLE MODAL -->
-<div class="modal-overlay" id="google-modal" onclick="if(event.target===this)closeGoogleModal()">
-  <div class="modal-box">
-    <div style="text-align:center;display:flex;flex-direction:column;gap:8px"><h2 style="color:#fff;font-size:18px;font-weight:700">Sign in with Google</h2><p style="color:#bfb399;font-size:13px">Google OAuth is not connected yet. Use email and password for now.</p></div>
-    <div id="google-error" class="error-msg"></div>
-    <form style="display:flex;flex-direction:column;gap:12px" onsubmit="handleGoogleSubmit(event)">
-      <div id="google-step1"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg><input class="input-field" type="email" id="google-email" placeholder="your@gmail.com"/></div></div>
-      <div id="google-step2" style="display:none"><div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><input class="input-field" type="password" id="google-password" placeholder="Password"/></div></div>
-      <div style="display:flex;gap:10px">
-        <button type="button" class="btn-ghost" style="flex:1" onclick="closeGoogleModal()">Cancel</button>
-        <button type="submit" class="btn-primary" style="flex:1" id="google-btn">Next</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <script>
 // ------ Firebase ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const FB = 'https://zidea-9da13-default-rtdb.firebaseio.com';
@@ -977,7 +957,6 @@ const db = {
   async read(p){for(let n=0;n<3;n++){try{const r=await fetch(`${FB}/${p}.json`);if(r.ok)return await r.json();}catch(_){}if(n<2)await new Promise(res=>setTimeout(res,400*(n+1)));}return null;},
   del(p){return fetch(`${FB}/${p}.json`,{method:'DELETE'}).catch(()=>{})}
 };
-async function testFirebaseAccess(){try{const r=await fetch(`${FB}/_test.json`,{method:'PUT',body:JSON.stringify({ok:true}),headers:{'Content-Type':'application/json'}});if(!r.ok){const t=await r.text();if(t.includes('Permission denied')||t.includes('PERMISSION_DENIED')){const b=document.createElement('div');b.style.cssText='position:fixed;top:0;left:0;right:0;background:#DC2626;color:#fff;padding:10px 20px;font-size:13px;font-weight:600;z-index:9999;text-align:center';b.innerHTML='⚠ Firebase rules blocking writes. Go to <a href="https://console.firebase.google.com" target="_blank" style="color:#fff;text-decoration:underline">Firebase Console</a> → Realtime Database → Rules → set { "rules": { ".read": true, ".write": true } }';document.body.prepend(b);}}else{fetch(`${FB}/_test.json`,{method:'DELETE'});}}catch(_){}}
 // Storage
 const memoryStore={};
 function getLocalStorage(){
@@ -1162,7 +1141,11 @@ function showPage(name,opts={}){
 function handleHashRoute(){
   if(suppressHashChange)return;
   const route=(window.location.hash||'#landing').replace('#','');
-  if(route==='login'||route==='signup'){openAuthModal(route,true);if(!currentUser)showPage('landing',{skipHash:true});return;}
+  if(route==='login'||route==='signup'){
+    if(currentUser)showPage('dashboard',{skipHash:true});
+    else {showPage('landing',{skipHash:true});openAuthModal(route,true);}
+    return;
+  }
   if(route.startsWith('arcade-')){
     if(!currentUser){showPage('landing',{skipHash:true});openAuthModal('login',true);return;}
     const game=route.replace('arcade-','');
@@ -1182,27 +1165,14 @@ function getAccounts(){
   Object.entries(raw).forEach(([key,value])=>{
     if(!value||typeof value!=='object')return;
     const email=normalizeEmail(value.email||key);
-    if(email)accounts[email]={...value,email};
+    if(email){const safe={...value,email};delete safe.password;accounts[email]=safe;}
   });
   save('zidea_accounts',accounts);
   return accounts;
 }
-async function findRemoteAccount(email){
-  if(!onlineReady())return null;
-  const data=await withTimeout(db.read('accounts'),1600).catch(()=>null);
-  if(!data)return null;
-  const found=Object.values(data).find(a=>normalizeEmail(a?.email)===email);
-  if(!found)return null;
-  return {email,username:found.username,password:found.password||'',wins:found.wins||0,losses:found.losses||0};
-}
-function saveAccount(email,account){
-  const accounts=getAccounts();
-  accounts[email]={...account,email};
-  save('zidea_accounts',accounts);
-}
 function enterApp(user){
+  if(!user?.uid||user.firebaseAuth!==true)return;
   currentUser=user;
-  save('zidea_session',user);
   try{setLoggedInUI();}catch(error){console.warn('setLoggedInUI failed',error);}
   try{updateLandingAuthUI();}catch(error){console.warn('updateLandingAuthUI failed',error);}
   try{closeAuthModal(true);}catch(error){console.warn('closeAuthModal failed',error);}
@@ -1210,68 +1180,6 @@ function enterApp(user){
   setTimeout(()=>{try{startFirebase();listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();}catch(error){console.warn('background sync failed',error);}},100);
   setTimeout(showWelcomeTour,350);
   showToast('Signed in successfully.');
-}
-function syncAccountOnline(email,account){
-  if(!onlineReady()||!account?.username)return;
-  withTimeout(db.write(`accounts/${account.username}`,{
-    email,
-    username:account.username,
-    password:account.password||'',
-    wins:account.wins||0,
-    losses:account.losses||0,
-    createdAt:account.createdAt||Date.now(),
-    updatedAt:Date.now()
-  }),1800).catch(()=>{});
-}
-function syncAllAccountsOnline(){
-  if(!onlineReady())return;
-  const accounts=getAccounts();
-  Object.entries(accounts).forEach(([email,account])=>syncAccountOnline(email,account));
-}
-async function handleLogin(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.classList.add('btn-loading');
-  const email=normalizeEmail(document.getElementById('login-email').value);
-  const pw=document.getElementById('login-password').value;
-  const err=document.getElementById('login-error');
-  const accounts=getAccounts();
-  let acc=accounts[email];
-  if(!acc){acc=await findRemoteAccount(email);if(acc)saveAccount(email,acc);}
-  if(!acc){err.textContent='No account found.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  if(acc.password!==pw){err.textContent='Wrong password.';err.classList.add('show');if(btn)btn.classList.remove('btn-loading');return;}
-  err.classList.remove('show');
-  if(btn)btn.classList.remove('btn-loading');
-  syncAccountOnline(email,acc);
-  loginSuccess({email,username:acc.username});
-}
-function handleSignup(e){
-  e.preventDefault();
-  const btn=e.target.querySelector('button[type="submit"]');if(btn)btn.disabled=true;
-  const username=document.getElementById('signup-username').value.trim().toLowerCase();
-  const email=normalizeEmail(document.getElementById('signup-email').value);
-  const pw=document.getElementById('signup-password').value;
-  const err=document.getElementById('signup-error');
-  try{
-    const accounts=getAccounts();
-    if(!/^[a-z0-9_]{3,20}$/.test(username)){err.textContent='Use 3-20 letters, numbers, or underscores for username.';err.classList.add('show');return;}
-    if(Object.values(accounts).some(a=>a.username===username)){err.textContent='Username taken.';err.classList.add('show');return;}
-    if(accounts[email]){err.textContent='Email already registered.';err.classList.add('show');return;}
-    err.classList.remove('show');
-    const account={email,username,password:pw,wins:0,losses:0,createdAt:Date.now()};
-    saveAccount(email,account);
-    err.classList.remove('show');
-    enterApp({email,username});
-    setTimeout(()=>syncAccountOnline(email,account),50);
-  }catch(error){
-    err.textContent='Could not create account: '+(error?.message||'Try again.');
-    err.classList.add('show');
-    console.error(error);
-  }finally{
-    if(btn)btn.disabled=false;
-  }
-}
-function loginSuccess(user){
-  enterApp(user);
 }
 function setLoggedInUI(){
   const n='@'+currentUser.username;
@@ -1288,115 +1196,6 @@ function handleLogout(force=false){
   if(currentUser&&fbStarted)db.patch('users/'+currentUser.username,{online:false,lastSeen:Date.now()});
   fbStarted=false;currentUser=null;removeStored('zidea_session');showPage('landing');showToast('Signed out.');
   updateLandingAuthUI();
-}
-async function handleForgotPassword(){
-  const email=normalizeEmail(document.getElementById('login-email')?.value||prompt('Enter your account email for password reset:')||'');
-  const err=document.getElementById('login-error');
-  if(!email){if(err){err.textContent='Enter your email first so we know where to send reset instructions.';err.classList.add('show');}return;}
-  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){if(err){err.textContent='Enter a valid email address.';err.classList.add('show');}return;}
-  const request={email,requestedAt:Date.now(),status:'requested'};
-  const requests=load('zidea_password_reset_requests')||[];
-  save('zidea_password_reset_requests',[request,...requests].slice(0,25));
-  await db.patch('passwordResets',{[Date.now()]:request}).catch(()=>{});
-  if(err)err.classList.remove('show');
-  showToast('Password reset instructions have been sent if this email is registered.');
-}
-async function loadGoogleConfig(){
-  if(googleClientId) return googleClientId;
-  try{
-    const res = await fetch('/api/config');
-    if(res.ok){
-      const data = await res.json();
-      googleClientId = data.googleClientId || '';
-    }
-  }catch(_){}
-  // Static local previews can also set the client ID directly via window vars.
-  googleClientId = googleClientId || window.zideaGoogleClientId || window.NEXT_PUBLIC_GOOGLE_CLIENT_ID || window.VITE_GOOGLE_CLIENT_ID || '81688894370-men2fe59sieo0hautlq9n3cq8tu1b7kf.apps.googleusercontent.com';
-  return googleClientId;
-}
-async function initGoogleAuth(){
-  const clientId = await loadGoogleConfig();
-  if(!clientId){
-    showToast('Google sign-in is not configured yet.');
-    return false;
-  }
-  if(!window.google?.accounts?.id){
-    showToast('Google sign-in is still loading. Try again in a moment.');
-    return false;
-  }
-  if(!googleReady){
-    google.accounts.id.initialize({
-      client_id: clientId,
-      callback: handleCredentialResponse,
-      ux_mode: 'popup',
-      auto_select: false,
-      cancel_on_tap_outside: true
-    });
-    googleReady=true;
-  }
-  return true;
-}
-async function handleGoogleLogin(){
-  const ready=await initGoogleAuth();
-  if(!ready)return;
-  try {
-    google.accounts.id.prompt(notification => {
-      console.log('Google prompt notification', notification);
-      if(notification.isNotDisplayed?.() || notification.isSkippedMoment?.()){
-        showToast('Google prompt was blocked or did not appear. Please allow popups and try again.');
-        let fallback=document.getElementById('google-fallback-button');
-        if(!fallback){
-          fallback=document.createElement('div');
-          fallback.id='google-fallback-button';
-          fallback.style.position='fixed';
-          fallback.style.left='-9999px';
-          document.body.appendChild(fallback);
-        }
-        google.accounts.id.renderButton(fallback,{theme:'outline',size:'large'});
-      }
-    });
-  } catch (error) {
-    console.error('Google sign-in failed', error);
-    showToast('Google sign-in failed. Please try again.');
-  }
-}
-async function handleCredentialResponse(response){
-  const idToken = response?.credential;
-  if(!idToken){
-    showToast('Google sign-in failed. Please try again.');
-    return;
-  }
-  try{
-    const res = await fetch('/api/auth/google', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({idToken})
-    });
-    const data = await res.json().catch(() => ({}));
-    if(!res.ok || !data.success) throw new Error(data.message || 'Authentication failed. Try again.');
-    if(data.token) save('zidea_google_session_token', data.token);
-    if(data.user?.avatar) save(`zidea_avatar_data_${data.user.username}`, data.user.avatar);
-    saveAccount(normalizeEmail(data.user.email), {
-      email: data.user.email,
-      username: data.user.username,
-      password: '',
-      google_id: data.user.google_id || '',
-      avatar: data.user.avatar || '',
-      wins: data.user.wins || 0,
-      losses: data.user.losses || 0
-    });
-    loginSuccess({email: data.user.email, username: data.user.username, avatar: data.user.avatar || ''});
-  } catch (error) {
-    const msg = String(error?.message || 'Google sign-in failed. Please try again.');
-    console.error('Google auth failed', error, {response: error?.response});
-    showToast(msg);
-  }
-}
-let gStep='email',gEmail='';
-function closeGoogleModal(){document.getElementById('google-modal').classList.remove('show');}
-function handleGoogleSubmit(e){
-  e.preventDefault();
-  handleGoogleLogin();
 }
 </script>
 
@@ -2287,25 +2086,19 @@ async function syncAvatarFromFirebase(){
   if(data.avatar)save(ideaStoreKey('avatar_data'),data.avatar);
   renderProfile();
 }
-function seedExploreUsers(){
-  const accounts=load('zidea_accounts')||{};
-  EXPLORE_MOCK.forEach(i=>{if(!accounts[(i.author||'user')+'@zidea.local'])accounts[(i.author||'user')+'@zidea.local']={username:i.author,password:'demo123',wins:0,losses:0};});
-  save('zidea_accounts',accounts);
-}
 // Boot
-testFirebaseAccess();
-seedExploreUsers();
-window.addEventListener('online',syncAllAccountsOnline);
-setTimeout(syncAllAccountsOnline,1200);
 document.getElementById('incoming-toast').style.display='none';
+getAccounts();
+removeStored('zidea_session');
+removeStored('zidea_google_session_token');
 updateStats();
-if(load('zidea_session')){currentUser=load('zidea_session');setLoggedInUI();startFirebase();setTimeout(()=>{listenIncoming();syncIdeasFromFirebase();syncAvatarFromFirebase();},800);}
-else{applyTheme();}
+applyTheme();
 updateLandingAuthUI();
 const pathSeg=window.location.pathname.split('/').filter(Boolean).pop();
 if(!window.location.hash&&pathSeg&&pathSeg!=='index.html'){window.location.hash=pathSeg;}
-if(window.location.hash)handleHashRoute();else showPage(currentUser?'dashboard':'landing');
 </script>
+
+<script src="./arcade.js"></script>
 
 <script>
 // ------ ZiD AI ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
