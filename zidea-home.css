@@ -17,7 +17,7 @@
   position: sticky;
   top: 0;
   min-height: 60px;
-  padding: 10px max(24px, calc((100vw - 1180px) / 2));
+  padding: 10px max(24px, calc((100vw - 1120px) / 2));
   background: rgba(8, 8, 8, .92);
   border-bottom-color: rgba(255, 255, 255, .08);
   z-index: 20;
@@ -53,7 +53,7 @@
 #landing-auth-actions .btn-primary { box-shadow: 0 5px 18px rgba(245, 184, 46, .18); }
 
 #page-landing .landing-hero {
-  width: min(1180px, 100%);
+  width: min(1120px, 100%);
   min-height: 500px;
   height: auto;
   margin: 0 auto;
@@ -77,7 +77,7 @@
 
 #page-landing .landing-hero h1 {
   margin: 0;
-  font-size: 72px;
+  font-size: clamp(48px, 6vw, 72px);
   line-height: .96;
   letter-spacing: 0;
 }
@@ -139,7 +139,7 @@
 .badge-call { bottom: 12%; right: 12%; }
 
 .landing-feature-strip {
-  width: min(1120px, calc(100% - 40px));
+  width: min(1120px, calc(100% - 48px));
   margin: 0 auto 28px;
   padding: 14px 10px;
   display: grid;
@@ -156,15 +156,44 @@
 .landing-feature-strip strong { color: #f5f2ec; font-size: 12px; }
 .landing-feature-strip small { margin-top: 3px; color: var(--home-muted); font-size: 10px; line-height: 1.4; }
 
-#page-landing .product-showcase { margin-top: 22px; }
+#page-landing .product-showcase {
+  width: min(1120px, calc(100% - 48px));
+  max-width: 1120px;
+  margin: 0 auto 48px;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: 32px;
+}
 #page-landing .phone-shell { border-color: rgba(245, 184, 46, .32); }
 #page-landing .game-shell { border-radius: 18px; background: linear-gradient(145deg, #171318, #0d0c0d); }
 #page-landing .game-cta { cursor: pointer; transition: background .18s ease, color .18s ease; }
 #page-landing .game-cta:hover { background: var(--home-gold); color: #111; }
-#page-landing #landing-how-it-works,
-#page-landing #landing-features { scroll-margin-top: 84px; }
-#page-landing .features { max-width: 1120px; }
+#page-landing #landing-how-it-works {
+  width: min(1120px, calc(100% - 48px));
+  max-width: 1120px;
+  margin: 0 auto 48px;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+  scroll-margin-top: 84px;
+}
+#page-landing #landing-features {
+  width: min(1120px, calc(100% - 48px));
+  max-width: 1120px;
+  margin: 0 auto 48px;
+  padding: 0;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  scroll-margin-top: 84px;
+}
 #page-landing .feature-card { border-radius: 12px; }
+.landing-bottom-cta {
+  width: min(1120px, calc(100% - 48px));
+  margin: 0 auto;
+  padding: 0 0 60px;
+  position: relative;
+  z-index: 1;
+  text-align: center;
+}
 
 #page-dashboard {
   background:
@@ -283,8 +312,17 @@
   #page-landing .landing-hero { min-height: 440px; grid-template-columns: minmax(0, 1.05fr) minmax(240px, .8fr); gap: 14px; padding-inline: 22px; }
   .landing-art-bolt { height: 225px; }
   .landing-art-badge { padding: 8px 10px; font-size: 10px; }
+  .landing-feature-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .landing-feature-strip > div:nth-child(3) { border-left: 0; }
+  .landing-feature-strip > div:nth-child(n+3) { border-top: 1px solid rgba(255, 255, 255, .1); }
+  #page-landing #landing-features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #page-landing .product-showcase { gap: 20px; }
   #page-dashboard .sidebar { width: 174px; }
   #page-dashboard .main-content { padding-inline: 20px; }
+}
+
+@media (max-width: 840px) {
+  #page-landing .product-showcase { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 680px) {
@@ -307,7 +345,12 @@
   .landing-feature-strip > div { padding: 10px 7px; }
   .landing-feature-strip > div:nth-child(3) { border-left: 0; }
   .landing-feature-strip > div:nth-child(n+3) { border-top: 1px solid rgba(255, 255, 255, .1); }
-  #page-landing .product-showcase { margin-top: 8px; }
+  #page-landing .product-showcase { width: calc(100% - 28px); margin-bottom: 36px; grid-template-columns: 1fr; gap: 16px; }
+  #page-landing #landing-how-it-works,
+  #page-landing #landing-features,
+  .landing-bottom-cta { width: calc(100% - 28px); }
+  #page-landing #landing-how-it-works { margin-bottom: 36px; }
+  #page-landing #landing-features { margin-bottom: 36px; }
   #page-dashboard .main-content { height: auto; min-height: calc(100vh - 64px); padding: 18px 14px 26px; gap: 12px; }
   .home-header .page-title { font-size: 20px; }
   .home-welcome-banner { min-height: 92px; gap: 11px; padding: 13px; }
