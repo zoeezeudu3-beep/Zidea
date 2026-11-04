@@ -1142,9 +1142,13 @@
     } catch (error) {
       state.error = error.message;
       document.documentElement.classList.remove('auth-restoring');
-      window.showPage?.('landing', { skipHash: true });
-      window.openAuthModal?.('login', true);
-      showAuthError(authErrorMessage(error));
+      const requestedRoute = window.location.hash.replace(/^#/, '');
+      if (requestedRoute && requestedRoute !== 'landing') {
+        const authPage = requestedRoute === 'signup' ? 'signup' : 'login';
+        window.showPage?.('landing', { skipHash: true });
+        window.openAuthModal?.(authPage, true);
+        showAuthError(authErrorMessage(error), authPage);
+      }
     }
     render();
     startHomePolling();

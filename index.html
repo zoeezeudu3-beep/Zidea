@@ -638,36 +638,30 @@ body.app-active #page-landing footer{display:none}
     <div class="orb" style="width:250px;height:250px;background:rgba(56,189,248,.07);top:45%;left:55%;animation-duration:11s;animation-delay:-3s"></div>
   </div>
   <nav class="nav">
-    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
+    <div class="logo"><svg width="24" height="30" viewBox="0 0 24 30" fill="none" aria-hidden="true"><path d="M14 1 2 17h8l-1 12 13-18h-8V1Z" fill="currentColor"/></svg>zidea</div>
     <div class="landing-nav-links" aria-label="Main navigation">
       <button type="button" onclick="showPage('landing');window.scrollTo({top:0,behavior:'smooth'})">Home</button>
       <button type="button" onclick="showPage('arcade')">Games</button>
       <button type="button" onclick="document.getElementById('landing-features').scrollIntoView({behavior:'smooth'})">Features</button>
-      <button type="button" onclick="document.getElementById('landing-how-it-works').scrollIntoView({behavior:'smooth'})">About</button>
+      <button type="button" onclick="document.getElementById('landing-more').scrollIntoView({behavior:'smooth'})">About</button>
     </div>
     <div style="display:flex;gap:8px" id="landing-auth-actions">
-      <button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage('login')">Log In</button>
+      <button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage('login')">Sign In</button>
       <button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage('signup')">Sign Up</button>
     </div>
   </nav>
   <section class="hero landing-hero">
     <div class="landing-hero-copy">
-      <p class="landing-eyebrow">A place to meet, play, and make things</p>
       <h1>Welcome to<br/><em>zidea</em></h1>
-      <p>Connect, share, play &amp; discover in one place. Meet people with similar ideas, chat, call, and enjoy games together.</p>
+      <p class="landing-hero-lead">Connect, Share, Play &amp; Discover<br class="landing-lead-break"/> — all in one place.</p>
+      <p class="landing-hero-description">Generate ideas, find people with similar thoughts, chat, call, and enjoy fun games!</p>
       <div class="hero-actions">
-        <button class="btn-primary" type="button" onclick="showPage('signup')"><span aria-hidden="true">➤</span> Get Started</button>
-        <button class="btn-ghost" type="button" onclick="document.getElementById('landing-features').scrollIntoView({behavior:'smooth'})"><span aria-hidden="true">▶</span> Explore Features</button>
+        <button class="btn-primary" type="button" onclick="showPage('signup')"><span aria-hidden="true">🚀</span> Get Started</button>
+        <button class="btn-ghost" type="button" onclick="document.getElementById('landing-features').scrollIntoView({behavior:'smooth'})"><span aria-hidden="true">▶</span> Watch Video</button>
       </div>
     </div>
     <div class="landing-hero-art" aria-hidden="true">
-      <div class="landing-art-orbit landing-art-orbit-one"></div>
-      <div class="landing-art-orbit landing-art-orbit-two"></div>
-      <svg class="landing-art-bolt" viewBox="0 0 220 280" fill="none"><path d="M132 8 20 154h75L78 272l122-160h-76L132 8Z" fill="url(#zideaBoltFill)" stroke="#FFE08A" stroke-width="4" stroke-linejoin="round"/><defs><linearGradient id="zideaBoltFill" x1="110" y1="8" x2="110" y2="272" gradientUnits="userSpaceOnUse"><stop stop-color="#FFF1A8"/><stop offset=".48" stop-color="#FFC638"/><stop offset="1" stop-color="#E99514"/></linearGradient></defs></svg>
-      <span class="landing-art-badge badge-idea">✦ Ideas</span>
-      <span class="landing-art-badge badge-game">🎮 Games</span>
-      <span class="landing-art-badge badge-chat">● Chat</span>
-      <span class="landing-art-badge badge-call">☎ Call</span>
+      <img src="./assets/landing-hero-art.png" alt="Golden Zidea lightning bolt surrounded by idea, game, chat, and call icons"/>
     </div>
   </section>
   <div class="landing-feature-strip" aria-label="Zidea features">
@@ -676,97 +670,27 @@ body.app-active #page-landing footer{display:none}
     <div><span>●</span><strong>Chat &amp; Call</strong><small>Connect with friends</small></div>
     <div><span>♟</span><strong>A Growing Community</strong><small>Be part of Zidea</small></div>
   </div>
-  <section class="product-showcase" aria-label="Zidea app preview">
-    <div class="showcase-phone">
-      <div class="phone-shell">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="phone-header"><span>9:41</span><span>5G</span></div>
-          <div class="phone-hero">
-            <div class="phone-hero-top">
-              <span>Zidea</span>
-              <span class="phone-pill">LIVE</span>
-            </div>
-            <div class="phone-hero-title">Connect.<br><em>Play.</em></div>
-            <div class="phone-hero-meta">
-              <span>12 friends online</span>
-              <span>+36% this week</span>
-            </div>
-          </div>
-          <div class="phone-cta">
-            <button class="mini-primary" type="button" onclick="focusDashboardSearch()">Find someone to call</button>
-            <button class="mini-ghost" type="button" onclick="showPage('chat')">Open chat</button>
-          </div>
-          <div class="phone-card-stack">
-            <div class="phone-mini-card">
-              <div class="phone-mini-head"><span>Voice call</span><span>2m</span></div>
-              <div class="phone-mini-body">
-                <div class="phone-ring">☎</div>
-                <div class="phone-mini-stats">
-                  <strong>@nova</strong>
-                  <span>Startup deck review</span>
-                </div>
-                <div class="phone-mini-bars"><span></span><span></span><span></span><span></span><span></span></div>
-              </div>
-            </div>
-            <div class="phone-mini-card">
-              <div class="phone-mini-head"><span>Idea match</span><span>98%</span></div>
-              <div class="phone-mini-body">
-                <div class="phone-ring" style="background:linear-gradient(135deg,#22c55e,#34d399)">💡</div>
-                <div class="phone-mini-stats">
-                  <strong>FitQuest</strong>
-                  <span>Health app concept</span>
-                </div>
-                <div class="phone-mini-bars"><span></span><span></span><span></span><span></span><span></span></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+  <section class="landing-teasers" id="landing-features">
+    <div class="landing-teasers-heading" id="landing-more">
+      <span aria-hidden="true"></span>
+      <div><h2>More Than <em>Just an</em> App</h2><p>A place to meet, play and grow together.</p></div>
+      <span aria-hidden="true"></span>
     </div>
-    <div class="showcase-game">
-      <div class="game-shell">
-        <div class="game-header">
-          <div class="live-badge">Live</div>
-          <div class="game-score"><span>Nova</span><span class="score-pill">3 - 2</span><span>you</span></div>
-        </div>
-        <div class="game-board" aria-label="Online game preview">
-          <div class="game-square x">X</div>
-          <div class="game-square o">O</div>
-          <div class="game-square x">X</div>
-          <div class="game-square o">O</div>
-          <div class="game-square x">X</div>
-          <div class="game-square"></div>
-          <div class="game-square"></div>
-          <div class="game-square o">O</div>
-          <div class="game-square"></div>
-        </div>
-        <div class="game-footer">
-          <div class="game-user"><span class="avatar-dot">N</span><span>@nova</span></div>
-          <button class="game-cta" type="button" onclick="showPage('arcade')">Explore games</button>
-        </div>
-      </div>
+    <div class="landing-teaser-grid">
+      <button class="landing-teaser-card" type="button" onclick="showPage('ideas')">
+        <img src="./assets/landing-share-ideas.png" alt="" />
+        <span><strong>Share Ideas</strong><small>Discover new ideas</small></span>
+      </button>
+      <button class="landing-teaser-card" type="button" onclick="showPage('arcade')">
+        <img src="./assets/landing-play-games.png" alt="" />
+        <span><strong>Play Games</strong><small>Have fun together</small></span>
+      </button>
+      <button class="landing-teaser-card" type="button" onclick="showPage('chat')">
+        <img src="./assets/landing-chat-call.png" alt="" />
+        <span><strong>Chat &amp; Call</strong><small>Stay connected</small></span>
+      </button>
     </div>
   </section>
-  <div id="landing-how-it-works">
-    <h2 style="text-align:center;font-size:22px;font-weight:800;color:#fff;margin-bottom:28px">How it works</h2>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0">
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">👤<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Create account</h3><p style="color:#bfb399;font-size:12px;line-height:1.6">Sign up with email. Pick a unique @username.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">🔍<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Find friends</h3><p style="color:#bfb399;font-size:12px;line-height:1.6">Search by @username. See who's online.</p></div>
-      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:20px;text-align:center"><div style="width:52px;height:52px;border-radius:16px;background:rgba(201,168,76,.2);border:1px solid rgba(201,168,76,.3);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">📞<span style="position:absolute;top:-8px;right:-8px;width:18px;height:18px;border-radius:50%;background:var(--brand);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span></div><h3 style="color:#fff;font-size:13px;font-weight:700">Call, chat &amp; play</h3><p style="color:#bfb399;font-size:12px;line-height:1.6">Voice call, send messages, or jump into a game.</p></div>
-    </div>
-  </div>
-  <div class="features" id="landing-features">
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Find Friends</h3><p>Search anyone by @username and connect instantly.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></div><h3>Voice Calls</h3><p>Real-time voice calls powered by WebRTC.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg></div><h3>ZIDEA PLAY</h3><p>Play IDEA WARS, BUILD TOGETHER, PITCH BATTLE, and the 60-SECOND CHALLENGE.</p></div>
-    <div class="card feature-card"><div class="feature-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div><h3>Generate Ideas</h3><p>AI-powered idea generator with breakdown &amp; scoring.</p></div>
-  </div>
-  <div class="landing-bottom-cta">
-    <h2 style="font-size:clamp(20px,5vw,32px);font-weight:800;color:#fff;margin-bottom:12px">Ready to connect?</h2>
-    <p style="color:#bfb399;font-size:14px;margin-bottom:24px">Join free. No credit card. No download.</p>
-    <button class="btn-primary" style="padding:14px 32px;font-size:15px" onclick="showPage('signup')">Create your account</button>
-  </div>
   <footer>&copy; 2026 Zidea. All rights reserved. &middot; <a href="#privacy" onclick="openInfoModal('privacy');return false;">Privacy Policy</a> &middot; <a href="#terms" onclick="openInfoModal('terms');return false;">Terms of Service</a> &middot; <a href="#contact" onclick="openInfoModal('contact');return false;">Contact</a></footer>
 
 </div>
@@ -826,26 +750,41 @@ body.app-active #page-landing footer{display:none}
 
 
 <!-- DASHBOARD -->
-<div id="page-dashboard" class="page"><aside class="sidebar">
-    <div class="logo" style="font-size:17px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>Zidea</div>
-    <nav class="sidebar-nav">
-      <div class="sidebar-label">Main</div>
-      <button class="nav-item active" onclick="showPage('dashboard')">🏠 Home</button>
-      <button class="nav-item" onclick="showPage('ideas')">💡 Generate Ideas</button>
-      <button class="nav-item" onclick="showPage('library')">📚 Library</button>
-      <button class="nav-item" onclick="showPage('explore')">🔥 Explore</button>
-      <div class="sidebar-label">Social</div>
-      <button class="nav-item" onclick="showPage('chat')">💬 Messages</button>
-      <button class="nav-item" onclick="showPage('arcade')">🎮 Arcade</button>
-      <button class="nav-item" onclick="showPage('zidai')">🤖 ZiD AI</button>
-      <div class="sidebar-label">Account</div>
-      <button class="nav-item" onclick="showPage('profile')">👤 Profile</button>
-      <button class="nav-item" onclick="showPage('settings')">⚙️ Settings</button>
-      <button class="nav-item" onclick="showPage('help')">❓ Help</button>
-    </nav>
-    <div class="sidebar-footer"><div class="sidebar-user" id="dash-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">Sign Out</button></div>
-  </aside>
-  <div class="main-content">
+<div id="page-dashboard" class="page">
+  <header class="dashboard-topbar">
+    <a class="dashboard-brand" href="#dashboard" onclick="showPage('dashboard');return false;">
+      <svg width="26" height="32" viewBox="0 0 24 30" fill="none" aria-hidden="true"><path d="M14 1 2 17h8l-1 12 13-18h-8V1Z" fill="currentColor"/></svg>
+      <span>zidea</span>
+    </a>
+    <div class="dashboard-topbar-actions">
+      <button type="button" class="dashboard-notifications" aria-label="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9m-8 12a2 2 0 0 0 4 0" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button type="button" class="dashboard-account-button" onclick="showPage('profile')" aria-label="Open profile">
+        <span class="dashboard-account-avatar" id="dashboard-nav-avatar">Z</span><span class="dashboard-account-chevron" aria-hidden="true">⌄</span>
+      </button>
+    </div>
+  </header>
+  <div class="dashboard-body">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <div class="sidebar-label">Menu</div>
+        <button class="nav-item active" onclick="showPage('dashboard')"><span class="sidebar-icon">⌂</span>Home</button>
+        <button class="nav-item" onclick="showPage('ideas')"><span class="sidebar-icon">💡</span>Ideas</button>
+        <button class="nav-item" onclick="showPage('arcade')"><span class="sidebar-icon">🎮</span>Arcade</button>
+        <button class="nav-item" onclick="showPage('chat')"><span class="sidebar-icon">☏</span>Chat</button>
+        <button class="nav-item" onclick="focusDashboardSearch()"><span class="sidebar-icon">☎</span>Call</button>
+        <button class="nav-item" onclick="showPage('profile')"><span class="sidebar-icon">♙</span>Profile</button>
+        <button class="nav-item" onclick="showPage('settings')"><span class="sidebar-icon">⚙</span>Settings</button>
+        <div class="sidebar-label sidebar-more-label">More</div>
+        <button class="nav-item" onclick="showPage('library')"><span class="sidebar-icon">▤</span>Library</button>
+        <button class="nav-item" onclick="showPage('explore')"><span class="sidebar-icon">⌕</span>Explore</button>
+        <button class="nav-item" onclick="showPage('zidai')"><span class="sidebar-icon">✦</span>ZiD AI</button>
+        <button class="nav-item" onclick="showPage('help')"><span class="sidebar-icon">?</span>Help</button>
+      </nav>
+      <div class="sidebar-footer"><div class="sidebar-user" id="dash-username">@username</div><button class="btn-ghost" style="font-size:12px;width:100%" onclick="handleLogout()">↪ &nbsp; Log Out</button></div>
+    </aside>
+    <div class="main-content">
     <header class="home-header">
       <div><div class="page-title">Home</div><div class="page-subtitle">Your ideas, people, and play space</div></div>
       <button type="button" class="home-profile-button" onclick="showPage('profile')"><span class="home-profile-avatar" id="dashboard-top-avatar">Z</span><span id="dashboard-top-username">Profile</span><span aria-hidden="true">⌄</span></button>
@@ -868,12 +807,13 @@ body.app-active #page-landing footer{display:none}
     </section>
     <section class="home-bottom-grid">
       <div class="home-panel home-activity-panel"><div class="home-panel-heading"><span>▥</span><h2>Your Activity</h2></div><div class="home-activity-row"><span class="activity-symbol idea-symbol">✦</span><span>Saved ideas</span><strong id="dashboard-saved-count">0</strong></div><div class="home-activity-row"><span class="activity-symbol game-symbol">🎮</span><span>Games played</span><strong id="dashboard-games-count">0</strong></div><div class="home-activity-row"><span class="activity-symbol people-symbol">♟</span><span>Account</span><strong id="dashboard-activity-username">@username</strong></div></div>
-      <div class="home-panel home-quick-panel"><div class="home-panel-heading"><span>ϟ</span><h2>Quick Actions</h2></div><button type="button" class="home-quick-action" onclick="openChallengeModal('idea-wars')"><span>♟</span> Challenge a Friend <b>→</b></button><button type="button" class="home-quick-action" onclick="showPage('arcade')"><span>🎮</span> Join a Game <b>→</b></button><button type="button" class="home-quick-action" onclick="focusDashboardSearch()"><span>☎</span> Find Someone to Call <b>→</b></button></div>
+      <div class="home-panel home-quick-panel"><div class="home-panel-heading"><span>ϟ</span><h2>Quick Actions</h2></div><button type="button" class="home-quick-action" onclick="openChallengeModal('idea-wars')"><span>♟</span> Invite a Friend <b>→</b></button><button type="button" class="home-quick-action" onclick="showPage('arcade')"><span>🎮</span> Join a Game <b>→</b></button><button type="button" class="home-quick-action" onclick="focusDashboardSearch()"><span>☎</span> Start a Call <b>→</b></button></div>
     </section>
     <section class="home-people-section"><div class="home-people-heading"><div><h2>Find People</h2><p>Search by username and start a chat or call.</p></div></div>
       <div class="input-wrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><input class="input-field" id="search-input" placeholder="Search @username..." oninput="filterUsers()"/></div>
       <div class="dashboard-grid"><div id="user-list" style="display:flex;flex-direction:column;gap:10px"></div><div class="card online-panel"><div class="online-panel-title"><span class="online-dot-green"></span> Online now</div><div id="online-list" style="margin-top:10px"></div></div></div>
     </section>
+    </div>
   </div>
 </div>
 
@@ -1563,7 +1503,7 @@ let suppressHashChange=false;
 function updateLandingAuthUI(){
   const box=document.getElementById('landing-auth-actions');if(!box)return;
   if(currentUser)box.innerHTML='<button class="btn-primary" style="padding:8px 16px" onclick="showPage(\'dashboard\')">Open Dashboard</button>';
-  else box.innerHTML='<button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage(\'login\')">Log In</button><button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage(\'signup\')">Sign Up</button>';
+  else box.innerHTML='<button class="btn-ghost" id="landing-login-btn" style="padding:8px 16px" onclick="showPage(\'login\')">Sign In</button><button class="btn-primary" id="landing-signup-btn" style="padding:8px 16px" onclick="showPage(\'signup\')">Sign Up</button>';
 }
 function syncSidebarActive(name){
   document.querySelectorAll('.sidebar .nav-item').forEach(btn=>{
@@ -1592,10 +1532,16 @@ function renderDashboardHome(){
   const profileName=document.getElementById('dashboard-top-username');
   const activityName=document.getElementById('dashboard-activity-username');
   const initials=getUserInitials(username||'Z');
-  if(greeting)greeting.textContent=username?`Welcome back, @${username}!`:'Welcome to Zidea';
+  const greetingName=(username||'Zoe').replace(/[_-]+/g,' ').replace(/\b\w/g,char=>char.toUpperCase());
+  if(greeting)greeting.textContent=`Welcome back, ${greetingName}! 👋`;
   if(profileName)profileName.textContent=username;
   if(activityName)activityName.textContent=username?`@${username}`:'Sign in';
-  ['dashboard-top-avatar','dashboard-welcome-avatar'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=initials;});
+  ['dashboard-top-avatar','dashboard-nav-avatar','dashboard-welcome-avatar'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    el.textContent=initials;
+    el.style.backgroundImage=currentUser?.avatar?`url(${JSON.stringify(currentUser.avatar)})`:'url("./assets/dashboard-avatar.png")';
+  });
   const saved=typeof getSavedIdeas==='function'?getSavedIdeas():[];
   const games=load(username?`zidea_game_stats_${username}`:'zidea_game_stats')||{};
   const gamesPlayed=Object.values(games).reduce((count,game)=>count+(game.wins||0)+(game.losses||0)+(game.draws||0),0);
