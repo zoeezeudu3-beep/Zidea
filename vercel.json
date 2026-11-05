@@ -24,6 +24,10 @@
       "use": "@vercel/static"
     },
     {
+      "src": "service-worker.js",
+      "use": "@vercel/static"
+    },
+    {
       "src": "assets/*.png",
       "use": "@vercel/static"
     },
@@ -40,6 +44,10 @@
     {
       "src": "/assets/(.*)",
       "dest": "/assets/$1"
+    },
+    {
+      "src": "/service-worker.js",
+      "dest": "/service-worker.js"
     },
     {
       "src": "/(.*)",

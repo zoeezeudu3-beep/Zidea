@@ -66,6 +66,7 @@
     creationDescription: '',
     categorySelection: {}
   };
+  const FIREBASE_CONFIG_CACHE_KEY = 'zidea_firebase_public_config';
   const legacyLogout = window.handleLogout;
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -97,27 +98,111 @@
     render();
   }
 
+  function cachedProfileForUser(user) {
+    const email = String(user?.email || '').trim().toLowerCase();
+    if (!email) return null;
+    try {
+      const profiles = JSON.parse(localStorage.getItem('zidea_profiles') || '{}');
+      const profile = Object.values(profiles).find(value =>
+        value && String(value.email || '').trim().toLowerCase() === email && value.username
+      );
+      return profile ? { ...profile, username: String(profile.username).toLowerCase() } : null;
+    } catch (error) {
+      console.warn('Could not read the saved ZIDEA profile for offline use:', error);
+      return null;
+    }
+  }
+
+  function isOfflineFailure(error) {
+    return navigator.onLine === false ||
+      error instanceof TypeError ||
+      error?.status >= 500 ||
+      /failed to fetch|network|offline|temporarily unavailable/i.test(error?.message || '');
+  }
+
+  async function loadProfileWithOfflineFallback(user) {
+    try {
+      return await refreshProfile(user);
+    } catch (error) {
+      const profile = isOfflineFailure(error) && cachedProfileForUser(user);
+      if (!profile) throw error;
+      state.profile = profile;
+      state.siteProfile = profile;
+      showOfflineNotice('You are offline. Your saved account is available; live data needs a connection.');
+      return profile;
+    }
+  }
+
+  function showOfflineNotice(message) {
+    const notice = document.getElementById('offline-status');
+    if (!notice) return;
+    notice.textContent = message;
+    notice.hidden = false;
+  }
+
+  async function waitForOfflineShell() {
+    if (!navigator.serviceWorker || window.location.protocol === 'file:' || navigator.serviceWorker.controller) return;
+    try {
+      const registration = await Promise.race([
+        navigator.serviceWorker.ready,
+        new Promise(resolve => setTimeout(() => resolve(null), 3000))
+      ]);
+      if (!registration || navigator.serviceWorker.controller) return;
+      await Promise.race([
+        new Promise(resolve => navigator.serviceWorker.addEventListener('controllerchange', resolve, { once: true })),
+        new Promise(resolve => setTimeout(resolve, 1000))
+      ]);
+    } catch (error) {
+      console.warn('Could not wait for the ZIDEA offline cache:', error);
+    }
+  }
+
   async function loadFirebase() {
     if (state.auth) return state.auth;
     if (state.authPromise) return state.authPromise;
     state.authPromise = (async () => {
+    await waitForOfflineShell();
     if (!state.config) {
       if (window.location.protocol === 'file:') {
-        throw new Error('ZIDEA sign-in needs the site and API running on a web server. Do not open index.html directly; use your deployed ZIDEA URL or start the project with Vercel development hosting.');
+        throw new Error('ZIDEA sign-in needs its web API. Run "npm run dev" to preview the app locally, or use your deployed website to sign in.');
+      }
+      let cachedConfig = null;
+      try {
+        cachedConfig = JSON.parse(localStorage.getItem(FIREBASE_CONFIG_CACHE_KEY) || 'null');
+      } catch (error) {
+        console.warn('Could not read the cached ZIDEA sign-in configuration:', error);
       }
       let response;
       try {
         response = await fetch('/api/config', { cache: 'no-store' });
-      } catch {
-        throw new Error('Could not reach ZIDEA sign-in configuration. Open the deployed site or run it with Vercel development hosting so /api/config is available.');
+      } catch (error) {
+        if (cachedConfig?.firebase) {
+          state.config = cachedConfig;
+        } else {
+          throw new Error('Could not reach ZIDEA sign-in configuration. Sign in once while online on this site; the local preview does not include sign-in APIs.');
+        }
       }
-      if (!response.ok) {
-        throw new Error(`ZIDEA sign-in configuration is unavailable (HTTP ${response.status}). Serve the site with its API routes enabled.`);
-      }
-      try {
-        state.config = await response.json();
-      } catch {
-        throw new Error('ZIDEA received an invalid sign-in configuration response. Check that /api/config is deployed correctly.');
+      if (response) {
+        if (!response.ok) {
+          if (cachedConfig?.firebase) {
+            state.config = cachedConfig;
+          } else {
+            throw new Error(`ZIDEA sign-in configuration is unavailable (HTTP ${response.status}). Serve the site with its API routes enabled.`);
+          }
+        } else {
+          try {
+            state.config = await response.json();
+            if (state.config?.firebase) {
+              try {
+                localStorage.setItem(FIREBASE_CONFIG_CACHE_KEY, JSON.stringify({ firebase: state.config.firebase }));
+              } catch (error) {
+                console.warn('Could not cache the public ZIDEA sign-in configuration:', error);
+              }
+            }
+          } catch {
+            throw new Error('ZIDEA received an invalid sign-in configuration response. Check that /api/config is deployed correctly.');
+          }
+        }
       }
     }
     const firebaseConfig = state.config.firebase || {};
@@ -148,12 +233,13 @@
       throw new Error('The Firebase web configuration does not match the initialized Firebase project.');
     }
     state.auth = window.firebase.auth();
+    await state.auth.setPersistence(window.firebase.auth.Auth.Persistence.LOCAL);
     state.auth.onAuthStateChanged(user => {
       const restoreSession = Boolean(user && !currentUser && !state.authFlowInProgress);
       state.user = user;
       state.profile = null;
       state.siteProfile = null;
-      if (user) refreshProfile().then(profile => {
+      if (user) loadProfileWithOfflineFallback(user).then(profile => {
         if (profile && state.siteProfile) return profile;
         if (state.profileSetupInProgress) return profile;
         return setupProfile(user, profile?.username);
@@ -168,6 +254,12 @@
             uid: user.uid,
             firebaseAuth: true
           };
+          window.saveProfileForUsername?.(profile.username, {
+            ...(state.siteProfile || {}),
+            ...profile,
+            email: user.email || state.siteProfile?.email || profile.email || '',
+            avatar: user.photoURL || state.siteProfile?.avatar || profile.avatar || ''
+          });
           window.setLoggedInUI?.();
           window.updateLandingAuthUI?.();
         }
@@ -201,10 +293,39 @@
       }).catch(error => {
         document.documentElement.classList.remove('auth-restoring');
         state.error = authErrorMessage(error, 'profile');
+        if (user && state.profile && state.siteProfile) {
+          currentUser = {
+            email: user.email || '',
+            username: state.profile.username,
+            avatar: user.photoURL || state.siteProfile.avatar || state.profile.avatar || '',
+            profile: state.siteProfile,
+            uid: user.uid,
+            firebaseAuth: true
+          };
+          window.saveProfileForUsername?.(state.profile.username, state.siteProfile);
+          window.setLoggedInUI?.();
+          window.updateLandingAuthUI?.();
+          if (restoreSession) {
+            window.closeAuthModal?.(true);
+            const route = window.location.hash.replace(/^#/, '');
+            if (route && !['landing', 'login', 'signup'].includes(route)) {
+              window.handleHashRoute?.();
+            } else {
+              window.showPage?.('dashboard', { skipHash: true });
+            }
+          }
+          showOfflineNotice('You are offline. Your saved account is available; live data needs a connection.');
+          render();
+          return;
+        }
         if (restoreSession) {
           window.showPage?.('landing', { skipHash: true });
-          window.openAuthModal?.('login', true);
-          showAuthError(state.error);
+          if (isOfflineFailure(error)) {
+            showOfflineNotice('You are still signed in, but your saved profile is not available on this device yet. Reconnect to load it.');
+          } else {
+            window.openAuthModal?.('login', true);
+            showAuthError(state.error);
+          }
         }
         render();
       });
@@ -230,6 +351,7 @@
       state.authPromise = null;
       throw error;
     }
+
   }
 
   async function api(action, values = {}) {
@@ -252,7 +374,11 @@
     const token = await user.getIdToken();
     const response = await fetch('/api/arcade', { headers: { Authorization: `Bearer ${token}` } });
     const data = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(data.error || 'Your player profile could not be loaded.');
+    if (!response.ok) {
+      const error = new Error(data.error || 'Your player profile could not be loaded.');
+      error.status = response.status;
+      throw error;
+    }
     state.user = user;
     state.profile = data.player;
     state.siteProfile = data.siteProfile || null;
@@ -392,7 +518,7 @@
         }
         credential = await auth.signInWithEmailAndPassword(email, password);
       }
-      const existingProfile = await refreshProfile(credential.user);
+      const existingProfile = await loadProfileWithOfflineFallback(credential.user);
       const profile = existingProfile && state.siteProfile
         ? existingProfile
         : await setupProfile(credential.user, existingProfile?.username);
@@ -481,7 +607,7 @@
         return;
       }
       const questionnaire = signupMode && typeof buildSignupQuestionnaire === 'function' ? buildSignupQuestionnaire() : {};
-      const existingProfile = await refreshProfile(credential.user);
+      const existingProfile = await loadProfileWithOfflineFallback(credential.user);
       const profile = existingProfile && state.siteProfile
         ? existingProfile
         : await setupProfile(credential.user, signupMode ? username || existingProfile?.username : existingProfile?.username, questionnaire);
@@ -1194,6 +1320,27 @@
     },
     renderProfileStats
   };
+
+  window.addEventListener('offline', () => {
+    showOfflineNotice('You are offline. Previously loaded pages and saved account details remain available.');
+  });
+  window.addEventListener('online', async () => {
+    if (!state.auth?.currentUser) {
+      const notice = document.getElementById('offline-status');
+      if (notice) notice.hidden = true;
+      return;
+    }
+    try {
+      const profile = await refreshProfile();
+      if (profile && state.siteProfile) {
+        window.saveProfileForUsername?.(profile.username, state.siteProfile);
+        const notice = document.getElementById('offline-status');
+        if (notice) notice.hidden = true;
+      }
+    } catch (error) {
+      showOfflineNotice(`Connected, but ZIDEA could not sync your account: ${authErrorMessage(error, 'profile')}`);
+    }
+  });
 
   document.addEventListener('DOMContentLoaded', initialize);
 })();

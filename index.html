@@ -77,7 +77,10 @@ button:active{transform:scale(.98)}
   <span class="auth-restore-spinner" aria-hidden="true"></span>
   <span>Checking your session...</span>
 </div>
+<div id="offline-status" role="status" aria-live="polite" hidden></div>
 <style>
+#offline-status{position:fixed;top:12px;left:50%;z-index:1100;max-width:min(620px,calc(100% - 24px));padding:10px 16px;transform:translateX(-50%);border:1px solid rgba(245,184,46,.45);border-radius:12px;background:rgba(20,17,12,.96);color:#f5d992;font:500 13px/1.45 Inter,sans-serif;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#offline-status[hidden]{display:none}
 /* PAGES — landing visible by default before JS */
 .page{display:none;opacity:0}
 .page.active{display:flex;opacity:1;transition:opacity .2s ease}
@@ -3784,3 +3787,20 @@ function startChessTimer(){
 }
 </script>
 <script src="./arcade.js"></script>
+<script>
+if('serviceWorker' in navigator&&location.protocol!=='file:'){
+  navigator.serviceWorker.register('./service-worker.js').catch(error=>console.warn('ZIDEA offline caching could not be enabled:',error));
+}
+if(!navigator.onLine){
+  const notice=document.getElementById('offline-status');
+  if(notice){notice.textContent='You are offline. Previously loaded pages and saved account details remain available.';notice.hidden=false;}
+}
+window.addEventListener('offline',function(){
+  const notice=document.getElementById('offline-status');
+  if(notice){notice.textContent='You are offline. Previously loaded pages and saved account details remain available.';notice.hidden=false;}
+});
+window.addEventListener('online',function(){
+  const notice=document.getElementById('offline-status');
+  if(notice){notice.hidden=true;notice.textContent='';}
+});
+</script>
