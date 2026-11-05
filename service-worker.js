@@ -1,17 +1,19 @@
-const CACHE_NAME = 'zidea-shell-v1';
+const CACHE_NAME = 'zidea-shell-v2';
 const APP_FILES = [
-  '/',
-  '/index.html',
-  '/arcade.css',
-  '/zidea-home.css',
-  '/arcade.js',
-  '/zidea-kb.js',
-  '/assets/dashboard-avatar.png',
-  '/assets/landing-hero-art.png',
-  '/assets/landing-share-ideas.png',
-  '/assets/landing-play-games.png',
-  '/assets/landing-chat-call.png'
-];
+  '',
+  'index.html',
+  'arcade.css',
+  'zidea-home.css',
+  'arcade.js',
+  'zidea-kb.js',
+  'assets/dashboard-avatar.png',
+  'assets/landing-hero-art.png',
+  'assets/landing-share-ideas.png',
+  'assets/landing-play-games.png',
+  'assets/landing-chat-call.png'
+].map(file => new URL(file, self.registration.scope).href);
+const APP_SHELL_URL = new URL('index.html', self.registration.scope).href;
+const API_PATH = new URL('api/', self.registration.scope).pathname;
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -36,7 +38,7 @@ self.addEventListener('fetch', event => {
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
-  if (url.origin === self.location.origin && url.pathname.startsWith('/api/')) return;
+  if (url.origin === self.location.origin && url.pathname.startsWith(API_PATH)) return;
 
   if (url.origin !== self.location.origin &&
       url.hostname === 'www.gstatic.com' &&
@@ -65,7 +67,7 @@ self.addEventListener('fetch', event => {
       const cached = await cache.match(request);
       if (cached) return cached;
       if (request.mode === 'navigate') {
-        const appShell = await cache.match('/index.html');
+        const appShell = await cache.match(APP_SHELL_URL);
         if (appShell) return appShell;
       }
       throw error;
